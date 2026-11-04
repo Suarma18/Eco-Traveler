@@ -1,13 +1,15 @@
 export type BudgetCategory = "Backpacker" | "Moderate" | "Comfort";
 export type ArrivalGate = "NgurahRaiAirport" | "GilimanukPort";
 export type TimeSlot = "Pagi" | "Siang" | "Sore" | "Malam";
+export type AppLocale = "id" | "en";
 
 export interface TripRequest {
   durationDays: number; // 1, 2, 3, atau 4
   interests: string[]; // ["Culture", "Nature", "Wellness", "Culinary", "Agriculture"]
   budgetCategory: BudgetCategory;
   arrivalGate: ArrivalGate;
-  simulateCapacityAlert?: boolean; // Opsional untuk pengujian Anti-Overtourism Capacity Guard
+  simulateCapacityAlert?: boolean;
+  locale?: AppLocale;
 }
 
 export interface TripDayActivity {
@@ -53,12 +55,12 @@ export interface ItineraryResponse {
   summaryNarrative: string;
   days: DayItinerary[];
   metrics: {
-    spreadScore: number; // Skala 0 - 100
-    localBenefitIndex: number; // Persentase belanja ke warga lokal (0 - 100%)
+    spreadScore: number;
+    localBenefitIndex: number;
     totalEstimatedSpendRp: number;
     totalLocalRetainedRp: number;
     primaryRegenciesBenefited: string[];
-    priorityZonePercentage?: number; // Target >= 70% durasi di kabupaten prioritas
+    priorityZonePercentage?: number;
     capacityRedirectsCount?: number;
     regencyBreakdown?: RegencySpendBreakdown[];
   };

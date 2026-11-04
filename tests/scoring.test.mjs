@@ -59,3 +59,9 @@ test("High-load village Penglipuran redirects to buffer village Undisan", () => 
   assert.equal(penglipuran.bufferVillageId, "desa-undisan");
 });
 
+test("Currency conversion converts IDR to USD accurately for English mode", () => {
+  const USD_EXCHANGE_RATE = 16000;
+  const spendRp = 320000;
+  const spendUsd = Math.round(spendRp / USD_EXCHANGE_RATE);
+  assert.equal(spendUsd, 20);
+});

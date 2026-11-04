@@ -14,9 +14,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { DayItinerary, TripDayActivity } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
-import { formatRupiah, DAY_COLORS } from "@/lib/utils";
+import { Locale, formatCurrency, DAY_COLORS } from "@/lib/utils";
 import { getVillageVisualMeta } from "@/lib/village-media";
 import { DESA_BY_ID } from "@/lib/scoring";
+import {
+  UI_TEXT,
+  formatTimeSlot,
+  getLocalizedVillageText,
+} from "@/lib/i18n";
 import {
   Layers,
   Store,
@@ -32,13 +37,18 @@ import {
 const CARTO_API_KEY =
   process.env.NEXT_PUBLIC_CARTO_BASEMAP_KEY?.trim() || "";
 
-export type BasemapProvider = "carto-voyager" | "carto-positron" | "osm-clean";
+export type BasemapProvider =
+  | "carto-voyager"
+  | "carto-positron"
+  | "carto-dark"
+  | "osm-clean";
 
 function createDayMarkerIcon(
   dayNumber: number,
   stepOrder: number,
   isSelected: boolean,
-  isRedirected: boolean
+  isRedirected: boolean,
+  locale: Locale
 ) {
   const color = DAY_COLORS[dayNumber]?.hex || "#0D4732";
   const scale = isSelected ? "scale(1.22)" : "scale(1)";
@@ -48,6 +58,7 @@ function createDayMarkerIcon(
   const badgeHtml = isRedirected
     ? `<span style="position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:9999px;background:#C85A32;border:2px solid #FFFFFF;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#FFFFFF;">!</span>`
     : "";
+  const prefix = locale === "en" ? "D" : "H";
 
   return L.divIcon({
     className: "custom-eco-marker",
@@ -70,7 +81,7 @@ function createDayMarkerIcon(
         font-size: 11px;
         font-weight: 700;
       ">
-        H${dayNumber}.${stepOrder}
+        ${prefix}${dayNumber}.${stepOrder}
         ${badgeHtml}
       </div>
     `,
@@ -142,6 +153,8 @@ interface LeafletMapProps {
   onSelectActivity: (activity: TripDayActivity) => void;
   arrivalCoords?: [number, number];
   arrivalLabel?: string;
+  locale: Locale;
+  isDark?: boolean;
 }
 
 export default function LeafletMap({
@@ -153,13 +166,22 @@ export default function LeafletMap({
   onSelectActivity,
   arrivalCoords = [-8.7467, 115.1668],
   arrivalLabel = "Bandara I Gusti Ngurah Rai",
+  locale,
+  isDark = false,
 }: LeafletMapProps) {
+  const t = UI_TEXT[locale];
   const [showAllCuratedVillages, setShowAllCuratedVillages] = useState(true);
   const [showSouthHotspotZone, setShowSouthHotspotZone] = useState(true);
   const [inspectorMinimized, setInspectorMinimized] = useState(false);
   const [tileTheme, setTileTheme] = useState<BasemapProvider>(
-    CARTO_API_KEY ? "carto-voyager" : "osm-clean"
+    CARTO_API_KEY ? (isDark ? "carto-dark" : "carto-voyager") : "osm-clean"
   );
+
+  // Sync basemap theme automatically when user switches Light/Dark mode
+  useEffect(() => {
+    if (!CARTO_API_KEY) return;
+    setTileTheme(isDark ? "carto-dark" : "carto-voyager");
+  }, [isDark]);
 
   const visibleDays = useMemo(() => {
     if (selectedDayFilter === null) return days;
@@ -197,8 +219,17 @@ export default function LeafletMap({
 
   const activeVisualMeta = useMemo(() => {
     if (!activeStep) return null;
-    return getVillageVisualMeta(activeStep.activity.villageId, allVillages);
-  }, [activeStep, allVillages]);
+    return getVillageVisualMeta(
+      activeStep.activity.villageId,
+      allVillages,
+      locale
+    );
+  }, [activeStep, allVillages, locale]);
+
+  const activeVillageText = useMemo(() => {
+    if (!activeVillageEntity) return null;
+    return getLocalizedVillageText(activeVillageEntity, locale);
+  }, [activeVillageEntity, locale]);
 
   const routeVillageIds = useMemo(() => {
     return new Set(days.flatMap((d) => d.activities.map((a) => a.villageId)));
@@ -219,6 +250,15 @@ export default function LeafletMap({
     : null;
 
   const tileConfig = useMemo(() => {
+    if (tileTheme === "carto-dark" && CARTO_API_KEY) {
+      return {
+        url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        subdomains: "abcd",
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20,
+      };
+    }
     if (tileTheme === "carto-voyager" && CARTO_API_KEY) {
       return {
         url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
@@ -255,27 +295,29 @@ export default function LeafletMap({
     onSelectActivity(flatActivities[nextIdx].activity);
   };
 
+  const dayPrefix = locale === "en" ? "D" : "H";
+
   return (
-    <div className="relative w-full h-[540px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 bg-stone-200 shadow-lg">
-      {/* Top Floating Glassmorphic HUD */}
-      <div className="absolute top-3.5 left-3.5 right-3.5 z-[500] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        {/* Filter Hari */}
+    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 dark:border-emerald-900/50 bg-stone-200 dark:bg-[#08120E] shadow-lg">
+      {/* Top Floating Glassmorphic HUD (Mobile Swipeable) */}
+      <div className="absolute top-2.5 sm:top-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
+        {/* Filter Hari - Horizontal Scrollable on Mobile */}
         <div
           role="group"
           aria-label="Filter hari perjalanan"
-          className="flex flex-wrap items-center gap-1 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md"
+          className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-800/50 p-1 rounded-xl pointer-events-auto shadow-md overflow-x-auto no-scrollbar max-w-full"
         >
           <button
             type="button"
             aria-pressed={selectedDayFilter === null}
             onClick={() => onSelectDayFilter(null)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
               selectedDayFilter === null
-                ? "bg-[#0D261C] text-white shadow-xs"
-                : "text-stone-600 hover:bg-stone-100"
+                ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
+                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
             }`}
           >
-            Semua ({days.length}H)
+            {t.allDaysBtn(days.length)}
           </button>
           {days.map((d) => {
             const colorInfo = DAY_COLORS[d.dayNumber] || DAY_COLORS[1];
@@ -288,74 +330,78 @@ export default function LeafletMap({
                 onClick={() =>
                   onSelectDayFilter(isActive ? null : d.dayNumber)
                 }
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                   isActive
-                    ? "bg-stone-900 text-white shadow-xs"
-                    : "text-stone-700 hover:bg-stone-100"
+                    ? "bg-stone-900 dark:bg-emerald-700 text-white shadow-xs"
+                    : "text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
                 }`}
               >
                 <span
                   aria-hidden="true"
-                  className="w-2.5 h-2.5 rounded-full inline-block"
+                  className="w-2 h-2 rounded-full inline-block shrink-0"
                   style={{ backgroundColor: colorInfo.hex }}
                 />
-                Hari {d.dayNumber}
+                <span>{t.dayBtn(d.dayNumber)}</span>
               </button>
             );
           })}
         </div>
 
         {/* Layer & Basemap Switcher */}
-        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md">
+        <div className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-800/50 p-1 rounded-xl pointer-events-auto shadow-md self-start sm:self-auto">
           <button
             type="button"
             aria-pressed={showAllCuratedVillages}
             onClick={() => setShowAllCuratedVillages((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
               showAllCuratedVillages
-                ? "bg-emerald-50 text-[#0D4732] font-semibold"
-                : "text-stone-500 hover:text-stone-800"
+                ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
+                : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
             }`}
           >
             <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>28 Desa</span>
+            <span>{t.villagesLayerBtn}</span>
           </button>
 
           <button
             type="button"
             aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] ${
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] ${
               showSouthHotspotZone
-                ? "bg-orange-50 text-[#C85A32] font-semibold"
-                : "text-stone-500 hover:text-stone-800"
+                ? "bg-orange-50 dark:bg-orange-950/60 text-[#C85A32] dark:text-[#F28B66] font-semibold"
+                : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Zona Padat</span>
+            <span>{t.hotspotZoneBtn}</span>
           </button>
 
           <button
             type="button"
-            aria-label="Ganti gaya peta dasar"
+            aria-label={t.switchBasemapLabel}
             onClick={() => {
               if (CARTO_API_KEY) {
-                setTileTheme((t) =>
-                  t === "carto-voyager"
+                setTileTheme((prev) =>
+                  prev === "carto-voyager"
                     ? "carto-positron"
-                    : t === "carto-positron"
+                    : prev === "carto-positron"
+                    ? "carto-dark"
+                    : prev === "carto-dark"
                     ? "osm-clean"
                     : "carto-voyager"
                 );
               }
             }}
-            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-stone-700 hover:text-stone-950 bg-stone-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
-            title="Ganti gaya peta dasar"
+            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-stone-700 dark:text-stone-200 hover:text-stone-950 bg-stone-100 dark:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            title={t.switchBasemapLabel}
           >
             {tileTheme === "carto-voyager"
               ? "Voyager"
               : tileTheme === "carto-positron"
               ? "Positron"
+              : tileTheme === "carto-dark"
+              ? "Dark"
               : "OSM"}
           </button>
         </div>
@@ -395,14 +441,12 @@ export default function LeafletMap({
             }}
           >
             <Popup>
-              <div className="p-1 max-w-[220px] text-stone-800">
-                <p className="text-xs font-bold text-[#C85A32] mb-1">
-                  Zona Padat Bali Selatan (65,88% PDRB)
+              <div className="p-1 max-w-[220px] text-stone-800 dark:text-stone-100">
+                <p className="text-xs font-bold text-[#C85A32] dark:text-[#F28B66] mb-1">
+                  {t.hotspotPopupTitle}
                 </p>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Koridor Kuta, Canggu, dan Seminyak mengalami kepadatan lalu
-                  lintas tinggi. Rute Anda dialihkan ke desa wisata di Bali
-                  Utara, Timur, dan Barat.
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  {t.hotspotPopupDesc}
                 </p>
               </div>
             </Popup>
@@ -413,43 +457,50 @@ export default function LeafletMap({
         {showAllCuratedVillages &&
           allVillages
             .filter((v) => !routeVillageIds.has(v.id))
-            .map((village) => (
-              <CircleMarker
-                key={village.id}
-                center={[village.lat, village.lng]}
-                radius={5.5}
-                pathOptions={{
-                  color: "#FFFFFF",
-                  weight: 1.5,
-                  fillColor: "#0D4732",
-                  fillOpacity: 0.65,
-                }}
-              >
-                <Popup>
-                  <div className="text-stone-900 min-w-[200px] max-w-[240px] space-y-1">
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-[#0D4732] inline-block">
-                      Kab. {village.regency}
-                    </span>
-                    <h4 className="font-bold text-sm text-stone-900">
-                      {village.name}
-                    </h4>
-                    <p className="text-xs text-stone-600 leading-snug">
-                      {village.highlights}
-                    </p>
-                    <div className="pt-1 border-t border-stone-100 text-[11px] text-[#0D4732] font-mono font-semibold tabular-nums">
-                      Homestay ~{formatRupiah(village.avgHomestayPrice)}/malam
+            .map((village) => {
+              const vText = getLocalizedVillageText(village, locale);
+              return (
+                <CircleMarker
+                  key={village.id}
+                  center={[village.lat, village.lng]}
+                  radius={5.5}
+                  pathOptions={{
+                    color: "#FFFFFF",
+                    weight: 1.5,
+                    fillColor: "#0D4732",
+                    fillOpacity: 0.65,
+                  }}
+                >
+                  <Popup>
+                    <div className="text-stone-900 dark:text-stone-100 min-w-[200px] max-w-[240px] space-y-1">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-[#0D4732] dark:text-emerald-300 inline-block">
+                        {locale === "en"
+                          ? village.regency
+                          : `Kab. ${village.regency}`}
+                      </span>
+                      <h4 className="font-bold text-sm text-stone-900 dark:text-white">
+                        {village.name}
+                      </h4>
+                      <p className="text-xs text-stone-600 dark:text-stone-300 leading-snug">
+                        {vText.highlights}
+                      </p>
+                      <div className="pt-1 border-t border-stone-100 dark:border-emerald-900/40 text-[11px] text-[#0D4732] dark:text-emerald-400 font-mono font-semibold tabular-nums">
+                        {t.homestayNightPrefix}
+                        {formatCurrency(village.avgHomestayPrice, locale)}
+                        {t.nightSuffix}
+                      </div>
                     </div>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
+                  </Popup>
+                </CircleMarker>
+              );
+            })}
 
         {/* Pin Titik Kedatangan */}
         <Marker position={arrivalCoords} icon={createGateIcon()}>
           <Popup>
-            <div className="text-stone-900 min-w-[180px]">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-stone-500">
-                Pintu Kedatangan
+            <div className="text-stone-900 dark:text-stone-100 min-w-[180px]">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                {t.arrivalPopupLabel}
               </p>
               <p className="text-xs font-bold mt-0.5">{arrivalLabel}</p>
             </div>
@@ -469,10 +520,10 @@ export default function LeafletMap({
                 ],
               ]}
               pathOptions={{
-                color: "#0D4732",
+                color: isDark ? "#34D399" : "#0D4732",
                 weight: 2,
                 dashArray: "6 8",
-                opacity: 0.65,
+                opacity: 0.7,
               }}
             />
           )}
@@ -534,7 +585,8 @@ export default function LeafletMap({
                       day.dayNumber,
                       actIdx + 1,
                       isSelected,
-                      isRedirected
+                      isRedirected,
+                      locale
                     )}
                     eventHandlers={{
                       click: () => {
@@ -544,42 +596,48 @@ export default function LeafletMap({
                     }}
                   >
                     <Popup>
-                      <div className="text-stone-900 min-w-[225px] max-w-[265px] space-y-1.5">
+                      <div className="text-stone-900 dark:text-stone-100 min-w-[225px] max-w-[265px] space-y-1.5">
                         <div className="flex items-center justify-between gap-2">
                           <span
                             className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
                             style={{ backgroundColor: dayColor }}
                           >
-                            Hari {day.dayNumber} · {activity.timeSlot}
+                            {t.dayBtn(day.dayNumber)} ·{" "}
+                            {formatTimeSlot(activity.timeSlot, locale)}
                           </span>
-                          <span className="text-[11px] font-medium text-stone-500">
-                            Kab. {activity.regency}
+                          <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
+                            {locale === "en"
+                              ? activity.regency
+                              : `Kab. ${activity.regency}`}
                           </span>
                         </div>
 
-                        <h4 className="font-bold text-sm text-stone-900">
+                        <h4 className="font-bold text-sm text-stone-900 dark:text-white">
                           {activity.villageName}
                         </h4>
-                        <p className="text-xs font-medium text-[#0D4732]">
+                        <p className="text-xs font-medium text-[#0D4732] dark:text-emerald-400">
                           {activity.activityTitle}
                         </p>
 
                         {activity.localUmkmSpot && (
-                          <div className="bg-stone-50 p-1.5 rounded text-[11px] text-stone-700 flex items-start gap-1.5">
+                          <div className="bg-stone-50 dark:bg-[#162921] p-1.5 rounded text-[11px] text-stone-700 dark:text-stone-200 flex items-start gap-1.5">
                             <Store
-                              className="w-3.5 h-3.5 text-[#C85A32] shrink-0 mt-0.5"
+                              className="w-3.5 h-3.5 text-[#C85A32] dark:text-[#F28B66] shrink-0 mt-0.5"
                               aria-hidden="true"
                             />
                             <span>{activity.localUmkmSpot}</span>
                           </div>
                         )}
 
-                        <div className="pt-1 border-t border-stone-100 flex items-center justify-between text-xs">
-                          <span className="text-stone-500">
-                            Belanja ke Warga:
+                        <div className="pt-1 border-t border-stone-100 dark:border-emerald-900/40 flex items-center justify-between text-xs">
+                          <span className="text-stone-500 dark:text-stone-400">
+                            {t.spendToLocals}
                           </span>
-                          <span className="font-mono font-bold text-[#0D4732] tabular-nums">
-                            {formatRupiah(activity.estimatedLocalSpendRp)}
+                          <span className="font-mono font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
+                            {formatCurrency(
+                              activity.estimatedLocalSpendRp,
+                              locale
+                            )}
                           </span>
                         </div>
                       </div>
@@ -594,16 +652,17 @@ export default function LeafletMap({
 
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
       {activeStep && activeVisualMeta && (
-        <div className="absolute bottom-3.5 left-3.5 right-3.5 z-[500] pointer-events-none">
-          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3.5 shadow-2xl pointer-events-auto transition-opacity">
+        <div className="absolute bottom-2.5 sm:bottom-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] pointer-events-none">
+          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3 sm:p-3.5 shadow-2xl pointer-events-auto transition-opacity">
             {inspectorMinimized ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold shrink-0">
-                    H{activeStep.dayNumber}.{activeStep.stepNumber}
+                    {dayPrefix}
+                    {activeStep.dayNumber}.{activeStep.stepNumber}
                   </span>
                   <span className="text-xs font-semibold truncate">
-                    {activeStep.activity.villageName} (Kab.{" "}
+                    {activeStep.activity.villageName} (
                     {activeStep.activity.regency})
                   </span>
                 </div>
@@ -612,7 +671,7 @@ export default function LeafletMap({
                     type="button"
                     onClick={() => handleStepNavigation("prev")}
                     className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                    aria-label="Destinasi sebelumnya"
+                    aria-label={t.prevStopLabel}
                   >
                     <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
@@ -620,7 +679,7 @@ export default function LeafletMap({
                     type="button"
                     onClick={() => handleStepNavigation("next")}
                     className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                    aria-label="Destinasi berikutnya"
+                    aria-label={t.nextStopLabel}
                   >
                     <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
@@ -628,16 +687,16 @@ export default function LeafletMap({
                     type="button"
                     onClick={() => setInspectorMinimized(false)}
                     className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                    aria-label="Perluas detail desa"
+                    aria-label={t.expandPanelLabel}
                   >
                     <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row gap-3.5 items-start">
-                {/* Thumbnail Foto Lanskap Desa */}
-                <div className="relative w-full sm:w-28 h-24 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-stone-800">
+              <div className="flex flex-col sm:flex-row gap-3 items-start">
+                {/* Thumbnail Foto Lanskap Desa (Hidden on very small screens to keep map clear, shown on sm+) */}
+                <div className="hidden sm:block relative w-28 h-24 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-stone-800">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={activeVisualMeta.imageUrl}
@@ -659,19 +718,27 @@ export default function LeafletMap({
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
-                          Hari {activeStep.dayNumber} ·{" "}
-                          {activeStep.activity.timeSlot}
+                          {t.dayBtn(activeStep.dayNumber)} ·{" "}
+                          {formatTimeSlot(activeStep.activity.timeSlot, locale)}
                         </span>
                         <span className="text-[11px] text-emerald-200/80 font-mono">
-                          Kab. {activeStep.activity.regency}
+                          {activeStep.activity.regency}
                         </span>
                         <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
-                          Kuota: {activeVisualMeta.quotaPercentage}% Terisi
+                          {t.quotaFilled(activeVisualMeta.quotaPercentage)}
                         </span>
                       </div>
-                      <h4 className="text-sm font-display font-bold text-white mt-1 truncate">
-                        {activeStep.activity.villageName}
-                      </h4>
+                      <div className="flex items-center justify-between gap-2 mt-1">
+                        <h4 className="text-sm font-display font-bold text-white truncate">
+                          {activeStep.activity.villageName}
+                        </h4>
+                        <span className="text-xs font-mono font-bold text-emerald-300 tabular-nums shrink-0">
+                          {formatCurrency(
+                            activeStep.activity.estimatedLocalSpendRp,
+                            locale
+                          )}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Step Navigator & Minimize */}
@@ -680,8 +747,8 @@ export default function LeafletMap({
                         type="button"
                         onClick={() => handleStepNavigation("prev")}
                         className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                        aria-label="Destinasi sebelumnya"
-                        title="Destinasi sebelumnya"
+                        aria-label={t.prevStopLabel}
+                        title={t.prevStopLabel}
                       >
                         <ChevronLeft
                           className="w-3.5 h-3.5"
@@ -692,8 +759,8 @@ export default function LeafletMap({
                         type="button"
                         onClick={() => handleStepNavigation("next")}
                         className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                        aria-label="Destinasi berikutnya"
-                        title="Destinasi berikutnya"
+                        aria-label={t.nextStopLabel}
+                        title={t.nextStopLabel}
                       >
                         <ChevronRight
                           className="w-3.5 h-3.5"
@@ -704,8 +771,8 @@ export default function LeafletMap({
                         type="button"
                         onClick={() => setInspectorMinimized(true)}
                         className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-                        aria-label="Kecilkan panel"
-                        title="Kecilkan panel"
+                        aria-label={t.minimizePanelLabel}
+                        title={t.minimizePanelLabel}
                       >
                         <Minimize2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
@@ -718,12 +785,12 @@ export default function LeafletMap({
                       className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
-                    <div>
+                    <div className="line-clamp-2 sm:line-clamp-none">
                       <strong className="text-amber-300">
-                        Awig-Awig Desa:{" "}
+                        {t.awigAwigPrefix}{" "}
                       </strong>
-                      {activeVillageEntity?.customsNote ||
-                        "Hormati kesucian kawasan pura dan jaga kelestarian irigasi subak setempat."}
+                      {activeVillageText?.customsNote ||
+                        "Respect sacred temple areas and preserve local subak irrigation channels."}
                     </div>
                   </div>
                 </div>

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { ItineraryResponse } from "@/types/trip";
 import { BALI_BASELINE_SHARE, PRIORITY_REGENCIES } from "@/lib/scoring";
-import { formatCompactRupiah, formatRupiah } from "@/lib/utils";
+import { Locale, formatCompactCurrency, formatCurrency } from "@/lib/utils";
+import { UI_TEXT } from "@/lib/i18n";
 import { X, Users, BarChart3, TrendingUp, Scale } from "lucide-react";
 
 interface GovernmentBarProps {
@@ -11,22 +12,30 @@ interface GovernmentBarProps {
   isOpen?: boolean;
   onClose?: () => void;
   inlineMode?: boolean;
+  locale: Locale;
 }
 
-const COHORT_MULTIPLIERS = [
-  { count: 1, label: "1 Wisatawan" },
-  { count: 1000, label: "1.000 Wisatawan" },
-  { count: 10000, label: "10.000 Wisatawan" },
-  { count: 50000, label: "50.000 Wisatawan" },
-];
+const COHORT_COUNTS = [1, 1000, 10000, 50000];
+
+const ZONE_BADGE_EN: Record<string, string> = {
+  "Bali Utara (Prioritas)": "North Bali",
+  "Bali Timur (Prioritas)": "East Bali",
+  "Bali Tengah-Utara (Prioritas)": "Central-North",
+  "Bali Barat (Prioritas)": "West Bali",
+  "Zona Transisi": "Transition Zone",
+  "Bali Selatan (Pusat)": "South Core",
+  "Kepulauan & Timur": "East Islands",
+};
 
 export default function GovernmentBar({
   itinerary,
   isOpen = false,
   onClose,
   inlineMode = false,
+  locale,
 }: GovernmentBarProps) {
   const [touristCohort, setTouristCohort] = useState<number>(1000);
+  const t = UI_TEXT[locale];
 
   useEffect(() => {
     if (!isOpen || inlineMode || !onClose) return;
@@ -77,31 +86,34 @@ export default function GovernmentBar({
       ? Math.round((priorityTotalSpend / totalRetainedSingle) * 1000) / 10
       : 88.5;
 
+  const cohortFormatted = touristCohort.toLocaleString(
+    locale === "en" ? "en-US" : "id-ID"
+  );
+
   const content = (
-    <div className="bg-white border border-stone-200/90 rounded-2xl w-full p-5 sm:p-6 space-y-6 shadow-xl">
-      <div className="flex items-start justify-between gap-4 border-b border-stone-200/80 pb-4">
+    <div className="bg-white dark:bg-[#101E18] border border-stone-200/90 dark:border-emerald-900/40 rounded-2xl w-full p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-xl transition-colors">
+      <div className="flex items-start justify-between gap-4 border-b border-stone-200/80 dark:border-emerald-900/30 pb-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#0D4732] font-semibold mb-1.5">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold mb-1.5">
             <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
-            Simulasi Kebijakan Pemerataan Ekonomi Bali
+            {t.govBadge}
           </span>
           <h3
             id="modal-sebaran-title"
-            className="text-lg sm:text-xl font-display font-bold text-stone-900 tracking-tight text-balance"
+            className="text-lg sm:text-xl font-display font-bold text-stone-900 dark:text-stone-100 tracking-tight text-balance"
           >
-            Proyeksi Redistribusi Belanja Wisatawan Antar-Kabupaten
+            {t.govTitle}
           </h3>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1">
-            Membandingkan porsi PDRB Status Quo (65,88% terpusat di Bali
-            Selatan) dengan distribusi belanja langsung dari rute Eco Traveler.
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 mt-1">
+            {t.govSubtitle}
           </p>
         </div>
         {onClose && !inlineMode && (
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
-            aria-label="Tutup rincian sebaran"
+            className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            aria-label={t.closeModalLabel}
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -110,77 +122,77 @@ export default function GovernmentBar({
 
       {/* 3-Card Macro Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-        <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
-          <div className="text-xs font-medium text-stone-500 flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-stone-50 dark:bg-[#162921] border border-stone-200/80 dark:border-emerald-900/40 space-y-1">
+          <div className="text-xs font-medium text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
             <Scale
-              className="w-3.5 h-3.5 text-[#C85A32]"
+              className="w-3.5 h-3.5 text-[#C85A32] dark:text-[#F28B66]"
               aria-hidden="true"
             />
-            <span>Status Quo PDRB Bali</span>
+            <span>{t.statusQuoTitle}</span>
           </div>
-          <div className="text-2xl font-display font-extrabold text-stone-900 font-mono tabular-nums">
-            65,88%
+          <div className="text-2xl font-display font-extrabold text-stone-900 dark:text-white font-mono tabular-nums">
+            {locale === "en" ? "65.88%" : "65,88%"}
           </div>
-          <p className="text-[11px] text-stone-600">
-            Terkonsentrasi di Bali Selatan (Badung, Denpasar, Gianyar, Tabanan).
+          <p className="text-[11px] text-stone-600 dark:text-stone-300">
+            {t.statusQuoDesc}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#0D261C] text-white space-y-1">
+        <div className="p-4 rounded-xl bg-[#0D261C] dark:bg-[#132A20] dark:border dark:border-emerald-700/40 text-white space-y-1">
           <div className="text-xs font-medium text-emerald-300 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Alokasi Rute Eco Traveler</span>
+            <span>{t.ecoRouteAllocTitle}</span>
           </div>
           <div className="text-2xl font-display font-extrabold text-white font-mono tabular-nums">
             {prioritySharePct}%
           </div>
           <p className="text-[11px] text-emerald-100/80">
-            Mengalir langsung ke Buleleng, Karangasem, Bangli, dan Jembrana.
+            {t.ecoRouteAllocDesc}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-900/15 space-y-1">
-          <div className="text-xs font-medium text-[#0D4732] flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-900/15 dark:border-emerald-800/40 space-y-1">
+          <div className="text-xs font-medium text-[#0D4732] dark:text-emerald-300 flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>
-              Injeksi Ekonomi ({touristCohort.toLocaleString("id-ID")} Turis)
-            </span>
+            <span>{t.econInjectionTitle(cohortFormatted)}</span>
           </div>
-          <div className="text-2xl font-display font-extrabold text-[#0D4732] font-mono tabular-nums">
-            {formatCompactRupiah(projectedTotalRetained)}
+          <div className="text-2xl font-display font-extrabold text-[#0D4732] dark:text-emerald-400 font-mono tabular-nums">
+            {formatCompactCurrency(projectedTotalRetained, locale)}
           </div>
-          <p className="text-[11px] text-stone-600">
-            Setara {formatRupiah(totalRetainedSingle)}/wisatawan ke usaha desa &
-            homestay warga.
+          <p className="text-[11px] text-stone-600 dark:text-stone-300">
+            {t.econInjectionDesc(formatCurrency(totalRetainedSingle, locale))}
           </p>
         </div>
       </div>
 
       {/* Cohort Multiplier Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-100/80 p-3 rounded-xl">
-        <span className="text-xs font-semibold text-stone-700">
-          Skala Simulasi Jumlah Wisatawan:
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-100/80 dark:bg-[#162921] p-3 rounded-xl">
+        <span className="text-xs font-semibold text-stone-700 dark:text-stone-200">
+          {t.cohortScaleLabel}
         </span>
         <div
           role="group"
-          aria-label="Skala jumlah wisatawan"
+          aria-label={t.cohortScaleLabel}
           className="flex flex-wrap items-center gap-1.5"
         >
-          {COHORT_MULTIPLIERS.map((m) => {
-            const active = touristCohort === m.count;
+          {COHORT_COUNTS.map((count) => {
+            const active = touristCohort === count;
+            const formatted = count.toLocaleString(
+              locale === "en" ? "en-US" : "id-ID"
+            );
             return (
               <button
-                key={m.count}
+                key={count}
                 type="button"
                 aria-pressed={active}
-                onClick={() => setTouristCohort(m.count)}
+                onClick={() => setTouristCohort(count)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                   active
-                    ? "bg-[#0D261C] text-white font-semibold shadow-xs"
-                    : "bg-white text-stone-700 hover:bg-stone-50 border border-stone-200/80"
+                    ? "bg-[#0D261C] dark:bg-emerald-600 text-white font-semibold shadow-xs"
+                    : "bg-white dark:bg-[#101E18] text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-[#1c3329] border border-stone-200/80 dark:border-emerald-900/40"
                 }`}
               >
-                {m.label}
+                {formatted} {t.touristUnit}
               </button>
             );
           })}
@@ -201,48 +213,54 @@ export default function GovernmentBar({
             visits: 0,
           };
           const projectedRegencyRp = activeInfo.spendRp * touristCohort;
+          const zoneLabel =
+            locale === "en"
+              ? ZONE_BADGE_EN[baseInfo.zone] || baseInfo.zone
+              : baseInfo.zone
+                  .replace(" (Prioritas)", "")
+                  .replace(" (Pusat)", "");
 
           return (
             <div
               key={regency}
               className={`p-3.5 rounded-xl border transition-colors ${
                 activeInfo.sharePct > 0
-                  ? "bg-white border-emerald-800/30 shadow-2xs"
-                  : "bg-stone-50/70 border-stone-200/70 opacity-75"
+                  ? "bg-white dark:bg-[#14251E] border-emerald-800/30 dark:border-emerald-600/40 shadow-2xs"
+                  : "bg-stone-50/70 dark:bg-[#101E18]/60 border-stone-200/70 dark:border-emerald-900/30 opacity-75"
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-stone-900">
-                    Kab. {regency}
+                  <span className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                    {locale === "en" ? regency : `Kab. ${regency}`}
                   </span>
                   <span
                     className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                       baseInfo.isPriority
-                        ? "bg-emerald-50 text-[#0D4732]"
-                        : "bg-stone-200/70 text-stone-600"
+                        ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300"
+                        : "bg-stone-200/70 dark:bg-stone-800 text-stone-600 dark:text-stone-400"
                     }`}
                   >
-                    {baseInfo.zone
-                      .replace(" (Prioritas)", "")
-                      .replace(" (Pusat)", "")}
+                    {zoneLabel}
                   </span>
                 </div>
-                <span className="font-mono text-xs font-bold text-[#0D4732] tabular-nums">
+                <span className="font-mono text-xs font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
                   {activeInfo.sharePct > 0
-                    ? formatCompactRupiah(projectedRegencyRp)
+                    ? formatCompactCurrency(projectedRegencyRp, locale)
+                    : locale === "en"
+                    ? "$0"
                     : "Rp 0"}
                 </span>
               </div>
 
               <div className="space-y-1.5 text-[11px] font-mono tabular-nums">
                 <div className="flex items-center gap-2">
-                  <span className="w-28 text-stone-500 text-[10px] shrink-0">
-                    Status Quo: {baseInfo.baselinePct}%
+                  <span className="w-28 text-stone-500 dark:text-stone-400 text-[10px] shrink-0">
+                    {t.statusQuoBar} {baseInfo.baselinePct}%
                   </span>
-                  <div className="flex-1 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-stone-400 rounded-full"
+                      className="h-full bg-stone-400 dark:bg-stone-600 rounded-full"
                       style={{
                         width: `${Math.min(100, baseInfo.baselinePct * 1.5)}%`,
                       }}
@@ -251,12 +269,12 @@ export default function GovernmentBar({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="w-28 text-[#0D4732] font-semibold text-[10px] shrink-0">
-                    Rute Ini: {activeInfo.sharePct}%
+                  <span className="w-28 text-[#0D4732] dark:text-emerald-400 font-semibold text-[10px] shrink-0">
+                    {t.thisRouteBar} {activeInfo.sharePct}%
                   </span>
-                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-stone-100 dark:bg-[#162921] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#0D4732] rounded-full transition-[width] duration-500"
+                      className="h-full bg-[#0D4732] dark:bg-emerald-500 rounded-full transition-[width] duration-500"
                       style={{
                         width: `${Math.min(100, activeInfo.sharePct)}%`,
                       }}
@@ -277,7 +295,7 @@ export default function GovernmentBar({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] bg-stone-950/50 backdrop-blur-xs flex items-center justify-center p-4 overscroll-contain"
+      className="fixed inset-0 z-[1000] bg-stone-950/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overscroll-contain"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-sebaran-title"

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { TripRequest, BudgetCategory, ArrivalGate } from "@/types/trip";
+import { TripRequest, BudgetCategory, ArrivalGate, AppLocale } from "@/types/trip";
 import { generateRedistributiveItinerary } from "@/lib/ai-engine";
 import { DESA_DATASET } from "@/lib/scoring";
 
@@ -8,7 +8,6 @@ export const runtime = "nodejs";
 const VALID_BUDGETS: BudgetCategory[] = ["Backpacker", "Moderate", "Comfort"];
 const VALID_GATES: ArrivalGate[] = ["NgurahRaiAirport", "GilimanukPort"];
 
-// Simple per-IP token bucket (max 20 requests per minute per IP)
 const RATE_WINDOW_MS = 60_000;
 const MAX_REQ_PER_WINDOW = 20;
 const ipHits = new Map<string, { count: number; resetAt: number }>();
@@ -55,15 +54,17 @@ export async function POST(req: NextRequest) {
       ? body.arrivalGate
       : "NgurahRaiAirport";
 
+    const locale: AppLocale = body.locale === "en" ? "en" : "id";
+
     const tripRequest: TripRequest = {
       durationDays,
       interests,
       budgetCategory,
       arrivalGate,
       simulateCapacityAlert: Boolean(body.simulateCapacityAlert),
+      locale,
     };
 
-    // If IP exceeds rate limit, serve deterministic fallback directly without calling Gemini
     const itinerary = await generateRedistributiveItinerary(
       tripRequest,
       isRateLimited(ip)
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
         budgetCategory: "Moderate",
         arrivalGate: "NgurahRaiAirport",
         simulateCapacityAlert: true,
+        locale: "id",
       },
       true
     );

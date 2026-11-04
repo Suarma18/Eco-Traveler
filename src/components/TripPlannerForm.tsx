@@ -2,6 +2,8 @@
 
 import React from "react";
 import { TripRequest, BudgetCategory, ArrivalGate } from "@/types/trip";
+import { Locale } from "@/lib/utils";
+import { UI_TEXT } from "@/lib/i18n";
 import {
   Loader2,
   Compass,
@@ -20,39 +22,77 @@ interface TripPlannerFormProps {
   onChange: (next: TripRequest) => void;
   onSubmit: (req: TripRequest) => void;
   isLoading: boolean;
+  locale: Locale;
 }
 
 const INTEREST_OPTIONS = [
-  { id: "Nature", label: "Alam & Konservasi", icon: Trees },
-  { id: "Culture", label: "Seni & Budaya Adat", icon: Landmark },
-  { id: "Culinary", label: "Kuliner Tradisional", icon: Utensils },
-  { id: "Wellness", label: "Kebugaran & Ekowisata", icon: HeartPulse },
-  { id: "Agriculture", label: "Agroturisme Subak", icon: Sprout },
+  {
+    id: "Nature",
+    labelId: "Alam & Konservasi",
+    labelEn: "Nature & Reefs",
+    icon: Trees,
+  },
+  {
+    id: "Culture",
+    labelId: "Seni & Budaya Adat",
+    labelEn: "Heritage & Arts",
+    icon: Landmark,
+  },
+  {
+    id: "Culinary",
+    labelId: "Kuliner Tradisional",
+    labelEn: "Village Culinary",
+    icon: Utensils,
+  },
+  {
+    id: "Wellness",
+    labelId: "Kebugaran & Ekowisata",
+    labelEn: "Eco-Wellness",
+    icon: HeartPulse,
+  },
+  {
+    id: "Agriculture",
+    labelId: "Agroturisme Subak",
+    labelEn: "Subak Agro",
+    icon: Sprout,
+  },
 ];
 
 const BUDGET_OPTIONS: {
   id: BudgetCategory;
-  label: string;
-  sub: string;
-  range: string;
+  labelId: string;
+  labelEn: string;
+  subId: string;
+  subEn: string;
+  rangeId: string;
+  rangeEn: string;
 }[] = [
   {
     id: "Backpacker",
-    label: "Backpacker",
-    sub: "Homestay Warga",
-    range: "~Rp 550rb/hr",
+    labelId: "Backpacker",
+    labelEn: "Backpacker",
+    subId: "Homestay Warga",
+    subEn: "Family Homestay",
+    rangeId: "~Rp 550rb/hr",
+    rangeEn: "~$35/day",
   },
   {
     id: "Moderate",
-    label: "Menengah",
-    sub: "Boutique Desa",
-    range: "~Rp 750rb/hr",
+    labelId: "Menengah",
+    labelEn: "Moderate",
+    subId: "Pondok Desa",
+    subEn: "Village Guest",
+    rangeId: "~Rp 750rb/hr",
+    rangeEn: "~$47/day",
   },
   {
     id: "Comfort",
-    label: "Eco-Lodge",
-    sub: "Lodge Komunitas",
-    range: "~Rp 1,05jt/hr",
+    labelId: "Eco-Lodge",
+    labelEn: "Eco-Lodge",
+    subId: "Lodge Komunitas",
+    subEn: "Community Lodge",
+    rangeId: "~Rp 1,05jt/hr",
+    rangeEn: "~$66/day",
   },
 ];
 
@@ -61,7 +101,10 @@ export default function TripPlannerForm({
   onChange,
   onSubmit,
   isLoading,
+  locale,
 }: TripPlannerFormProps) {
+  const t = UI_TEXT[locale];
+
   const toggleInterest = (interestId: string) => {
     const exists = value.interests.includes(interestId);
     let nextInterests: string[];
@@ -80,6 +123,7 @@ export default function TripPlannerForm({
     const updated: TripRequest = {
       ...value,
       ...preset,
+      locale,
     };
     onChange(updated);
     onSubmit(updated);
@@ -87,26 +131,26 @@ export default function TripPlannerForm({
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(value);
+    onSubmit({ ...value, locale });
   };
 
   return (
     <form
       onSubmit={handleFormSubmit}
-      className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs space-y-4"
+      className="bg-white dark:bg-[#101E18] border border-stone-200/90 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4 transition-colors"
     >
       {/* Visual Quick Scenario Cards */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-stone-800 flex items-center gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
             <Sparkles
-              className="w-3.5 h-3.5 text-[#C85A32]"
+              className="w-3.5 h-3.5 text-[#C85A32] dark:text-[#F28B66]"
               aria-hidden="true"
             />
-            Kurasi Ekspedisi Cepat
+            {t.quickScenariosTitle}
           </span>
-          <span className="text-[11px] text-stone-500">
-            Klik untuk muat instan
+          <span className="text-[11px] text-stone-500 dark:text-stone-400">
+            {t.quickScenariosHint}
           </span>
         </div>
 
@@ -122,23 +166,23 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: true,
               })
             }
-            className="group relative overflow-hidden rounded-xl border border-stone-200/90 bg-stone-50 p-2.5 text-left transition-colors hover:border-[#0D4732] hover:bg-emerald-50/30 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=240&q=80"
-              alt="Koridor Timur dan Kaldera"
+              alt={t.scenario1Title}
               width={48}
               height={48}
               className="w-12 h-12 rounded-lg object-cover shrink-0"
               loading="lazy"
             />
             <div className="min-w-0">
-              <div className="text-xs font-bold text-stone-900 group-hover:text-[#0D4732] truncate">
-                Timur & Kaldera Batur (3H)
+              <div className="text-xs font-bold text-stone-900 dark:text-stone-100 group-hover:text-[#0D4732] dark:group-hover:text-emerald-300 truncate">
+                {t.scenario1Title}
               </div>
-              <p className="text-[11px] text-stone-500 truncate">
-                Sidemen · Undisan · Tejakula
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 truncate">
+                {t.scenario1Sub}
               </p>
             </div>
           </button>
@@ -154,23 +198,23 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: false,
               })
             }
-            className="group relative overflow-hidden rounded-xl border border-stone-200/90 bg-stone-50 p-2.5 text-left transition-colors hover:border-[#0D4732] hover:bg-emerald-50/30 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=240&q=80"
-              alt="Lintas Barat dan Pesisir Utara"
+              alt={t.scenario2Title}
               width={48}
               height={48}
               className="w-12 h-12 rounded-lg object-cover shrink-0"
               loading="lazy"
             />
             <div className="min-w-0">
-              <div className="text-xs font-bold text-stone-900 group-hover:text-[#0D4732] truncate">
-                Lintas Barat & Biorock (4H)
+              <div className="text-xs font-bold text-stone-900 dark:text-stone-100 group-hover:text-[#0D4732] dark:group-hover:text-emerald-300 truncate">
+                {t.scenario2Title}
               </div>
-              <p className="text-[11px] text-stone-500 truncate">
-                Jembrana · Pemuteran · Munduk
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 truncate">
+                {t.scenario2Sub}
               </p>
             </div>
           </button>
@@ -180,10 +224,10 @@ export default function TripPlannerForm({
       {/* Baris 1: Durasi & Titik Kedatangan */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
         <fieldset className="space-y-1.5">
-          <legend className="block text-xs font-semibold text-stone-700">
-            Durasi Perjalanan
+          <legend className="block text-xs font-semibold text-stone-700 dark:text-stone-300">
+            {t.durationLabel}
           </legend>
-          <div className="grid grid-cols-4 gap-1 bg-stone-100 p-1 rounded-xl">
+          <div className="grid grid-cols-4 gap-1 bg-stone-100 dark:bg-[#162921] p-1 rounded-xl">
             {[1, 2, 3, 4].map((day) => {
               const active = value.durationDays === day;
               return (
@@ -192,13 +236,13 @@ export default function TripPlannerForm({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onChange({ ...value, durationDays: day })}
-                  className={`py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                  className={`py-2.5 sm:py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                     active
-                      ? "bg-[#0D261C] text-white shadow-xs"
-                      : "text-stone-600 hover:text-stone-900"
+                      ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
+                      : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white"
                   }`}
                 >
-                  {day} Hari
+                  {day} {locale === "en" ? (day === 1 ? "Day" : "Days") : "Hari"}
                 </button>
               );
             })}
@@ -206,10 +250,10 @@ export default function TripPlannerForm({
         </fieldset>
 
         <fieldset className="space-y-1.5">
-          <legend className="block text-xs font-semibold text-stone-700">
-            Pintu Kedatangan
+          <legend className="block text-xs font-semibold text-stone-700 dark:text-stone-300">
+            {t.arrivalLabel}
           </legend>
-          <div className="grid grid-cols-2 gap-1 bg-stone-100 p-1 rounded-xl">
+          <div className="grid grid-cols-2 gap-1 bg-stone-100 dark:bg-[#162921] p-1 rounded-xl">
             {[
               {
                 id: "NgurahRaiAirport" as ArrivalGate,
@@ -230,10 +274,10 @@ export default function TripPlannerForm({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onChange({ ...value, arrivalGate: gate.id })}
-                  className={`py-2 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                  className={`py-2.5 sm:py-2 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                     active
-                      ? "bg-[#0D261C] text-white shadow-xs"
-                      : "text-stone-600 hover:text-stone-900"
+                      ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
+                      : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
@@ -248,11 +292,11 @@ export default function TripPlannerForm({
       {/* Baris 2: Minat Perjalanan */}
       <fieldset className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <legend className="text-xs font-semibold text-stone-700">
-            Fokus Pengalaman Desa
+          <legend className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+            {t.interestsLabel}
           </legend>
-          <span className="text-[11px] font-mono text-[#0D4732] font-semibold">
-            {value.interests.length} dipilih
+          <span className="text-[11px] font-mono text-[#0D4732] dark:text-emerald-400 font-semibold">
+            {t.selectedCount(value.interests.length)}
           </span>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -265,19 +309,21 @@ export default function TripPlannerForm({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => toggleInterest(item.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                   selected
-                    ? "bg-[#0D261C] text-white border-[#0D261C] shadow-2xs"
-                    : "bg-stone-50 text-stone-700 border-stone-200/90 hover:bg-stone-100"
+                    ? "bg-[#0D261C] dark:bg-emerald-700 text-white border-[#0D261C] dark:border-emerald-600 shadow-2xs"
+                    : "bg-stone-50 dark:bg-[#162921] text-stone-700 dark:text-stone-300 border-stone-200/90 dark:border-emerald-900/40 hover:bg-stone-100 dark:hover:bg-[#1d352b]"
                 }`}
               >
                 <Icon
                   aria-hidden="true"
                   className={`w-3.5 h-3.5 ${
-                    selected ? "text-emerald-300" : "text-stone-500"
+                    selected
+                      ? "text-emerald-300"
+                      : "text-stone-500 dark:text-stone-400"
                   }`}
                 />
-                <span>{item.label}</span>
+                <span>{locale === "en" ? item.labelEn : item.labelId}</span>
               </button>
             );
           })}
@@ -286,8 +332,8 @@ export default function TripPlannerForm({
 
       {/* Baris 3: Kategori Anggaran */}
       <fieldset className="space-y-1.5">
-        <legend className="block text-xs font-semibold text-stone-700">
-          Preferensi Menginap & Anggaran
+        <legend className="block text-xs font-semibold text-stone-700 dark:text-stone-300">
+          {t.budgetLabel}
         </legend>
         <div className="grid grid-cols-3 gap-2">
           {BUDGET_OPTIONS.map((b) => {
@@ -300,16 +346,18 @@ export default function TripPlannerForm({
                 onClick={() => onChange({ ...value, budgetCategory: b.id })}
                 className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                   active
-                    ? "bg-emerald-50/70 border-[#0D4732] text-stone-900"
-                    : "bg-stone-50/60 border-stone-200/80 text-stone-600 hover:bg-stone-100/70"
+                    ? "bg-emerald-50/70 dark:bg-emerald-950/60 border-[#0D4732] dark:border-emerald-500 text-stone-900 dark:text-stone-100"
+                    : "bg-stone-50/60 dark:bg-[#162921] border-stone-200/80 dark:border-emerald-900/40 text-stone-600 dark:text-stone-300 hover:bg-stone-100/70 dark:hover:bg-[#1d352b]"
                 }`}
               >
-                <div className="text-xs font-bold text-stone-900">
-                  {b.label}
+                <div className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
+                  {locale === "en" ? b.labelEn : b.labelId}
                 </div>
-                <div className="text-[10px] text-stone-500">{b.sub}</div>
-                <div className="text-[11px] font-mono font-semibold text-[#0D4732] mt-0.5 tabular-nums">
-                  {b.range}
+                <div className="text-[10px] text-stone-500 dark:text-stone-400 truncate">
+                  {locale === "en" ? b.subEn : b.subId}
+                </div>
+                <div className="text-[11px] font-mono font-semibold text-[#0D4732] dark:text-emerald-400 mt-0.5 tabular-nums">
+                  {locale === "en" ? b.rangeEn : b.rangeId}
                 </div>
               </button>
             );
@@ -318,8 +366,8 @@ export default function TripPlannerForm({
       </fieldset>
 
       {/* Baris 4: Proteksi Kuota Desa & Submit CTA */}
-      <div className="pt-2.5 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <label className="inline-flex items-center gap-2 text-xs text-stone-600 cursor-pointer select-none">
+      <div className="pt-2.5 border-t border-stone-100 dark:border-emerald-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <label className="inline-flex items-center gap-2 text-xs text-stone-600 dark:text-stone-300 cursor-pointer select-none">
           <input
             type="checkbox"
             name="simulateCapacityAlert"
@@ -327,15 +375,15 @@ export default function TripPlannerForm({
             onChange={(e) =>
               onChange({ ...value, simulateCapacityAlert: e.target.checked })
             }
-            className="w-4 h-4 accent-[#0D261C] rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="w-4 h-4 accent-[#0D261C] dark:accent-emerald-500 rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
           />
-          <span>Aktifkan proteksi kuota & pengalihan Desa Penyangga</span>
+          <span>{t.capacityGuardCheck}</span>
         </label>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="px-5 py-2.5 rounded-xl bg-[#0D261C] hover:bg-[#143628] disabled:opacity-60 text-white font-display font-semibold text-xs tracking-wide transition-colors active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shrink-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] focus-visible:ring-offset-2"
+          className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#143628] dark:hover:bg-emerald-500 disabled:opacity-60 text-white font-display font-semibold text-xs tracking-wide transition-colors active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shrink-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] focus-visible:ring-offset-2"
         >
           {isLoading ? (
             <>
@@ -343,15 +391,15 @@ export default function TripPlannerForm({
                 className="w-3.5 h-3.5 animate-spin"
                 aria-hidden="true"
               />
-              <span>Menyusun rute…</span>
+              <span>{t.submitLoading}</span>
             </>
           ) : (
             <>
               <Compass
-                className="w-3.5 h-3.5 text-emerald-300"
+                className="w-3.5 h-3.5 text-emerald-300 dark:text-white"
                 aria-hidden="true"
               />
-              <span>Susun Rute Pemerataan</span>
+              <span>{t.submitButton}</span>
             </>
           )}
         </button>

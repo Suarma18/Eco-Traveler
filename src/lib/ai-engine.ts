@@ -15,16 +15,19 @@ import {
   PRIORITY_REGENCIES,
 } from "@/lib/scoring";
 import { formatRupiah } from "@/lib/utils";
+import { localizeItinerary } from "@/lib/i18n";
 
 const GEMINI_TIMEOUT_MS = 6000;
 
 export const ARRIVAL_GATES = {
   NgurahRaiAirport: {
     label: "Bandara I Gusti Ngurah Rai (Tuban - Selatan)",
+    labelEn: "I Gusti Ngurah Rai International Airport",
     coords: [-8.7467, 115.1668] as [number, number],
   },
   GilimanukPort: {
     label: "Pelabuhan Gilimanuk (Jembrana - Barat)",
+    labelEn: "Gilimanuk Ferry Port (West Bali)",
     coords: [-8.1638, 114.4361] as [number, number],
   },
 };
@@ -37,7 +40,7 @@ Guidelines:
 2. Do not route visitors to Kuta, Seminyak, or Canggu.
 3. Keep daily routes geographically sequential without backtracking from the arrivalGate.
 4. Estimate local spending (Homestay, Warung, Community Guide) in Indonesian Rupiah.
-5. Write descriptions in plain, concrete Indonesian without promotional clichés. Output valid JSON only.`;
+5. Write descriptions in plain, concrete language without promotional clichés. Output valid JSON only.`;
 
 function scoreVillageMatch(village: DesaWisata, interests: string[]): number {
   if (!interests || interests.length === 0) return 1;
@@ -67,6 +70,7 @@ export function buildDeterministicItinerary(
       : ["Culture", "Nature"];
   const budget = request.budgetCategory || "Moderate";
   const gate = request.arrivalGate || "NgurahRaiAirport";
+  const locale = request.locale === "en" ? "en" : "id";
 
   const spendMultiplier =
     budget === "Backpacker" ? 0.78 : budget === "Comfort" ? 1.38 : 1.0;
@@ -272,7 +276,7 @@ export function buildDeterministicItinerary(
     .map((i) => interestLabels[i] || i)
     .join(", ");
 
-  return {
+  const baseItinerary: ItineraryResponse = {
     tripTitle: `Rute ${duration} Hari: ${
       gate === "GilimanukPort"
         ? "Lintas Barat Jembrana & Pesisir Utara Buleleng"
@@ -288,7 +292,17 @@ export function buildDeterministicItinerary(
     days: guardedDays,
     metrics,
     culturalEtiquette,
+    engineMeta: {
+      source: "deterministic-fallback",
+      modelUsed: "Subak Spatial Engine v2.0",
+      latencyMs: 14,
+      arrivalGateLabel:
+        locale === "en" ? ARRIVAL_GATES[gate].labelEn : ARRIVAL_GATES[gate].label,
+      arrivalCoords: ARRIVAL_GATES[gate].coords,
+    },
   };
+
+  return locale === "en" ? localizeItinerary(baseItinerary, "en") : baseItinerary;
 }
 
 export async function generateRedistributiveItinerary(
@@ -299,6 +313,7 @@ export async function generateRedistributiveItinerary(
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-1.5-flash";
   const gate = request.arrivalGate || "NgurahRaiAirport";
+  const locale = request.locale === "en" ? "en" : "id";
 
   if (!skipExternalAi && apiKey && apiKey.length > 10) {
     try {
@@ -326,19 +341,25 @@ export async function generateRedistributiveItinerary(
         customsNote: d.customsNote,
       }));
 
+      const langInstruction =
+        locale === "en"
+          ? "Write all titles, descriptions, summaryNarrative, and culturalEtiquette in plain, natural English."
+          : "Tulis seluruh judul, deskripsi, summaryNarrative, dan culturalEtiquette dalam Bahasa Indonesia yang lugas.";
+
       const prompt = `Buat rencana perjalanan wisata desa Bali berdasarkan parameter berikut:
 - Durasi: ${request.durationDays} hari
 - Minat Wisatawan: ${request.interests.join(", ")}
 - Kategori Anggaran: ${request.budgetCategory}
 - Titik Kedatangan: ${ARRIVAL_GATES[gate].label} (${gate})
+- Bahasa Output: ${langInstruction}
 
 Dataset Desa Wisata Terverifikasi (HANYA gunakan desa dari daftar ini, jangan mengulang desa yang sama):
 ${JSON.stringify(compactDataset)}
 
 Kembalikan JSON dengan struktur persis:
 {
-  "tripTitle": "string (Bahasa Indonesia)",
-  "summaryNarrative": "string (Bahasa Indonesia, lugas dan faktual)",
+  "tripTitle": "string",
+  "summaryNarrative": "string",
   "days": [
     {
       "dayNumber": 1,
@@ -398,7 +419,10 @@ Kembalikan JSON dengan struktur persis:
         const syncedDays: DayItinerary[] = parsed.days.map((day, idx) => ({
           dayNumber: day.dayNumber || idx + 1,
           themeTitle:
-            day.themeTitle || `Hari ${idx + 1}: Eksplorasi Desa Wisata`,
+            day.themeTitle ||
+            (locale === "en"
+              ? `Day ${idx + 1}: Village Exploration`
+              : `Hari ${idx + 1}: Eksplorasi Desa Wisata`),
           activities: (day.activities || []).map((act, actIdx) => {
             let matchedVillage =
               DESA_BY_ID.get(act.villageId) ||
@@ -406,7 +430,6 @@ Kembalikan JSON dengan struktur persis:
                 (v) => v.name.toLowerCase() === act.villageName?.toLowerCase()
               );
 
-            // Prevent duplicate villages if LLM repeats an ID or hallucinates
             if (!matchedVillage || usedVillageIds.has(matchedVillage.id)) {
               matchedVillage =
                 DESA_DATASET.find((v) => !usedVillageIds.has(v.id)) ||
@@ -437,7 +460,7 @@ Kembalikan JSON dengan struktur persis:
           recommendedStay: day.recommendedStay || {
             name: "Homestay Koperasi Desa Wisata",
             type: "Community Homestay",
-            priceRangeRp: "Rp 250.000 / malam",
+            priceRangeRp: "Rp 250.000 - Rp 290.000 / malam",
           },
         }));
 
@@ -452,10 +475,12 @@ Kembalikan JSON dengan struktur persis:
           request.budgetCategory
         );
 
-        return {
+        const aiItinerary: ItineraryResponse = {
           tripTitle:
             parsed.tripTitle ||
-            `Rute Perjalanan ${request.durationDays} Hari Desa Bali`,
+            (locale === "en"
+              ? `${request.durationDays}-Day Bali Village Route`
+              : `Rute Perjalanan ${request.durationDays} Hari Desa Bali`),
           summaryNarrative:
             parsed.summaryNarrative ||
             "Rute perjalanan yang menyalurkan belanja wisatawan ke penginapan warga dan usaha desa di luar Bali Selatan.",
@@ -469,10 +494,15 @@ Kembalikan JSON dengan struktur persis:
             source: "gemini-ai",
             modelUsed: modelName,
             latencyMs: Date.now() - startTime,
-            arrivalGateLabel: ARRIVAL_GATES[gate].label,
+            arrivalGateLabel:
+              locale === "en"
+                ? ARRIVAL_GATES[gate].labelEn
+                : ARRIVAL_GATES[gate].label,
             arrivalCoords: ARRIVAL_GATES[gate].coords,
           },
         };
+
+        return locale === "en" ? localizeItinerary(aiItinerary, "en") : aiItinerary;
       }
     } catch (error) {
       console.warn(
@@ -490,7 +520,10 @@ Kembalikan JSON dengan struktur persis:
       source: "deterministic-fallback",
       modelUsed: "Subak Spatial Engine v2.0",
       latencyMs: Math.max(12, Date.now() - startTime),
-      arrivalGateLabel: ARRIVAL_GATES[gate].label,
+      arrivalGateLabel:
+        locale === "en"
+          ? ARRIVAL_GATES[gate].labelEn
+          : ARRIVAL_GATES[gate].label,
       arrivalCoords: ARRIVAL_GATES[gate].coords,
     },
   };
