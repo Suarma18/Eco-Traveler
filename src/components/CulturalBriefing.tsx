@@ -57,7 +57,7 @@ export default function CulturalBriefing({
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? -1 : idx)}
                 aria-expanded={isOpen}
-                className="w-full px-4 py-3 text-left flex items-center justify-between gap-3 hover:bg-stone-50 dark:hover:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0D4732]"
+                className="w-full px-4 py-3 text-left flex items-center justify-between gap-3 hover:bg-stone-50 dark:hover:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
               >
                 <div className="flex items-center gap-2">
                   <Sparkles

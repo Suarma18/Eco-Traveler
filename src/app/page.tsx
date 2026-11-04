@@ -96,14 +96,12 @@ export default function HomePage() {
   const [selectedActivity, setSelectedActivity] =
     useState<TripDayActivity | null>(null);
 
-  // Desktop view mode ("atlas" shows split-screen Plan+Map, "simulation" shows full-screen simulation)
-  // Mobile view mode ("plan" | "map" | "simulation") controlled via bottom thumb bar
   const [activeView, setActiveView] = useState<"atlas" | "simulation">("atlas");
   const [mobileTab, setMobileTab] = useState<"plan" | "map" | "simulation">(
     "plan"
   );
 
-  // Hydrate saved theme & locale preferences from localStorage
+  // Sync React state with initial theme & locale applied in <head>
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem("eco-traveler-theme");
@@ -174,10 +172,20 @@ export default function HomePage() {
     [locale]
   );
 
+  // Auto-Light Print Guard: Temporarily switch to Light Mode during window.print() so PDF is ink-friendly
   const handleDownloadPdf = () => {
-    if (typeof window !== "undefined") {
-      window.print();
+    if (typeof window === "undefined") return;
+    const htmlEl = document.documentElement;
+    const wasDark = htmlEl.classList.contains("dark");
+    if (wasDark) {
+      htmlEl.classList.remove("dark");
     }
+    setTimeout(() => {
+      window.print();
+      if (wasDark) {
+        htmlEl.classList.add("dark");
+      }
+    }, 60);
   };
 
   const handleJumpToMapOnMobile = (activity: TripDayActivity) => {
@@ -224,7 +232,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Center Desktop View Mode Switcher (Hidden on Mobile, replaced by Bottom Thumb Bar) */}
+          {/* Center Desktop View Mode Switcher */}
           <div
             role="tablist"
             aria-label="Mode tampilan"
@@ -235,7 +243,7 @@ export default function HomePage() {
               role="tab"
               aria-selected={activeView === "atlas"}
               onClick={() => setActiveView("atlas")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                 activeView === "atlas"
                   ? "bg-white dark:bg-[#162921] text-stone-900 dark:text-white shadow-xs"
                   : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
@@ -252,7 +260,7 @@ export default function HomePage() {
               role="tab"
               aria-selected={activeView === "simulation"}
               onClick={() => setActiveView("simulation")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                 activeView === "simulation"
                   ? "bg-white dark:bg-[#162921] text-stone-900 dark:text-white shadow-xs"
                   : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
@@ -278,7 +286,7 @@ export default function HomePage() {
                 type="button"
                 aria-pressed={locale === "id"}
                 onClick={() => handleToggleLocale("id")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   locale === "id"
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
                     : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
@@ -291,7 +299,7 @@ export default function HomePage() {
                 type="button"
                 aria-pressed={locale === "en"}
                 onClick={() => handleToggleLocale("en")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   locale === "en"
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
                     : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
@@ -312,28 +320,34 @@ export default function HomePage() {
                 type="button"
                 aria-pressed={!isDark}
                 onClick={() => handleSetTheme(false)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   !isDark
                     ? "bg-white text-stone-900 shadow-2xs"
                     : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
                 }`}
                 title={t.themeLight}
               >
-                <Sun className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                <Sun
+                  className="w-3.5 h-3.5 text-amber-500"
+                  aria-hidden="true"
+                />
                 <span className="hidden sm:inline">{t.themeLight}</span>
               </button>
               <button
                 type="button"
                 aria-pressed={isDark}
                 onClick={() => handleSetTheme(true)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   isDark
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
                     : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
                 }`}
                 title={t.themeDark}
               >
-                <Moon className="w-3.5 h-3.5 text-emerald-300" aria-hidden="true" />
+                <Moon
+                  className="w-3.5 h-3.5 text-emerald-300"
+                  aria-hidden="true"
+                />
                 <span className="hidden sm:inline">{t.themeDark}</span>
               </button>
             </div>
@@ -342,7 +356,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={handleDownloadPdf}
-              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#0D4732] dark:hover:bg-emerald-500 text-white font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] focus-visible:ring-offset-2"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#0D4732] dark:hover:bg-emerald-500 text-white font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
             >
               <FileDown
                 className="w-3.5 h-3.5 text-emerald-300 dark:text-white"
@@ -386,7 +400,7 @@ export default function HomePage() {
           </div>
         ) : null}
 
-        {/* ATLAS SPLIT-SCREEN (Desktop shows both columns; Mobile shows active mobileTab) */}
+        {/* ATLAS SPLIT-SCREEN */}
         {activeView === "atlas" && mobileTab !== "simulation" && (
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             {/* PANEL KIRI: 46% Lebar Layar Desktop, atau Tab "plan" di Mobile */}
@@ -396,7 +410,7 @@ export default function HomePage() {
               }`}
             >
               {/* Editorial Hero Banner */}
-              <section className="relative rounded-2xl overflow-hidden bg-[#0D261C] dark:bg-[#132A20] dark:border dark:border-emerald-800/50 text-white p-4 sm:p-6 shadow-sm">
+              <section className="relative rounded-2xl overflow-hidden bg-[#0D261C] dark:bg-[#163527] dark:border dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/15 text-white p-4 sm:p-6 shadow-md">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
@@ -481,7 +495,7 @@ export default function HomePage() {
                 </p>
               </section>
 
-              {/* Kartu Rute Timeline Harian (Editorial Visual Timeline) */}
+              {/* Kartu Rute Timeline Harian */}
               <ItineraryTimeline
                 days={itinerary.days}
                 allVillages={DESA_DATASET}
@@ -543,7 +557,7 @@ export default function HomePage() {
               setActiveView("atlas");
               setMobileTab("plan");
             }}
-            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "plan"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
                 : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
@@ -560,7 +574,7 @@ export default function HomePage() {
               setActiveView("atlas");
               setMobileTab("map");
             }}
-            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "map"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
                 : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
@@ -576,7 +590,7 @@ export default function HomePage() {
             onClick={() => {
               setMobileTab("simulation");
             }}
-            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "simulation"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
                 : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"

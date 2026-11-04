@@ -166,7 +166,7 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: true,
               })
             }
-            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -198,7 +198,7 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: false,
               })
             }
-            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="group relative overflow-hidden rounded-xl border border-stone-200/90 dark:border-emerald-900/40 bg-stone-50 dark:bg-[#162921] p-2.5 text-left transition-colors hover:border-[#0D4732] dark:hover:border-emerald-500/60 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 cursor-pointer flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -236,7 +236,7 @@ export default function TripPlannerForm({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onChange({ ...value, durationDays: day })}
-                  className={`py-2.5 sm:py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                  className={`py-2.5 sm:py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                     active
                       ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
                       : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white"
@@ -274,7 +274,7 @@ export default function TripPlannerForm({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onChange({ ...value, arrivalGate: gate.id })}
-                  className={`py-2.5 sm:py-2 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                  className={`py-2.5 sm:py-2 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                     active
                       ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
                       : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white"
@@ -309,7 +309,7 @@ export default function TripPlannerForm({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => toggleInterest(item.id)}
-                className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   selected
                     ? "bg-[#0D261C] dark:bg-emerald-700 text-white border-[#0D261C] dark:border-emerald-600 shadow-2xs"
                     : "bg-stone-50 dark:bg-[#162921] text-stone-700 dark:text-stone-300 border-stone-200/90 dark:border-emerald-900/40 hover:bg-stone-100 dark:hover:bg-[#1d352b]"
@@ -344,7 +344,7 @@ export default function TripPlannerForm({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange({ ...value, budgetCategory: b.id })}
-                className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   active
                     ? "bg-emerald-50/70 dark:bg-emerald-950/60 border-[#0D4732] dark:border-emerald-500 text-stone-900 dark:text-stone-100"
                     : "bg-stone-50/60 dark:bg-[#162921] border-stone-200/80 dark:border-emerald-900/40 text-stone-600 dark:text-stone-300 hover:bg-stone-100/70 dark:hover:bg-[#1d352b]"
@@ -375,7 +375,7 @@ export default function TripPlannerForm({
             onChange={(e) =>
               onChange({ ...value, simulateCapacityAlert: e.target.checked })
             }
-            className="w-4 h-4 accent-[#0D261C] dark:accent-emerald-500 rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="w-4 h-4 accent-[#0D261C] dark:accent-emerald-500 rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
           />
           <span>{t.capacityGuardCheck}</span>
         </label>
@@ -383,7 +383,7 @@ export default function TripPlannerForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#143628] dark:hover:bg-emerald-500 disabled:opacity-60 text-white font-display font-semibold text-xs tracking-wide transition-colors active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shrink-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] focus-visible:ring-offset-2"
+          className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#143628] dark:hover:bg-emerald-500 disabled:opacity-60 text-white font-display font-semibold text-xs tracking-wide transition-colors active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 shrink-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
         >
           {isLoading ? (
             <>

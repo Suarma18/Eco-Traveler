@@ -48,13 +48,18 @@ function createDayMarkerIcon(
   stepOrder: number,
   isSelected: boolean,
   isRedirected: boolean,
-  locale: Locale
+  locale: Locale,
+  useDarkMapColors: boolean
 ) {
-  const color = DAY_COLORS[dayNumber]?.hex || "#0D4732";
+  const colorObj = DAY_COLORS[dayNumber] || DAY_COLORS[1];
+  const color = useDarkMapColors ? colorObj.darkHex : colorObj.hex;
+  const textColor = useDarkMapColors && dayNumber === 4 ? "#141715" : "#FFFFFF";
   const scale = isSelected ? "scale(1.22)" : "scale(1)";
   const ring = isSelected
-    ? `0 0 0 6px rgba(13, 71, 50, 0.28), 0 8px 20px rgba(13, 38, 28, 0.35)`
-    : `0 4px 12px rgba(13, 38, 28, 0.25)`;
+    ? useDarkMapColors
+      ? `0 0 0 6px rgba(52, 211, 153, 0.35), 0 8px 20px rgba(0, 0, 0, 0.65)`
+      : `0 0 0 6px rgba(13, 71, 50, 0.28), 0 8px 20px rgba(13, 38, 28, 0.35)`
+    : `0 4px 12px rgba(13, 38, 28, 0.35)`;
   const badgeHtml = isRedirected
     ? `<span style="position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:9999px;background:#C85A32;border:2px solid #FFFFFF;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#FFFFFF;">!</span>`
     : "";
@@ -76,10 +81,10 @@ function createDayMarkerIcon(
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #FFFFFF;
+        color: ${textColor};
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 11px;
-        font-weight: 700;
+        font-weight: 800;
       ">
         ${prefix}${dayNumber}.${stepOrder}
         ${badgeHtml}
@@ -101,7 +106,7 @@ function createGateIcon() {
         border-radius: 10px;
         background: #0D261C;
         border: 2px solid #34D399;
-        box-shadow: 0 4px 12px rgba(13, 38, 28, 0.35);
+        box-shadow: 0 4px 12px rgba(13, 38, 28, 0.45);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -177,11 +182,12 @@ export default function LeafletMap({
     CARTO_API_KEY ? (isDark ? "carto-dark" : "carto-voyager") : "osm-clean"
   );
 
-  // Sync basemap theme automatically when user switches Light/Dark mode
   useEffect(() => {
     if (!CARTO_API_KEY) return;
     setTileTheme(isDark ? "carto-dark" : "carto-voyager");
   }, [isDark]);
+
+  const useDarkMapColors = isDark || tileTheme === "carto-dark";
 
   const visibleDays = useMemo(() => {
     if (selectedDayFilter === null) return days;
@@ -298,20 +304,20 @@ export default function LeafletMap({
   const dayPrefix = locale === "en" ? "D" : "H";
 
   return (
-    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 dark:border-emerald-900/50 bg-stone-200 dark:bg-[#08120E] shadow-lg">
+    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 dark:border-emerald-800/60 bg-stone-200 dark:bg-[#08120E] shadow-lg">
       {/* Top Floating Glassmorphic HUD (Mobile Swipeable) */}
       <div className="absolute top-2.5 sm:top-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
         {/* Filter Hari - Horizontal Scrollable on Mobile */}
         <div
           role="group"
           aria-label="Filter hari perjalanan"
-          className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-800/50 p-1 rounded-xl pointer-events-auto shadow-md overflow-x-auto no-scrollbar max-w-full"
+          className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-md overflow-x-auto no-scrollbar max-w-full"
         >
           <button
             type="button"
             aria-pressed={selectedDayFilter === null}
             onClick={() => onSelectDayFilter(null)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               selectedDayFilter === null
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
                 : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
@@ -322,6 +328,9 @@ export default function LeafletMap({
           {days.map((d) => {
             const colorInfo = DAY_COLORS[d.dayNumber] || DAY_COLORS[1];
             const isActive = selectedDayFilter === d.dayNumber;
+            const dotColor = useDarkMapColors
+              ? colorInfo.darkHex
+              : colorInfo.hex;
             return (
               <button
                 key={d.dayNumber}
@@ -330,7 +339,7 @@ export default function LeafletMap({
                 onClick={() =>
                   onSelectDayFilter(isActive ? null : d.dayNumber)
                 }
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   isActive
                     ? "bg-stone-900 dark:bg-emerald-700 text-white shadow-xs"
                     : "text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
@@ -338,8 +347,8 @@ export default function LeafletMap({
               >
                 <span
                   aria-hidden="true"
-                  className="w-2 h-2 rounded-full inline-block shrink-0"
-                  style={{ backgroundColor: colorInfo.hex }}
+                  className="w-2.5 h-2.5 rounded-full inline-block shrink-0"
+                  style={{ backgroundColor: dotColor }}
                 />
                 <span>{t.dayBtn(d.dayNumber)}</span>
               </button>
@@ -348,12 +357,12 @@ export default function LeafletMap({
         </div>
 
         {/* Layer & Basemap Switcher */}
-        <div className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-800/50 p-1 rounded-xl pointer-events-auto shadow-md self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-md self-start sm:self-auto">
           <button
             type="button"
             aria-pressed={showAllCuratedVillages}
             onClick={() => setShowAllCuratedVillages((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               showAllCuratedVillages
                 ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
                 : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
@@ -367,7 +376,7 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] ${
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] dark:focus-visible:ring-orange-400 ${
               showSouthHotspotZone
                 ? "bg-orange-50 dark:bg-orange-950/60 text-[#C85A32] dark:text-[#F28B66] font-semibold"
                 : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
@@ -393,7 +402,7 @@ export default function LeafletMap({
                 );
               }
             }}
-            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-stone-700 dark:text-stone-200 hover:text-stone-950 bg-stone-100 dark:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-stone-700 dark:text-stone-200 hover:text-stone-950 bg-stone-100 dark:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
             title={t.switchBasemapLabel}
           >
             {tileTheme === "carto-voyager"
@@ -433,9 +442,9 @@ export default function LeafletMap({
             center={[-8.6785, 115.1585]}
             radius={26}
             pathOptions={{
-              color: "#C85A32",
-              fillColor: "#C85A32",
-              fillOpacity: 0.14,
+              color: useDarkMapColors ? "#FB923C" : "#C85A32",
+              fillColor: useDarkMapColors ? "#FB923C" : "#C85A32",
+              fillOpacity: useDarkMapColors ? 0.22 : 0.14,
               weight: 1.5,
               dashArray: "4 4",
             }}
@@ -465,10 +474,10 @@ export default function LeafletMap({
                   center={[village.lat, village.lng]}
                   radius={5.5}
                   pathOptions={{
-                    color: "#FFFFFF",
+                    color: useDarkMapColors ? "#08120E" : "#FFFFFF",
                     weight: 1.5,
-                    fillColor: "#0D4732",
-                    fillOpacity: 0.65,
+                    fillColor: useDarkMapColors ? "#34D399" : "#0D4732",
+                    fillOpacity: useDarkMapColors ? 0.8 : 0.65,
                   }}
                 >
                   <Popup>
@@ -520,17 +529,20 @@ export default function LeafletMap({
                 ],
               ]}
               pathOptions={{
-                color: isDark ? "#34D399" : "#0D4732",
-                weight: 2,
+                color: useDarkMapColors ? "#34D399" : "#0D4732",
+                weight: 2.5,
                 dashArray: "6 8",
-                opacity: 0.7,
+                opacity: 0.8,
               }}
             />
           )}
 
         {/* Polyline Jalur Harian & Pin Destinasi */}
         {visibleDays.map((day, dayIdx) => {
-          const dayColor = DAY_COLORS[day.dayNumber]?.hex || "#0D4732";
+          const colorInfo = DAY_COLORS[day.dayNumber] || DAY_COLORS[1];
+          const dayColor = useDarkMapColors
+            ? colorInfo.darkHex
+            : colorInfo.hex;
           const dayPositions: [number, number][] = day.activities.map((a) => [
             a.lat,
             a.lng,
@@ -551,10 +563,10 @@ export default function LeafletMap({
                     [day.activities[0].lat, day.activities[0].lng],
                   ]}
                   pathOptions={{
-                    color: "#78716C",
+                    color: useDarkMapColors ? "#A8A29E" : "#78716C",
                     weight: 2.5,
                     dashArray: "4 7",
-                    opacity: 0.75,
+                    opacity: 0.8,
                   }}
                 />
               )}
@@ -565,7 +577,7 @@ export default function LeafletMap({
                   pathOptions={{
                     color: dayColor,
                     weight: 4,
-                    opacity: 0.9,
+                    opacity: 0.95,
                   }}
                 />
               )}
@@ -586,7 +598,8 @@ export default function LeafletMap({
                       actIdx + 1,
                       isSelected,
                       isRedirected,
-                      locale
+                      locale,
+                      useDarkMapColors
                     )}
                     eventHandlers={{
                       click: () => {
@@ -600,7 +613,7 @@ export default function LeafletMap({
                         <div className="flex items-center justify-between gap-2">
                           <span
                             className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
-                            style={{ backgroundColor: dayColor }}
+                            style={{ backgroundColor: colorInfo.hex }}
                           >
                             {t.dayBtn(day.dayNumber)} ·{" "}
                             {formatTimeSlot(activity.timeSlot, locale)}
@@ -653,7 +666,7 @@ export default function LeafletMap({
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
       {activeStep && activeVisualMeta && (
         <div className="absolute bottom-2.5 sm:bottom-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] pointer-events-none">
-          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3 sm:p-3.5 shadow-2xl pointer-events-auto transition-opacity">
+          <div className="bg-[#0D261C]/95 dark:bg-[#0E241B]/95 backdrop-blur-md text-white border border-emerald-800/60 dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/20 rounded-2xl p-3 sm:p-3.5 shadow-2xl pointer-events-auto transition-opacity">
             {inspectorMinimized ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -695,7 +708,7 @@ export default function LeafletMap({
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row gap-3 items-start">
-                {/* Thumbnail Foto Lanskap Desa (Hidden on very small screens to keep map clear, shown on sm+) */}
+                {/* Thumbnail Foto Lanskap Desa */}
                 <div className="hidden sm:block relative w-28 h-24 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-stone-800">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img

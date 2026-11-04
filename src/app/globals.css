@@ -13,8 +13,8 @@
 html.dark {
   color-scheme: dark;
   --canvas-bg: #08120e;
-  --forest-anchor: #11261d;
-  --forest-primary: #183529;
+  --forest-anchor: #153427;
+  --forest-primary: #1c4232;
   --terracotta-accent: #f28b66;
 }
 
@@ -81,6 +81,65 @@ html.dark ::-webkit-scrollbar-thumb {
 }
 
 /* Custom Leaflet Styling - Subak Atelier Light & Dark */
+.leaflet-top.leaflet-left {
+  margin-top: 52px !important;
+}
+
+.leaflet-bar {
+  border: 1px solid rgba(214, 211, 209, 0.9) !important;
+  box-shadow: 0 4px 12px rgba(13, 38, 28, 0.12) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #1c1917 !important;
+  border-bottom: 1px solid rgba(214, 211, 209, 0.7) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-weight: 700 !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #f5f5f4 !important;
+  color: #0d4732 !important;
+}
+
+html.dark .leaflet-bar {
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .leaflet-bar a {
+  background-color: rgba(16, 30, 24, 0.95) !important;
+  color: #ecfdf5 !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+html.dark .leaflet-bar a:hover {
+  background-color: #162921 !important;
+  color: #34d399 !important;
+}
+
+.leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #57534e !important;
+  border-radius: 6px 0 0 0 !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+}
+
+html.dark .leaflet-control-attribution {
+  background-color: rgba(8, 18, 14, 0.85) !important;
+  color: #a8a29e !important;
+}
+
+html.dark .leaflet-control-attribution a {
+  color: #6ee7b7 !important;
+}
+
 .leaflet-popup-content-wrapper {
   background-color: #ffffff !important;
   color: #171717 !important;
@@ -93,8 +152,8 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark .leaflet-popup-content-wrapper {
   background-color: #101e18 !important;
   color: #f5f5f4 !important;
-  border: 1px solid rgba(52, 211, 153, 0.25) !important;
-  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.7) !important;
 }
 
 .leaflet-popup-tip {
@@ -103,6 +162,10 @@ html.dark .leaflet-popup-content-wrapper {
 
 html.dark .leaflet-popup-tip {
   background-color: #101e18 !important;
+}
+
+html.dark .leaflet-popup-close-button {
+  color: #a7f3d0 !important;
 }
 
 .leaflet-popup-content {
@@ -116,7 +179,10 @@ html.dark .leaflet-popup-tip {
 }
 
 @media print {
-  body {
+  html,
+  body,
+  html.dark,
+  html.dark body {
     background-color: #ffffff !important;
     color: #171717 !important;
   }

@@ -77,7 +77,7 @@ export default function TelemetryCards({
       {/* 3-Cell Bento Impact Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Cell 1: Anchor Dark Forest Card - Spread Score */}
-        <div className="bg-[#0D261C] dark:bg-[#132A20] dark:border dark:border-emerald-700/40 text-white rounded-2xl p-4 flex flex-col justify-between shadow-md">
+        <div className="bg-[#0D261C] dark:bg-[#163527] dark:border dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/15 text-white rounded-2xl p-4 flex flex-col justify-between shadow-md">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-emerald-200/90">
               {t.spreadScoreTitle}
@@ -177,7 +177,7 @@ export default function TelemetryCards({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-0.5 font-semibold text-[#C85A32] dark:text-[#F28B66] hover:underline cursor-pointer shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32]"
+                className="inline-flex items-center gap-0.5 font-semibold text-[#C85A32] dark:text-[#F28B66] hover:underline cursor-pointer shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] dark:focus-visible:ring-[#F28B66]"
               >
                 <span>{t.simPdrbBtn}</span>
                 <ArrowUpRight className="w-3 h-3" aria-hidden="true" />
@@ -208,7 +208,7 @@ export default function TelemetryCards({
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="text-xs font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer shrink-0 flex items-center gap-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="text-xs font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer shrink-0 flex items-center gap-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
           >
             <span>{t.openSimDashboard}</span>
             <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />

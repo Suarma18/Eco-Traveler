@@ -59,7 +59,7 @@ export default function ItineraryTimeline({
           <button
             type="button"
             onClick={() => onSelectDayFilter(null)}
-            className="font-semibold text-[#C85A32] dark:text-[#F28B66] hover:underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32]"
+            className="font-semibold text-[#C85A32] dark:text-[#F28B66] hover:underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] dark:focus-visible:ring-[#F28B66]"
           >
             {t.showAllDays(days.length)}
           </button>
@@ -142,9 +142,9 @@ export default function ItineraryTimeline({
                           onSelectActivity(activity);
                         }
                       }}
-                      className={`group relative bg-white dark:bg-[#101E18] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                      className={`group relative bg-white dark:bg-[#101E18] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                         isSelected
-                          ? "border-[#0D4732] dark:border-emerald-500 ring-2 ring-[#0D4732]/15 dark:ring-emerald-500/20 shadow-md"
+                          ? "border-[#0D4732] dark:border-emerald-400 ring-2 ring-[#0D4732]/15 dark:ring-emerald-400/25 shadow-md"
                           : "border-stone-200/90 dark:border-emerald-900/40 hover:border-stone-300 dark:hover:border-emerald-700/60 shadow-2xs"
                       }`}
                     >
@@ -257,7 +257,7 @@ export default function ItineraryTimeline({
                                       e.stopPropagation();
                                       onJumpToMap(activity);
                                     }}
-                                    className="lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer"
+                                    className="lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
                                   >
                                     <MapPin
                                       className="w-3 h-3"
@@ -292,7 +292,7 @@ export default function ItineraryTimeline({
 
                 {/* Rekomendasi Homestay / Eco-Lodge Warga di Akhir Hari */}
                 {day.recommendedStay && (
-                  <div className="relative bg-[#0D261C] dark:bg-[#132A20] dark:border dark:border-emerald-700/40 text-white rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm">
+                  <div className="relative bg-[#0D261C] dark:bg-[#163527] dark:border dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/15 text-white rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm">
                     <span
                       aria-hidden="true"
                       className="absolute -left-[23px] sm:-left-[27px] top-4 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#F6F5F0] dark:border-[#08120E]"

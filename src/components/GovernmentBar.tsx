@@ -112,7 +112,7 @@ export default function GovernmentBar({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
+            className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
             aria-label={t.closeModalLabel}
           >
             <X className="w-5 h-5" aria-hidden="true" />
@@ -138,7 +138,7 @@ export default function GovernmentBar({
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#0D261C] dark:bg-[#132A20] dark:border dark:border-emerald-700/40 text-white space-y-1">
+        <div className="p-4 rounded-xl bg-[#0D261C] dark:bg-[#163527] dark:border dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/15 text-white space-y-1">
           <div className="text-xs font-medium text-emerald-300 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{t.ecoRouteAllocTitle}</span>
@@ -186,7 +186,7 @@ export default function GovernmentBar({
                 type="button"
                 aria-pressed={active}
                 onClick={() => setTouristCohort(count)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   active
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white font-semibold shadow-xs"
                     : "bg-white dark:bg-[#101E18] text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-[#1c3329] border border-stone-200/80 dark:border-emerald-900/40"

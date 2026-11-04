@@ -75,7 +75,6 @@ export function formatStayPriceRange(
 
   if (amountsRp.length === 0) return priceRangeStr;
 
-  // Jika input sudah dalam USD namun locale === "id"
   const isAlreadyUsd = priceRangeStr.includes("$");
   const normalizedRp = amountsRp.map((val) =>
     isAlreadyUsd && val < 2000 ? val * USD_EXCHANGE_RATE : val
@@ -100,6 +99,7 @@ export const DAY_COLORS: Record<
   number,
   {
     hex: string;
+    darkHex: string;
     label: string;
     labelEn: string;
     bgClass: string;
@@ -109,7 +109,8 @@ export const DAY_COLORS: Record<
   }
 > = {
   1: {
-    hex: "#0D4732", // Hari 1: Subak Deep Emerald
+    hex: "#0D4732", // Light Mode: Subak Deep Emerald
+    darkHex: "#10B981", // Dark Mode Map: Luminous Emerald (High contrast on dark_all)
     label: "Hari 1",
     labelEn: "Day 1",
     bgClass: "bg-[#0D4732]",
@@ -118,7 +119,8 @@ export const DAY_COLORS: Record<
     textClass: "text-[#0D4732]",
   },
   2: {
-    hex: "#C85A32", // Hari 2: Warm Terracotta
+    hex: "#C85A32", // Light Mode: Warm Terracotta
+    darkHex: "#FB923C", // Dark Mode Map: Luminous Amber-Terracotta
     label: "Hari 2",
     labelEn: "Day 2",
     bgClass: "bg-[#C85A32]",
@@ -127,7 +129,8 @@ export const DAY_COLORS: Record<
     textClass: "text-[#C85A32]",
   },
   3: {
-    hex: "#1D63B8", // Hari 3: Ocean Biorock Blue
+    hex: "#1D63B8", // Light Mode: Ocean Biorock Blue
+    darkHex: "#38BDF8", // Dark Mode Map: Luminous Sky Blue
     label: "Hari 3",
     labelEn: "Day 3",
     bgClass: "bg-[#1D63B8]",
@@ -136,7 +139,8 @@ export const DAY_COLORS: Record<
     textClass: "text-[#1D63B8]",
   },
   4: {
-    hex: "#A16207", // Hari 4: Highland Ochre Gold
+    hex: "#A16207", // Light Mode: Highland Ochre Gold
+    darkHex: "#FBBF24", // Dark Mode Map: Luminous Gold
     label: "Hari 4",
     labelEn: "Day 4",
     bgClass: "bg-amber-700",
