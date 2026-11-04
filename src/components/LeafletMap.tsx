@@ -134,6 +134,14 @@ function MapViewportController({
   const map = useMap();
 
   useEffect(() => {
+    // Pastikan ukuran viewport Leaflet ter-kalkulasi sempurna saat mount atau container ditampilkan
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [map]);
+
+  useEffect(() => {
     if (focusCoords) {
       map.flyTo(focusCoords, 12, { duration: 1.05 });
     }
@@ -178,16 +186,11 @@ export default function LeafletMap({
   const [showAllCuratedVillages, setShowAllCuratedVillages] = useState(true);
   const [showSouthHotspotZone, setShowSouthHotspotZone] = useState(true);
   const [inspectorMinimized, setInspectorMinimized] = useState(false);
-  const [tileTheme, setTileTheme] = useState<BasemapProvider>(
-    CARTO_API_KEY ? (isDark ? "carto-dark" : "carto-voyager") : "osm-clean"
-  );
+  const [tileTheme, setTileTheme] = useState<BasemapProvider>("osm-clean");
 
-  useEffect(() => {
-    if (!CARTO_API_KEY) return;
-    setTileTheme(isDark ? "carto-dark" : "carto-voyager");
-  }, [isDark]);
-
-  const useDarkMapColors = isDark || tileTheme === "carto-dark";
+  // Map basemap selalu konsisten mempertahankan OpenStreetMap (OSM) sebagai default
+  // terlepas dari apakah pengguna memilih tema Terang atau Gelap di seluruh website.
+  const useDarkMapColors = tileTheme === "carto-dark";
 
   const visibleDays = useMemo(() => {
     if (selectedDayFilter === null) return days;
@@ -256,27 +259,27 @@ export default function LeafletMap({
     : null;
 
   const tileConfig = useMemo(() => {
-    if (tileTheme === "carto-dark" && CARTO_API_KEY) {
+    if (tileTheme === "carto-dark") {
       return {
-        url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         subdomains: "abcd",
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 20,
       };
     }
-    if (tileTheme === "carto-voyager" && CARTO_API_KEY) {
+    if (tileTheme === "carto-voyager") {
       return {
-        url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
         subdomains: "abcd",
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 20,
       };
     }
-    if (tileTheme === "carto-positron" && CARTO_API_KEY) {
+    if (tileTheme === "carto-positron") {
       return {
-        url: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         subdomains: "abcd",
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -304,14 +307,14 @@ export default function LeafletMap({
   const dayPrefix = locale === "en" ? "D" : "H";
 
   return (
-    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 dark:border-emerald-800/60 bg-stone-200 dark:bg-[#08120E] shadow-lg">
+    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-slate-200/90 dark:border-emerald-800/60 bg-slate-200 dark:bg-[#090E0B] shadow-sm">
       {/* Top Floating Glassmorphic HUD (Mobile Swipeable) */}
       <div className="absolute top-2.5 sm:top-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
         {/* Filter Hari - Horizontal Scrollable on Mobile */}
         <div
           role="group"
           aria-label="Filter hari perjalanan"
-          className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-md overflow-x-auto no-scrollbar max-w-full"
+          className="flex items-center gap-1 bg-white/95 dark:bg-[#111914]/95 backdrop-blur-md border border-slate-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-xs overflow-x-auto no-scrollbar max-w-full"
         >
           <button
             type="button"
@@ -319,8 +322,8 @@ export default function LeafletMap({
             onClick={() => onSelectDayFilter(null)}
             className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               selectedDayFilter === null
-                ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-xs"
-                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
+                ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
+                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
             }`}
           >
             {t.allDaysBtn(days.length)}
@@ -341,8 +344,8 @@ export default function LeafletMap({
                 }
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   isActive
-                    ? "bg-stone-900 dark:bg-emerald-700 text-white shadow-xs"
-                    : "text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
+                    ? "bg-slate-900 dark:bg-emerald-700 text-white shadow-2xs"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
                 }`}
               >
                 <span
@@ -357,7 +360,7 @@ export default function LeafletMap({
         </div>
 
         {/* Layer & Basemap Switcher */}
-        <div className="flex items-center gap-1 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border border-stone-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-md self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-white/95 dark:bg-[#111914]/95 backdrop-blur-md border border-slate-200/90 dark:border-emerald-700/50 p-1 rounded-xl pointer-events-auto shadow-xs self-start sm:self-auto">
           <button
             type="button"
             aria-pressed={showAllCuratedVillages}
@@ -365,7 +368,7 @@ export default function LeafletMap({
             className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               showAllCuratedVillages
                 ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
-                : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
             <Layers className="w-3.5 h-3.5" aria-hidden="true" />
@@ -376,10 +379,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] dark:focus-visible:ring-orange-400 ${
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
               showSouthHotspotZone
-                ? "bg-orange-50 dark:bg-orange-950/60 text-[#C85A32] dark:text-[#F28B66] font-semibold"
-                : "text-stone-500 dark:text-stone-400 hover:text-stone-800"
+                ? "bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] font-semibold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
@@ -390,28 +393,26 @@ export default function LeafletMap({
             type="button"
             aria-label={t.switchBasemapLabel}
             onClick={() => {
-              if (CARTO_API_KEY) {
-                setTileTheme((prev) =>
-                  prev === "carto-voyager"
-                    ? "carto-positron"
-                    : prev === "carto-positron"
-                    ? "carto-dark"
-                    : prev === "carto-dark"
-                    ? "osm-clean"
-                    : "carto-voyager"
-                );
-              }
+              setTileTheme((prev) =>
+                prev === "osm-clean"
+                  ? "carto-voyager"
+                  : prev === "carto-voyager"
+                  ? "carto-positron"
+                  : prev === "carto-positron"
+                  ? "carto-dark"
+                  : "osm-clean"
+              );
             }}
-            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-stone-700 dark:text-stone-200 hover:text-stone-950 bg-stone-100 dark:bg-[#162921] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
+            className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white bg-slate-100 dark:bg-[#16231c] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
             title={t.switchBasemapLabel}
           >
-            {tileTheme === "carto-voyager"
+            {tileTheme === "osm-clean"
+              ? "OSM"
+              : tileTheme === "carto-voyager"
               ? "Voyager"
               : tileTheme === "carto-positron"
               ? "Positron"
-              : tileTheme === "carto-dark"
-              ? "Dark"
-              : "OSM"}
+              : "Dark"}
           </button>
         </div>
       </div>
@@ -429,6 +430,7 @@ export default function LeafletMap({
           url={tileConfig.url}
           subdomains={tileConfig.subdomains}
           maxZoom={tileConfig.maxZoom}
+          keepBuffer={8}
         />
 
         <MapViewportController
@@ -666,7 +668,7 @@ export default function LeafletMap({
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
       {activeStep && activeVisualMeta && (
         <div className="absolute bottom-2.5 sm:bottom-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] pointer-events-none">
-          <div className="bg-[#0D261C]/95 dark:bg-[#0E241B]/95 backdrop-blur-md text-white border border-emerald-800/60 dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/20 rounded-2xl p-3 sm:p-3.5 shadow-2xl pointer-events-auto transition-opacity">
+          <div className="bg-[#0D261C]/95 dark:bg-[#0E1F18]/95 backdrop-blur-md text-white border border-emerald-800/60 dark:border-emerald-500/30 rounded-2xl p-3 sm:p-3.5 shadow-xl pointer-events-auto transition-opacity">
             {inspectorMinimized ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">

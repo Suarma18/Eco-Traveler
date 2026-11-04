@@ -30,22 +30,77 @@ import {
   Route,
 } from "lucide-react";
 
+// Eager-preload chunk LeafletMap di awal runtime browser agar tidak tertahan antrean hidrasi
+if (typeof window !== "undefined") {
+  import("@/components/LeafletMap");
+}
+
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
   ssr: false,
   loading: () => (
     <div
-      className="w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-6.5rem)] rounded-2xl bg-stone-100 dark:bg-[#101E18] border border-stone-200/80 dark:border-emerald-900/40 animate-pulse flex flex-col items-center justify-center p-6 text-center"
+      className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden bg-stone-100 dark:bg-[#08120E] border border-stone-200/90 dark:border-emerald-800/60 shadow-lg flex flex-col items-center justify-center p-6 text-center select-none"
       aria-live="polite"
+      aria-busy="true"
     >
-      <div className="w-11 h-11 rounded-2xl bg-white dark:bg-[#162921] border border-stone-200 dark:border-emerald-800/50 flex items-center justify-center mb-3 shadow-sm">
-        <MapIcon
-          className="w-5 h-5 text-[#0D4732] dark:text-emerald-400"
-          aria-hidden="true"
-        />
+      {/* Topographic Coordinate Grid Background */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(#0D4732_1px,transparent_1px)] [background-size:20px_20px] opacity-15 dark:opacity-25"
+      />
+
+      {/* Top Floating Badge Mockup */}
+      <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+        <div className="px-2.5 py-1 rounded-xl bg-white/90 dark:bg-[#101E18]/90 backdrop-blur-xs border border-stone-200 dark:border-emerald-800/40 text-[11px] font-mono font-medium text-stone-600 dark:text-stone-300 shadow-xs">
+          OpenStreetMap · Basemap Siaga
+        </div>
+        <div className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[10px] font-mono text-[#0D4732] dark:text-emerald-300 font-semibold">
+          8°20&apos;S 115°13&apos;E
+        </div>
       </div>
-      <p className="font-display text-sm font-bold text-stone-800 dark:text-stone-100">
-        Loading Bali Spatial Village Atlas…
-      </p>
+
+      {/* Center Animated Bali Spatial Blueprint */}
+      <div className="relative z-10 flex flex-col items-center max-w-sm space-y-3.5">
+        <div className="relative w-44 h-28 flex items-center justify-center">
+          {/* SVG Siluet Pulau Bali dengan Titik Node Desa */}
+          <svg
+            viewBox="0 0 240 140"
+            className="w-full h-full text-emerald-800/20 dark:text-emerald-400/20 drop-shadow-sm"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M 24 64 Q 70 32, 130 36 T 202 66 Q 224 76, 212 92 Q 176 102, 144 100 Q 138 126, 128 132 Q 120 126, 124 102 Q 80 94, 24 64 Z" />
+            {/* Jalur Koneksi Desa */}
+            <path
+              d="M 54 68 L 108 46 L 134 62 L 174 74"
+              fill="none"
+              stroke="#10B981"
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
+              className="animate-pulse"
+            />
+            {/* Simpul Titik Desa */}
+            <circle cx="54" cy="68" r="3.5" fill="#C85A32" />
+            <circle cx="108" cy="46" r="3.5" fill="#10B981" />
+            <circle cx="134" cy="62" r="3.5" fill="#38BDF8" />
+            <circle cx="174" cy="74" r="3.5" fill="#FBBF24" />
+          </svg>
+
+          {/* Radar Scanner Ripple Effect */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="w-16 h-16 rounded-full border-2 border-emerald-500/30 animate-ping" />
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-display text-sm font-bold text-stone-900 dark:text-stone-100 tracking-tight">
+            Menyiapkan Atlas Spasial Bali
+          </p>
+          <p className="text-xs font-mono text-stone-500 dark:text-stone-400">
+            Sinkronisasi layer OpenStreetMap & 28 titik desa...
+          </p>
+        </div>
+      </div>
     </div>
   ),
 });
@@ -199,13 +254,13 @@ export default function HomePage() {
   const t = UI_TEXT[locale];
 
   return (
-    <div className="min-h-[100dvh] pb-20 lg:pb-0 bg-[#F6F5F0] dark:bg-[#08120E] text-[#141715] dark:text-stone-100 transition-colors">
+    <div className="min-h-[100dvh] pb-20 lg:pb-0 bg-[#F8F9FA] dark:bg-[#090E0B] text-slate-900 dark:text-slate-100 transition-colors">
       {/* Sticky Top Command Bar */}
-      <header className="sticky top-0 z-40 h-14 sm:h-16 bg-[#F6F5F0]/90 dark:bg-[#08120E]/90 backdrop-blur-md border-b border-stone-200/80 dark:border-emerald-900/40 no-print transition-colors">
+      <header className="sticky top-0 z-40 h-14 sm:h-16 bg-[#F8F9FA]/90 dark:bg-[#090E0B]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-emerald-950/80 no-print transition-colors">
         <div className="max-w-[1520px] mx-auto h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Identity */}
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D261C] dark:bg-emerald-700 text-white flex items-center justify-center shadow-sm shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D261C] dark:bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0 ring-1 ring-emerald-500/20">
               <Compass
                 className="w-4 h-4 text-emerald-300 dark:text-white"
                 aria-hidden="true"
@@ -215,18 +270,18 @@ export default function HomePage() {
               <div className="flex items-center gap-2">
                 <span
                   translate="no"
-                  className="font-display text-sm sm:text-base font-bold tracking-tight text-[#0D261C] dark:text-white truncate"
+                  className="font-display text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-white truncate"
                 >
                   Eco Traveler
                 </span>
                 <span
                   translate="no"
-                  className="hidden md:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/10 dark:bg-emerald-500/20 text-[#0D4732] dark:text-emerald-300"
+                  className="hidden md:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40"
                 >
                   Subak Atelier
                 </span>
               </div>
-              <p className="text-[11px] text-stone-500 dark:text-stone-400 hidden sm:block truncate">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block truncate">
                 {t.brandSubtitle}
               </p>
             </div>
@@ -236,7 +291,7 @@ export default function HomePage() {
           <div
             role="tablist"
             aria-label="Mode tampilan"
-            className="hidden lg:flex items-center bg-stone-200/75 dark:bg-[#101E18] p-1 rounded-xl border border-stone-300/60 dark:border-emerald-900/50"
+            className="hidden lg:flex items-center bg-slate-200/70 dark:bg-[#121B16] p-1 rounded-xl border border-slate-300/70 dark:border-emerald-900/40"
           >
             <button
               type="button"
@@ -245,8 +300,8 @@ export default function HomePage() {
               onClick={() => setActiveView("atlas")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                 activeView === "atlas"
-                  ? "bg-white dark:bg-[#162921] text-stone-900 dark:text-white shadow-xs"
-                  : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-[#18271F] text-slate-900 dark:text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <MapIcon
@@ -262,12 +317,12 @@ export default function HomePage() {
               onClick={() => setActiveView("simulation")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                 activeView === "simulation"
-                  ? "bg-white dark:bg-[#162921] text-stone-900 dark:text-white shadow-xs"
-                  : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                  ? "bg-white dark:bg-[#18271F] text-slate-900 dark:text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <BarChart3
-                className="w-3.5 h-3.5 text-[#C85A32] dark:text-[#F28B66]"
+                className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
                 aria-hidden="true"
               />
               <span>{t.tabSimulation}</span>
@@ -276,37 +331,37 @@ export default function HomePage() {
 
           {/* Right Controls: Language Toggle (ID/EN) + Theme Toggle (Light/Dark) + PDF Button */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Toggle ID / EN (Also converts Rp <-> USD) */}
+            {/* Toggle ID / EN */}
             <div
               role="group"
-              aria-label="Pilih Bahasa dan Mata Uang"
-              className="inline-flex items-center bg-stone-200/80 dark:bg-[#101E18] p-0.5 rounded-xl border border-stone-300/70 dark:border-emerald-900/50"
+              aria-label="Pilih Bahasa"
+              className="inline-flex items-center bg-slate-200/70 dark:bg-[#121B16] p-0.5 rounded-xl border border-slate-300/70 dark:border-emerald-900/40"
             >
               <button
                 type="button"
                 aria-pressed={locale === "id"}
                 onClick={() => handleToggleLocale("id")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   locale === "id"
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
-                    : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
-                title="Bahasa Indonesia (IDR Rp)"
+                title="Bahasa Indonesia (ID)"
               >
-                ID·Rp
+                ID
               </button>
               <button
                 type="button"
                 aria-pressed={locale === "en"}
                 onClick={() => handleToggleLocale("en")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   locale === "en"
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
-                    : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
-                title="English (USD $)"
+                title="English (EN)"
               >
-                EN·$
+                EN
               </button>
             </div>
 
@@ -314,7 +369,7 @@ export default function HomePage() {
             <div
               role="group"
               aria-label="Pilih Tema Tampilan"
-              className="inline-flex items-center bg-stone-200/80 dark:bg-[#101E18] p-0.5 rounded-xl border border-stone-300/70 dark:border-emerald-900/50"
+              className="inline-flex items-center bg-slate-200/70 dark:bg-[#121B16] p-0.5 rounded-xl border border-slate-300/70 dark:border-emerald-900/40"
             >
               <button
                 type="button"
@@ -322,8 +377,8 @@ export default function HomePage() {
                 onClick={() => handleSetTheme(false)}
                 className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   !isDark
-                    ? "bg-white text-stone-900 shadow-2xs"
-                    : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title={t.themeLight}
               >
@@ -340,7 +395,7 @@ export default function HomePage() {
                 className={`px-2 py-1 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                   isDark
                     ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
-                    : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title={t.themeDark}
               >
@@ -375,34 +430,39 @@ export default function HomePage() {
         className="max-w-[1520px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5"
       >
         {/* DESKTOP SIMULATION VIEW OR MOBILE SIMULATION TAB */}
-        {activeView === "simulation" || mobileTab === "simulation" ? (
-          <div
-            className={
-              activeView === "simulation"
+        <div
+          className={
+            activeView === "simulation" || mobileTab === "simulation"
+              ? activeView === "simulation"
                 ? "space-y-5"
                 : "lg:hidden space-y-5"
-            }
-          >
-            <TelemetryCards
-              itinerary={itinerary}
-              hideSimulationTriggers
-              locale={locale}
-            />
-            <GovernmentBar
-              itinerary={itinerary}
-              inlineMode={true}
-              onClose={() => {
-                setActiveView("atlas");
-                setMobileTab("plan");
-              }}
-              locale={locale}
-            />
-          </div>
-        ) : null}
+              : "hidden"
+          }
+        >
+          <TelemetryCards
+            itinerary={itinerary}
+            hideSimulationTriggers
+            locale={locale}
+          />
+          <GovernmentBar
+            itinerary={itinerary}
+            inlineMode={true}
+            onClose={() => {
+              setActiveView("atlas");
+              setMobileTab("plan");
+            }}
+            locale={locale}
+          />
+        </div>
 
-        {/* ATLAS SPLIT-SCREEN */}
-        {activeView === "atlas" && mobileTab !== "simulation" && (
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* ATLAS SPLIT-SCREEN (Tetap dimount di DOM agar kontainer Leaflet Map tidak dihancurkan saat beralih tab) */}
+        <div
+          className={`flex flex-col lg:flex-row gap-6 items-start ${
+            activeView === "simulation" || mobileTab === "simulation"
+              ? "hidden"
+              : ""
+          }`}
+        >
             {/* PANEL KIRI: 46% Lebar Layar Desktop, atau Tab "plan" di Mobile */}
             <div
               className={`w-full lg:w-[46%] space-y-4 sm:space-y-5 ${
@@ -410,7 +470,7 @@ export default function HomePage() {
               }`}
             >
               {/* Editorial Hero Banner */}
-              <section className="relative rounded-2xl overflow-hidden bg-[#0D261C] dark:bg-[#163527] dark:border dark:border-emerald-500/40 dark:ring-1 dark:ring-emerald-400/15 text-white p-4 sm:p-6 shadow-md">
+              <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 text-white p-5 sm:p-6 shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
@@ -418,9 +478,9 @@ export default function HomePage() {
                   aria-hidden="true"
                   width={1200}
                   height={400}
-                  className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
+                  className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-luminosity pointer-events-none"
                 />
-                <div className="relative z-10 space-y-2.5 sm:space-y-3">
+                <div className="relative z-10 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-emerald-200 border border-white/15">
                       <Sparkles
@@ -429,9 +489,10 @@ export default function HomePage() {
                       />
                       {t.heroBadge}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-stone-300">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-slate-300 bg-black/25 px-2 py-0.5 rounded-full border border-white/10">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <CheckCircle2
-                        className="w-3.5 h-3.5 text-emerald-400"
+                        className="w-3 h-3 text-emerald-400"
                         aria-hidden="true"
                       />
                       {itinerary.engineMeta?.source === "gemini-ai"
@@ -440,11 +501,11 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  <h1 className="font-display text-xl sm:text-[28px] font-bold tracking-tight text-white leading-tight text-balance">
+                  <h1 className="font-display text-xl sm:text-[26px] font-bold tracking-tight text-white leading-snug text-balance">
                     {t.heroTitle}
                   </h1>
 
-                  <p className="text-xs sm:text-sm text-stone-200/90 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed max-w-xl">
                     {t.heroDesc}
                   </p>
                 </div>
@@ -467,30 +528,30 @@ export default function HomePage() {
               {/* Ringkasan Narasi Rute Aktif */}
               <section
                 aria-live="polite"
-                className="bg-white dark:bg-[#101E18] border border-stone-200/80 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2 transition-colors"
+                className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2.5 transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-1.5 font-semibold text-[#0D4732] dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
                     <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                     {t.routeSummaryDays(itinerary.days.length)}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-stone-600 dark:text-stone-300 font-medium">
+                  <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
                     <PlaneLanding
-                      className="w-3.5 h-3.5 text-[#C85A32] dark:text-[#F28B66]"
+                      className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
                       aria-hidden="true"
                     />
                     {t.arrivalGatePrefix}{" "}
-                    <strong className="text-stone-900 dark:text-stone-100">
+                    <strong className="text-slate-900 dark:text-slate-100">
                       {itinerary.engineMeta?.arrivalGateLabel ||
                         "Bandara I Gusti Ngurah Rai"}
                     </strong>
                   </span>
                 </div>
 
-                <h2 className="font-display text-base sm:text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 pt-0.5 text-balance">
+                <h2 className="font-display text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 pt-0.5 text-balance">
                   {itinerary.tripTitle}
                 </h2>
-                <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                   {itinerary.summaryNarrative}
                 </p>
               </section>
@@ -515,7 +576,7 @@ export default function HomePage() {
               />
 
               {/* Footer Ringkas */}
-              <footer className="pt-3 pb-4 border-t border-stone-200/80 dark:border-emerald-900/40 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500 dark:text-stone-400">
+              <footer className="pt-3 pb-4 border-t border-slate-200/80 dark:border-emerald-900/40 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
                 <span translate="no">{t.footerLeft}</span>
                 <span>{t.footerRight}</span>
               </footer>
@@ -541,13 +602,12 @@ export default function HomePage() {
               />
             </aside>
           </div>
-        )}
       </main>
 
       {/* Sticky Bottom Thumb Navigation Bar (Mobile / Handphone Only, < 1024px) */}
       <nav
         aria-label="Navigasi utama ponsel"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#101E18]/95 backdrop-blur-md border-t border-stone-200/90 dark:border-emerald-900/50 px-3 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] no-print shadow-2xl"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#111914]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-emerald-900/50 px-3 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] no-print shadow-2xl"
       >
         <div className="grid grid-cols-3 gap-1.5 max-w-md mx-auto">
           <button
@@ -560,7 +620,7 @@ export default function HomePage() {
             className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "plan"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
-                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
+                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
             }`}
           >
             <Route className="w-4 h-4" aria-hidden="true" />
@@ -577,7 +637,7 @@ export default function HomePage() {
             className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "map"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
-                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
+                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
             }`}
           >
             <MapIcon className="w-4 h-4" aria-hidden="true" />
@@ -593,7 +653,7 @@ export default function HomePage() {
             className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "simulation"
                 ? "bg-[#0D261C] dark:bg-emerald-600 text-white"
-                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-[#162921]"
+                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
             }`}
           >
             <BarChart3 className="w-4 h-4" aria-hidden="true" />

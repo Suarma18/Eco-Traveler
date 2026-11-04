@@ -4,31 +4,31 @@
 
 :root {
   color-scheme: light;
-  --canvas-bg: #f6f5f0;
+  --canvas-bg: #f8f9fa;
   --forest-anchor: #0d261c;
-  --forest-primary: #143628;
-  --terracotta-accent: #c85a32;
+  --forest-primary: #0d5c3a;
+  --terracotta-accent: #ea580c;
 }
 
 html.dark {
   color-scheme: dark;
-  --canvas-bg: #08120e;
-  --forest-anchor: #153427;
-  --forest-primary: #1c4232;
-  --terracotta-accent: #f28b66;
+  --canvas-bg: #090e0b;
+  --forest-anchor: #12281e;
+  --forest-primary: #1b4d36;
+  --terracotta-accent: #fb923c;
 }
 
 body {
   background-color: var(--canvas-bg);
-  color: #171717;
+  color: #0f172a;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(13, 71, 50, 0.12);
 }
 
 html.dark body {
-  background-color: #08120e;
-  color: #f5f5f4;
+  background-color: #090e0b;
+  color: #f8fafc;
 }
 
 .tabular-nums {
