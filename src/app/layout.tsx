@@ -25,16 +25,15 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eco Traveler | AI Redistributive Travel Planner for Bali",
+  title: "Eco Traveler | Perencana Rute Wisata Berkeadilan Bali",
   description:
-    "Perencana perjalanan wisata cerdas berbasis AI yang mengoptimalkan pemerataan ekonomi wilayah (Spatial Equity) dan retensi belanja UMKM Desa Wisata di Bali Utara, Timur, dan Barat. Karya Kompetisi Bali DigiFest 2026 - Bidang Bali Smart Society.",
+    "Platform geospasial dan perencana perjalanan wisata Bali berbasis AI yang mengoptimalkan pemerataan ekonomi Desa Wisata mandiri dan pelestarian etika adat (Awig-Awig).",
   keywords: [
     "Eco Traveler Bali",
     "Bali DigiFest 2026",
     "Bali Smart Society",
     "Desa Wisata Bali",
-    "Anti-Overtourism Bali",
-    "Spatial Equity Tourism",
+    "Perencana Rute Wisata Berkeadilan Bali",
   ],
 };
 
@@ -48,10 +47,9 @@ export default function RootLayout({
       lang="id"
       className={`${outfit.variable} ${jakarta.variable} ${jetbrains.variable} scroll-smooth`}
     >
-      <body className="font-sans antialiased bg-[#07130E] text-slate-100 selection:bg-emerald-500 selection:text-slate-950 min-h-[100dvh]">
+      <body className="font-sans antialiased bg-[#F6F5F0] text-stone-900 selection:bg-[#0D261C] selection:text-emerald-200 min-h-[100dvh]">
         {children}
       </body>
     </html>
   );
 }
-

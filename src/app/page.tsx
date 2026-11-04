@@ -19,28 +19,26 @@ import GovernmentBar from "@/components/GovernmentBar";
 import {
   Compass,
   Map as MapIcon,
-  ShieldCheck,
-  Sparkles,
+  FileDown,
   BarChart3,
-  ScrollText,
-  ArrowDownRight,
-  Globe2,
-  Database,
-  Cpu,
+  Sparkles,
+  PlaneLanding,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[520px] lg:h-[620px] rounded-2xl bg-slate-900/90 border border-slate-800 animate-pulse flex flex-col items-center justify-center p-6 text-center">
-      <div className="w-12 h-12 rounded-2xl bg-emerald-950 border border-emerald-700/60 flex items-center justify-center mb-3">
-        <MapIcon className="w-6 h-6 text-emerald-400" />
+    <div className="w-full h-[540px] lg:h-[calc(100dvh-6.5rem)] rounded-2xl bg-stone-100 border border-stone-200/80 animate-pulse flex flex-col items-center justify-center p-6 text-center">
+      <div className="w-11 h-11 rounded-2xl bg-white border border-stone-200 flex items-center justify-center mb-3 shadow-sm">
+        <MapIcon className="w-5 h-5 text-[#0D4732]" />
       </div>
-      <p className="text-sm font-display font-bold text-slate-200">
-        Memuat Peta Spasial Desa Wisata Bali...
+      <p className="font-display text-sm font-bold text-stone-800">
+        Memuat Atlas Spasial Desa Wisata Bali...
       </p>
-      <p className="text-xs text-slate-400 mt-1">
-        Menyiapkan 28 titik koordinat Disparda & jalur polyline harian
+      <p className="text-xs text-stone-500 mt-1">
+        Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian
       </p>
     </div>
   ),
@@ -61,9 +59,9 @@ function getInitialItinerary(): ItineraryResponse {
     culturalEtiquette: preset.culturalEtiquette,
     engineMeta: {
       source: "deterministic-fallback",
-      modelUsed: "EcoTraveler Heuristic Spatial Engine v1.0",
+      modelUsed: "Subak Spatial Engine v2.0",
       latencyMs: 14,
-      arrivalGateLabel: "Bandara I Gusti Ngurah Rai (Tuban - Selatan)",
+      arrivalGateLabel: "Bandara I Gusti Ngurah Rai",
       arrivalCoords: [-8.7467, 115.1668],
     },
   };
@@ -87,6 +85,7 @@ export default function HomePage() {
   );
   const [selectedActivity, setSelectedActivity] =
     useState<TripDayActivity | null>(null);
+  const [activeView, setActiveView] = useState<"atlas" | "simulation">("atlas");
 
   const handleGenerate = useCallback(async (reqPayload: TripRequest) => {
     setIsLoading(true);
@@ -111,7 +110,6 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    // Sinkronisasi awal saat halaman pertama kali dibuka
     handleGenerate({
       durationDays: 3,
       interests: ["Culture", "Nature", "Culinary"],
@@ -121,218 +119,195 @@ export default function HomePage() {
     });
   }, [handleGenerate]);
 
+  const handleDownloadPdf = () => {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
+
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-[#07130E] text-slate-100">
-      {/* Sticky Navigation Header (Height 68px, single-line on desktop) */}
-      <header className="sticky top-0 z-[600] h-[68px] bg-[#07130E]/90 backdrop-blur-md border-b border-emerald-950/80">
-        <div className="max-w-[1400px] mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
+    <div className="min-h-[100dvh] bg-[#F6F5F0] text-[#141715]">
+      {/* Sticky Top Command Bar */}
+      <header className="sticky top-0 z-40 h-16 bg-[#F6F5F0]/90 backdrop-blur-md border-b border-stone-200/80 no-print">
+        <div className="max-w-[1520px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          {/* Brand Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-display font-extrabold shadow-md shadow-emerald-950">
-              <Compass className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-[#0D261C] text-white flex items-center justify-center shadow-sm">
+              <Compass className="w-4 h-4 text-emerald-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-extrabold text-base tracking-tight text-slate-100">
+                <span className="font-display text-base font-bold tracking-tight text-[#0D261C]">
                   Eco Traveler
                 </span>
-                <span className="hidden sm:inline-block text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/70">
-                  Bali DigiFest 2026
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/10 text-[#0D4732]">
+                  Subak Atelier
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">
-                AI Redistributive Travel Planner • Bali Smart Society
+              <p className="text-[11px] text-stone-500 hidden sm:block">
+                Atlas Spasial & Kurator Rute Berkeadilan Bali
               </p>
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
-            <a
-              href="#workspace-planner"
-              className="hover:text-emerald-400 transition-colors"
+          {/* Center View Mode Switcher */}
+          <div className="flex items-center bg-stone-200/75 p-1 rounded-xl border border-stone-300/60">
+            <button
+              type="button"
+              onClick={() => setActiveView("atlas")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                activeView === "atlas"
+                  ? "bg-white text-stone-900 shadow-xs"
+                  : "text-stone-600 hover:text-stone-900"
+              }`}
             >
-              Perencana & Peta
-            </a>
-            <a
-              href="#simulasi-pdrb"
-              className="hover:text-emerald-400 transition-colors"
+              <MapIcon className="w-3.5 h-3.5 text-[#0D4732]" />
+              <span>Eksplorasi Rute & Peta</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView("simulation")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                activeView === "simulation"
+                  ? "bg-white text-stone-900 shadow-xs"
+                  : "text-stone-600 hover:text-stone-900"
+              }`}
             >
-              Simulasi Dampak Kabupaten
-            </a>
-            <a
-              href="#panduan-adat"
-              className="hover:text-emerald-400 transition-colors"
-            >
-              Panduan Awig-Awig
-            </a>
-          </nav>
+              <BarChart3 className="w-3.5 h-3.5 text-[#C85A32]" />
+              <span>Simulasi Dampak Regulasi</span>
+            </button>
+          </div>
 
-          <div className="flex items-center gap-2">
-            <span className="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              28 Desa Terverifikasi
-            </span>
-            <a
-              href="#workspace-planner"
-              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-xs transition-all"
+          {/* Right Action Button */}
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              className="px-3.5 py-2 rounded-xl bg-[#0D261C] hover:bg-[#0D4732] text-white font-semibold text-xs transition-all cursor-pointer inline-flex items-center gap-2 shadow-xs"
             >
-              Mulai Rute
-            </a>
+              <FileDown className="w-3.5 h-3.5 text-emerald-300" />
+              <span className="hidden md:inline">
+                Unduh Rencana Perjalanan (PDF)
+              </span>
+              <span className="md:hidden">Unduh PDF</span>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-6 lg:py-8 space-y-10">
-        {/* Split-Screen Editorial Hero Section (Strict Hero Stack Discipline) */}
-        <section className="relative rounded-3xl bg-gradient-to-br from-slate-900/95 via-[#0B2219] to-slate-950 border border-emerald-900/50 p-6 sm:p-8 lg:p-10 shadow-2xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Copy Stack (4 elements max) */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-emerald-300 bg-emerald-950/90 border border-emerald-800/70 px-3 py-1 rounded-full">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                Redistributive Spatial AI Engine • Bali Smart Society
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight text-slate-100 leading-[1.1]">
-                Sebarkan Manfaat Wisata ke{" "}
-                <span className="text-emerald-400">
-                  Desa Mandiri Bali Utara, Timur & Barat.
-                </span>
-              </h1>
-
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-[60ch]">
-                Kawasan Sarbagita menanggung 65,88% konsentrasi PDRB dan beban
-                kemacetan akut. Eco Traveler mengoptimalkan rute bebas macet
-                yang menahan ≥75% belanja wisatawan di homestay warga dan UMKM
-                desa.
-              </p>
-
-              <div className="pt-1 flex flex-wrap items-center gap-3">
-                <a
-                  href="#workspace-planner"
-                  className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-emerald-950/60"
-                >
-                  <span>Rancang Perjalanan</span>
-                  <ArrowDownRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="#simulasi-pdrb"
-                  className="px-4 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-xs sm:text-sm transition-all inline-flex items-center gap-2"
-                >
-                  <BarChart3 className="w-4 h-4 text-emerald-400" />
-                  <span>Simulasi Ekonomi Juri</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Right Spatial Equity Live Summary Card */}
-            <div className="lg:col-span-5 bg-slate-950/85 border border-slate-800/90 rounded-2xl p-5 space-y-4 shadow-xl">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
-                    Indeks Ketimpangan Spasial Bali
-                  </span>
-                  <h2 className="text-sm font-display font-bold text-slate-100">
-                    Mengapa Algoritma Popularitas Gagal?
-                  </h2>
-                </div>
-                <Globe2 className="w-5 h-5 text-emerald-400" />
-              </div>
-
-              <div className="space-y-3 text-xs">
-                <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-900/50 space-y-1">
-                  <div className="flex items-center justify-between font-semibold text-rose-300">
-                    <span>Bali Selatan (Sarbagita)</span>
-                    <span className="font-mono">65,88% PDRB (Bobot 0.2)</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Algoritma ulasan populer menumpuk 6,6 juta wisman di koridor
-                    Kuta-Canggu-Ubud, memicu krisis air & macet.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/60 space-y-1">
-                  <div className="flex items-center justify-between font-semibold text-emerald-300">
-                    <span>Buleleng, Karangasem, Bangli, Jembrana</span>
-                    <span className="font-mono">Prioritas 1.0</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300">
-                    Eco Traveler mengunci minimal 70% durasi di desa wisata
-                    luar selatan + pelindung kuota otomatis (Buffer Village).
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-                <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-base font-mono font-bold text-emerald-400">
-                    {itinerary.metrics.spreadScore}
-                  </div>
-                  <div className="text-[10px] text-slate-400">Spread Score</div>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-base font-mono font-bold text-emerald-400">
-                    {itinerary.metrics.localBenefitIndex}%
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    Local Benefit
-                  </div>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                  <div className="text-base font-mono font-bold text-amber-300">
-                    28 Desa
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    Kurasi Disparda
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Main Workspace Container */}
+      <main className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        {activeView === "simulation" ? (
+          <div className="space-y-5">
+            <TelemetryCards itinerary={itinerary} />
+            <GovernmentBar
+              itinerary={itinerary}
+              inlineMode={true}
+              onClose={() => setActiveView("atlas")}
+            />
           </div>
-        </section>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            {/* PANEL KIRI: 46% Lebar Layar, Scrollable Editorial Stream */}
+            <div className="w-full lg:w-[46%] space-y-5">
+              {/* Editorial Hero Banner */}
+              <section className="relative rounded-2xl overflow-hidden bg-[#0D261C] text-white p-5 sm:p-6 shadow-sm">
+                <img
+                  src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
+                  alt="Lanskap Subak Bali"
+                  className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
+                />
+                <div className="relative z-10 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-emerald-200 border border-white/15">
+                      <Sparkles className="w-3 h-3 text-emerald-300" />
+                      28 Desa Wisata Terkurasi · Bali Smart Society
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-stone-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      {itinerary.engineMeta?.source === "gemini-ai"
+                        ? "Gemini Spatial AI"
+                        : "Deterministic Spatial Engine"}
+                    </span>
+                  </div>
 
-        {/* Core Interactive Workspace: Form + Telemetry + Map + Timeline */}
-        <section id="workspace-planner" className="scroll-mt-20 space-y-6">
-          {/* Telemetry Metrics Strip */}
-          <TelemetryCards itinerary={itinerary} />
+                  <h1 className="font-display text-2xl sm:text-[28px] font-bold tracking-tight text-white leading-tight">
+                    Perencana Rute Wisata Berkeadilan Bali
+                  </h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Sidebar: Trip Planner Form (4 Cols on Desktop) */}
-            <div className="lg:col-span-4 lg:sticky lg:top-20">
-              <TripPlannerForm
-                value={request}
-                onChange={setRequest}
-                onSubmit={handleGenerate}
-                isLoading={isLoading}
-              />
-            </div>
+                  <p className="text-xs sm:text-sm text-stone-200/90 leading-relaxed">
+                    Menyusun perjalanan bebas macet yang menyalurkan manfaat
+                    ekonomi langsung ke homestay warga, koperasi subak, dan UMKM
+                    desa di luar koridor padat Bali Selatan.
+                  </p>
+                </div>
+              </section>
 
-            {/* Right Main Panel: Active Route Header, Interactive Map & Day-by-Day Timeline (8 Cols) */}
-            <div className="lg:col-span-8 space-y-6">
-              {/* Active Itinerary Narrative Banner */}
-              <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-xl space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Rencana Perjalanan Aktif ({itinerary.days.length} Hari)
+              {/* Kontrol Rute & Skenario Instan */}
+              <div className="no-print">
+                <TripPlannerForm
+                  value={request}
+                  onChange={setRequest}
+                  onSubmit={handleGenerate}
+                  isLoading={isLoading}
+                />
+              </div>
+
+              {/* 3-Cell Bento Impact Grid & 1-Line Regional Share */}
+              <TelemetryCards itinerary={itinerary} />
+
+              {/* Ringkasan Narasi Rute Aktif */}
+              <section className="bg-white border border-stone-200/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-[#0D4732] bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/60">
+                    <Clock className="w-3.5 h-3.5" />
+                    Rencana Perjalanan {itinerary.days.length} Hari
                   </span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Pintu Masuk:{" "}
-                    <strong className="text-slate-200">
+                  <span className="inline-flex items-center gap-1.5 text-stone-600 font-medium">
+                    <PlaneLanding className="w-3.5 h-3.5 text-[#C85A32]" />
+                    Titik Masuk:{" "}
+                    <strong className="text-stone-900">
                       {itinerary.engineMeta?.arrivalGateLabel ||
                         "Bandara I Gusti Ngurah Rai"}
                     </strong>
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-display font-extrabold text-slate-100">
+
+                <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-stone-900 pt-0.5">
                   {itinerary.tripTitle}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
                   {itinerary.summaryNarrative}
                 </p>
-              </div>
+              </section>
 
-              {/* Interactive Leaflet Spatial Map */}
+              {/* Kartu Rute Timeline Harian (Editorial Visual Timeline) */}
+              <ItineraryTimeline
+                days={itinerary.days}
+                allVillages={ALL_VILLAGES}
+                selectedActivity={selectedActivity}
+                onSelectActivity={setSelectedActivity}
+                selectedDayFilter={selectedDayFilter}
+                onSelectDayFilter={setSelectedDayFilter}
+              />
+
+              {/* Panduan Etika Adat Desa (Awig-Awig) */}
+              <CulturalBriefing
+                itinerary={itinerary}
+                allVillages={ALL_VILLAGES}
+              />
+
+              {/* Footer Ringkas */}
+              <footer className="pt-3 pb-6 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
+                <span>
+                  Eco Traveler · Arsitektur Spasial Pariwisata Berkeadilan
+                </span>
+                <span>Dataset Terkurasi 28 Desa Wisata Bali</span>
+              </footer>
+            </div>
+
+            {/* PANEL KANAN: 54% Lebar Layar, Sticky Full-Height Spatial Atlas */}
+            <aside className="w-full lg:w-[54%] lg:sticky lg:top-[5.25rem]">
               <LeafletMap
                 days={itinerary.days}
                 allVillages={ALL_VILLAGES}
@@ -343,94 +318,10 @@ export default function HomePage() {
                 arrivalCoords={itinerary.engineMeta?.arrivalCoords}
                 arrivalLabel={itinerary.engineMeta?.arrivalGateLabel}
               />
-
-              {/* Day-by-Day Route Timeline */}
-              <ItineraryTimeline
-                days={itinerary.days}
-                selectedActivity={selectedActivity}
-                onSelectActivity={setSelectedActivity}
-                selectedDayFilter={selectedDayFilter}
-                onSelectDayFilter={setSelectedDayFilter}
-              />
-            </div>
+            </aside>
           </div>
-        </section>
-
-        {/* Regional Impact Simulation Dashboard (Nilai Tambah Juri) */}
-        <div id="simulasi-pdrb" className="scroll-mt-20">
-          <GovernmentBar itinerary={itinerary} />
-        </div>
-
-        {/* Contextual Adat & Cultural Etiquette Briefing */}
-        <div id="panduan-adat" className="scroll-mt-20">
-          <CulturalBriefing itinerary={itinerary} allVillages={ALL_VILLAGES} />
-        </div>
+        )}
       </main>
-
-      {/* Competition Compliance & Attribution Footer (PRD Section 9) */}
-      <footer className="border-t border-slate-800/80 bg-slate-950/90 mt-12 py-8">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-400">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 font-display font-bold text-slate-200 text-sm">
-                <Compass className="w-4 h-4 text-emerald-400" />
-                <span>Eco Traveler - Bali DigiFest 2026</span>
-              </div>
-              <p className="leading-relaxed">
-                AI Redistributive Travel Planner untuk mengatasi overtourism
-                Bali Selatan dan mempercepat pemerataan ekonomi Desa Wisata di
-                Buleleng, Karangasem, Bangli, dan Jembrana.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-slate-200">
-                <Database className="w-4 h-4 text-emerald-400" />
-                <span>Transparansi Dataset & Peta (Lampiran C)</span>
-              </div>
-              <ul className="space-y-1 text-[11px]">
-                <li>
-                  • <strong>Dataset Desa Wisata:</strong> Kurasi 28 Desa Wisata
-                  Binaan Disparda Provinsi Bali & Pokdarwis Daerah.
-                </li>
-                <li>
-                  • <strong>Spasial & Basemap:</strong> Leaflet.js &
-                  OpenStreetMap / CartoDB Voyager (ODbL / CC-BY-SA).
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-slate-200">
-                <Cpu className="w-4 h-4 text-emerald-400" />
-                <span>Arsitektur AI & Keandalan Juri</span>
-              </div>
-              <ul className="space-y-1 text-[11px]">
-                <li>
-                  • <strong>AI Engine:</strong> Google Gemini 1.5 Flash dengan
-                  Structured JSON Output + Deterministic Failover Cache.
-                </li>
-                <li>
-                  • <strong>Telemetry Math:</strong> Kalkulasi deterministik{" "}
-                  <code>src/lib/scoring.ts</code> (Spread Score & LBI ≥ 75%).
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-slate-900 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
-            <span>
-              © 2026 Eco Traveler MVP • Kategori Mahasiswa/Umum - Bidang Bali
-              Smart Society
-            </span>
-            <span className="font-mono flex items-center gap-1.5 text-emerald-400/90">
-              <ScrollText className="w-3.5 h-3.5" />
-              Zero-Crash Deterministic Fallback Ready (≤100ms)
-            </span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
-

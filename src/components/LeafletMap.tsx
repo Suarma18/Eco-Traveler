@@ -15,15 +15,23 @@ import "leaflet/dist/leaflet.css";
 import { DayItinerary, TripDayActivity } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
 import { formatRupiah, DAY_COLORS } from "@/lib/utils";
+import { getVillageVisualMeta } from "@/lib/village-media";
 import {
-  Compass,
   Layers,
-  Navigation,
-  ShieldAlert,
   Store,
-  Sparkles,
-  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  ScrollText,
+  Mountain,
+  ShieldAlert,
+  Minimize2,
+  Maximize2,
 } from "lucide-react";
+
+const CARTO_API_KEY =
+  process.env.NEXT_PUBLIC_CARTO_BASEMAP_KEY?.trim() || "";
+
+export type BasemapProvider = "carto-voyager" | "carto-positron" | "osm-clean";
 
 function createDayMarkerIcon(
   dayNumber: number,
@@ -31,13 +39,13 @@ function createDayMarkerIcon(
   isSelected: boolean,
   isRedirected: boolean
 ) {
-  const color = DAY_COLORS[dayNumber]?.hex || "#10B981";
-  const scale = isSelected ? "scale(1.18)" : "scale(1)";
+  const color = DAY_COLORS[dayNumber]?.hex || "#0D4732";
+  const scale = isSelected ? "scale(1.22)" : "scale(1)";
   const ring = isSelected
-    ? `0 0 0 6px rgba(16, 185, 129, 0.35), 0 8px 20px rgba(0,0,0,0.45)`
-    : `0 4px 12px rgba(0,0,0,0.35)`;
+    ? `0 0 0 6px rgba(13, 71, 50, 0.28), 0 8px 20px rgba(13, 38, 28, 0.35)`
+    : `0 4px 12px rgba(13, 38, 28, 0.25)`;
   const badgeHtml = isRedirected
-    ? `<span style="position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:9999px;background:#F59E0B;border:2px solid #091510;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#091510;">!</span>`
+    ? `<span style="position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:9999px;background:#C85A32;border:2px solid #FFFFFF;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#FFFFFF;">!</span>`
     : "";
 
   return L.divIcon({
@@ -49,16 +57,16 @@ function createDayMarkerIcon(
         height: 34px;
         border-radius: 9999px;
         background: ${color};
-        border: 3px solid #F8FAFC;
+        border: 2.5px solid #FFFFFF;
         box-shadow: ${ring};
         transform: ${scale};
-        transition: all 0.2s ease;
+        transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
         display: flex;
         align-items: center;
         justify-content: center;
         color: #FFFFFF;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
       ">
         H${dayNumber}.${stepOrder}
@@ -78,15 +86,16 @@ function createGateIcon() {
       <div style="
         width: 32px;
         height: 32px;
-        border-radius: 8px;
-        background: #0F172A;
-        border: 2px solid #38BDF8;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+        border-radius: 10px;
+        background: #0D261C;
+        border: 2px solid #34D399;
+        box-shadow: 0 4px 12px rgba(13, 38, 28, 0.35);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #38BDF8;
-        font-size: 11px;
+        color: #ECFDF5;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 10px;
         font-weight: 800;
       ">
         IN
@@ -109,14 +118,14 @@ function MapViewportController({
 
   useEffect(() => {
     if (focusCoords) {
-      map.flyTo(focusCoords, 12, { duration: 1.1 });
+      map.flyTo(focusCoords, 12, { duration: 1.05 });
     }
   }, [focusCoords, map]);
 
   useEffect(() => {
     if (!focusCoords && allRouteCoords.length > 1) {
       const bounds = L.latLngBounds(allRouteCoords);
-      map.fitBounds(bounds, { padding: [42, 42], maxZoom: 11 });
+      map.fitBounds(bounds, { padding: [46, 46], maxZoom: 11 });
     }
   }, [allRouteCoords, focusCoords, map]);
 
@@ -142,20 +151,53 @@ export default function LeafletMap({
   selectedActivity,
   onSelectActivity,
   arrivalCoords = [-8.7467, 115.1668],
-  arrivalLabel = "Bandara I Gusti Ngurah Rai (Selatan)",
+  arrivalLabel = "Bandara I Gusti Ngurah Rai",
 }: LeafletMapProps) {
   const [showAllCuratedVillages, setShowAllCuratedVillages] = useState(true);
   const [showSouthHotspotZone, setShowSouthHotspotZone] = useState(true);
+  const [inspectorMinimized, setInspectorMinimized] = useState(false);
+  const [tileTheme, setTileTheme] = useState<BasemapProvider>(
+    CARTO_API_KEY ? "carto-voyager" : "osm-clean"
+  );
 
   const visibleDays = useMemo(() => {
     if (selectedDayFilter === null) return days;
     return days.filter((d) => d.dayNumber === selectedDayFilter);
   }, [days, selectedDayFilter]);
 
-  const routeVillageIds = useMemo(() => {
-    return new Set(
-      days.flatMap((d) => d.activities.map((a) => a.villageId))
+  const flatActivities = useMemo(() => {
+    return visibleDays.flatMap((d) =>
+      d.activities.map((act, idx) => ({
+        dayNumber: d.dayNumber,
+        stepNumber: idx + 1,
+        activity: act,
+      }))
     );
+  }, [visibleDays]);
+
+  const activeStepIndex = useMemo(() => {
+    if (!selectedActivity) return 0;
+    const foundIdx = flatActivities.findIndex(
+      (item) =>
+        item.activity.villageId === selectedActivity.villageId &&
+        item.activity.timeSlot === selectedActivity.timeSlot
+    );
+    return foundIdx >= 0 ? foundIdx : 0;
+  }, [flatActivities, selectedActivity]);
+
+  const activeStep = flatActivities[activeStepIndex] || flatActivities[0];
+  const activeVillageEntity = useMemo(() => {
+    if (!activeStep) return undefined;
+    return allVillages.find((v) => v.id === activeStep.activity.villageId);
+  }, [activeStep, allVillages]);
+
+  const activeVisualMeta = useMemo(() => {
+    if (!activeStep) return null;
+    return getVillageVisualMeta(activeStep.activity.villageId, allVillages);
+  }, [activeStep, allVillages]);
+
+  const routeVillageIds = useMemo(() => {
+    return new Set(days.flatMap((d) => d.activities.map((a) => a.villageId)));
   }, [days]);
 
   const allRouteCoords = useMemo(() => {
@@ -172,26 +214,59 @@ export default function LeafletMap({
     ? [selectedActivity.lat, selectedActivity.lng]
     : null;
 
+  const tileConfig = useMemo(() => {
+    if (tileTheme === "carto-voyager" && CARTO_API_KEY) {
+      return {
+        url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        subdomains: "abcd",
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20,
+      };
+    }
+    if (tileTheme === "carto-positron" && CARTO_API_KEY) {
+      return {
+        url: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`,
+        subdomains: "abcd",
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20,
+      };
+    }
+    return {
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      subdomains: "abc",
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    };
+  }, [tileTheme]);
+
+  const handleStepNavigation = (direction: "prev" | "next") => {
+    if (flatActivities.length === 0) return;
+    const nextIdx =
+      direction === "next"
+        ? (activeStepIndex + 1) % flatActivities.length
+        : (activeStepIndex - 1 + flatActivities.length) % flatActivities.length;
+    onSelectActivity(flatActivities[nextIdx].activity);
+  };
+
   return (
-    <div className="relative w-full h-[520px] lg:h-[620px] rounded-2xl overflow-hidden border border-emerald-900/60 bg-slate-950 shadow-2xl">
-      {/* Top Overlay Filter Bar */}
-      <div className="absolute top-3 left-3 right-3 z-[500] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        {/* Filter Hari & Legend */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-950/90 backdrop-blur-md border border-slate-800/90 px-2.5 py-1.5 rounded-xl pointer-events-auto shadow-lg">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
-            <Navigation className="w-3.5 h-3.5 text-emerald-400" />
-            Rute:
-          </span>
+    <div className="relative w-full h-[540px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-stone-200/90 bg-stone-200 shadow-lg">
+      {/* Top Floating Glassmorphic HUD */}
+      <div className="absolute top-3.5 left-3.5 right-3.5 z-[500] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+        {/* Filter Hari */}
+        <div className="flex flex-wrap items-center gap-1 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md">
           <button
             type="button"
             onClick={() => onSelectDayFilter(null)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               selectedDayFilter === null
-                ? "bg-emerald-500 text-slate-950 font-semibold shadow-sm"
-                : "text-slate-300 hover:bg-slate-800"
+                ? "bg-[#0D261C] text-white shadow-xs"
+                : "text-stone-600 hover:bg-stone-100"
             }`}
           >
-            Semua Hari ({days.length}H)
+            Semua ({days.length}H)
           </button>
           {days.map((d) => {
             const colorInfo = DAY_COLORS[d.dayNumber] || DAY_COLORS[1];
@@ -203,10 +278,10 @@ export default function LeafletMap({
                 onClick={() =>
                   onSelectDayFilter(isActive ? null : d.dayNumber)
                 }
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                   isActive
-                    ? "bg-slate-100 text-slate-950 font-semibold shadow-sm"
-                    : "bg-slate-900/90 text-slate-200 hover:bg-slate-800 border border-slate-800"
+                    ? "bg-stone-900 text-white shadow-xs"
+                    : "text-stone-700 hover:bg-stone-100"
                 }`}
               >
                 <span
@@ -219,31 +294,55 @@ export default function LeafletMap({
           })}
         </div>
 
-        {/* Layer Controls */}
-        <div className="flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-md border border-slate-800/90 px-2.5 py-1.5 rounded-xl pointer-events-auto shadow-lg">
+        {/* Layer & Basemap Switcher */}
+        <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md">
           <button
             type="button"
             onClick={() => setShowAllCuratedVillages((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               showAllCuratedVillages
-                ? "bg-emerald-950/90 text-emerald-300 border border-emerald-700/60"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-emerald-50 text-[#0D4732] font-semibold"
+                : "text-stone-500 hover:text-stone-800"
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>28 Desa Disparda</span>
+            <span>28 Desa</span>
           </button>
+
           <button
             type="button"
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
               showSouthHotspotZone
-                ? "bg-rose-950/80 text-rose-300 border border-rose-700/50"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-orange-50 text-[#C85A32] font-semibold"
+                : "text-stone-500 hover:text-stone-800"
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Zona Jenuh Selatan</span>
+            <span className="hidden sm:inline">Zona Padat</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (CARTO_API_KEY) {
+                setTileTheme((t) =>
+                  t === "carto-voyager"
+                    ? "carto-positron"
+                    : t === "carto-positron"
+                    ? "osm-clean"
+                    : "carto-voyager"
+                );
+              }
+            }}
+            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-stone-700 hover:text-stone-950 bg-stone-100 transition-all cursor-pointer"
+            title="Ganti gaya peta dasar"
+          >
+            {tileTheme === "carto-voyager"
+              ? "Voyager"
+              : tileTheme === "carto-positron"
+              ? "Positron"
+              : "OSM"}
           </button>
         </div>
       </div>
@@ -256,8 +355,11 @@ export default function LeafletMap({
         className="w-full h-full z-0"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          key={tileTheme}
+          attribution={tileConfig.attribution}
+          url={tileConfig.url}
+          subdomains={tileConfig.subdomains}
+          maxZoom={tileConfig.maxZoom}
         />
 
         <MapViewportController
@@ -265,35 +367,35 @@ export default function LeafletMap({
           allRouteCoords={allRouteCoords}
         />
 
-        {/* Visualisasi Zona Jenuh Overtourism Bali Selatan (Kuta-Seminyak-Canggu) */}
+        {/* Visualisasi Zona Konsentrasi Bali Selatan */}
         {showSouthHotspotZone && (
           <CircleMarker
             center={[-8.6785, 115.1585]}
-            radius={28}
+            radius={26}
             pathOptions={{
-              color: "#E11D48",
-              fillColor: "#E11D48",
-              fillOpacity: 0.16,
+              color: "#C85A32",
+              fillColor: "#C85A32",
+              fillOpacity: 0.14,
               weight: 1.5,
               dashArray: "4 4",
             }}
           >
             <Popup>
-              <div className="p-1 max-w-[230px] text-slate-800">
-                <p className="text-xs font-bold uppercase tracking-wider text-rose-600 mb-1">
-                  Zona Konsentrasi Sarbagita (Bobot 0.2)
+              <div className="p-1 max-w-[220px] text-stone-800">
+                <p className="text-xs font-bold text-[#C85A32] mb-1">
+                  Zona Padat Bali Selatan (65,88% PDRB)
                 </p>
-                <p className="text-xs leading-relaxed">
-                  Kawasan Kuta-Canggu-Seminyak menanggung beban kemacetan &
-                  65,88% konsentrasi PDRB. Eco Traveler mengalihkan rute Anda ke
-                  utara, timur, dan barat.
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  Koridor Kuta-Canggu-Seminyak mengalami beban lalu lintas
+                  tinggi. Rute Anda dialihkan menuju desa mandiri di utara,
+                  timur, dan barat.
                 </p>
               </div>
             </Popup>
           </CircleMarker>
         )}
 
-        {/* Layer Seluruh 28 Desa Wisata Terkurasi (Non-Rute Aktif) */}
+        {/* Titik 28 Desa Wisata Terkurasi Lainnya */}
         {showAllCuratedVillages &&
           allVillages
             .filter((v) => !routeVillageIds.has(v.id))
@@ -301,64 +403,46 @@ export default function LeafletMap({
               <CircleMarker
                 key={village.id}
                 center={[village.lat, village.lng]}
-                radius={6}
+                radius={5.5}
                 pathOptions={{
-                  color: "#0F172A",
+                  color: "#FFFFFF",
                   weight: 1.5,
-                  fillColor:
-                    village.regency === "Badung" ||
-                    village.regency === "Denpasar"
-                      ? "#94A3B8"
-                      : village.regency === "Gianyar" ||
-                        village.regency === "Tabanan"
-                      ? "#38BDF8"
-                      : "#10B981",
-                  fillOpacity: 0.78,
+                  fillColor: "#0D4732",
+                  fillOpacity: 0.65,
                 }}
               >
                 <Popup>
-                  <div className="text-slate-900 min-w-[210px] max-w-[250px] space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                        Kab. {village.regency}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-500">
-                        Zona {village.zone}
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-sm text-slate-900">
+                  <div className="text-stone-900 min-w-[200px] max-w-[240px] space-y-1">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-[#0D4732] inline-block">
+                      Kab. {village.regency}
+                    </span>
+                    <h4 className="font-bold text-sm text-stone-900">
                       {village.name}
                     </h4>
-                    <p className="text-xs text-slate-600 leading-snug">
+                    <p className="text-xs text-stone-600 leading-snug">
                       {village.highlights}
                     </p>
-                    <div className="pt-1 border-t border-slate-200 text-[11px] text-slate-700">
-                      <strong>UMKM:</strong> {village.localUmkm}
-                    </div>
-                    <div className="text-[11px] text-emerald-700 font-semibold">
-                      Homestay: ~{formatRupiah(village.avgHomestayPrice)}/malam
+                    <div className="pt-1 border-t border-stone-100 text-[11px] text-[#0D4732] font-mono font-semibold tabular-nums">
+                      Homestay ~{formatRupiah(village.avgHomestayPrice)}/malam
                     </div>
                   </div>
                 </Popup>
               </CircleMarker>
             ))}
 
-        {/* Pin Titik Kedatangan (Arrival Gate) */}
+        {/* Pin Titik Kedatangan */}
         <Marker position={arrivalCoords} icon={createGateIcon()}>
           <Popup>
-            <div className="text-slate-900 min-w-[190px]">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold">
-                Titik Kedatangan Wisatawan
+            <div className="text-stone-900 min-w-[180px]">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-stone-500">
+                Pintu Kedatangan
               </p>
               <p className="text-xs font-bold mt-0.5">{arrivalLabel}</p>
-              <p className="text-[11px] text-slate-600 mt-1">
-                Titik awal pergerakan menuju koridor Desa Wisata prioritas.
-              </p>
             </div>
           </Popup>
         </Marker>
 
-        {/* Garis Penghubung dari Pintu Kedatangan ke Destinasi Pertama Hari 1 */}
+        {/* Garis dari Pintu Kedatangan ke Destinasi Pertama Hari 1 */}
         {visibleDays.length > 0 &&
           visibleDays[0].dayNumber === 1 &&
           visibleDays[0].activities.length > 0 && (
@@ -371,23 +455,22 @@ export default function LeafletMap({
                 ],
               ]}
               pathOptions={{
-                color: "#38BDF8",
-                weight: 2.5,
+                color: "#0D4732",
+                weight: 2,
                 dashArray: "6 8",
-                opacity: 0.75,
+                opacity: 0.65,
               }}
             />
           )}
 
-        {/* Polyline Jalur Harian & Pin Destinasi per Hari */}
+        {/* Polyline Jalur Harian & Pin Destinasi */}
         {visibleDays.map((day, dayIdx) => {
-          const dayColor = DAY_COLORS[day.dayNumber]?.hex || "#2563EB";
+          const dayColor = DAY_COLORS[day.dayNumber]?.hex || "#0D4732";
           const dayPositions: [number, number][] = day.activities.map((a) => [
             a.lat,
             a.lng,
           ]);
 
-          // Hubungkan akhir hari sebelumnya ke awal hari berikutnya agar alur utuh
           const prevDay = dayIdx > 0 ? visibleDays[dayIdx - 1] : null;
           const prevLastAct =
             prevDay && prevDay.activities.length > 0
@@ -403,10 +486,10 @@ export default function LeafletMap({
                     [day.activities[0].lat, day.activities[0].lng],
                   ]}
                   pathOptions={{
-                    color: "#94A3B8",
+                    color: "#78716C",
                     weight: 2.5,
-                    dashArray: "4 8",
-                    opacity: 0.7,
+                    dashArray: "4 7",
+                    opacity: 0.75,
                   }}
                 />
               )}
@@ -440,56 +523,45 @@ export default function LeafletMap({
                       isRedirected
                     )}
                     eventHandlers={{
-                      click: () => onSelectActivity(activity),
+                      click: () => {
+                        onSelectActivity(activity);
+                        setInspectorMinimized(false);
+                      },
                     }}
                   >
                     <Popup>
-                      <div className="text-slate-900 min-w-[235px] max-w-[275px] space-y-1.5">
+                      <div className="text-stone-900 min-w-[225px] max-w-[265px] space-y-1.5">
                         <div className="flex items-center justify-between gap-2">
                           <span
-                            className="text-[10px] font-bold uppercase px-2 py-0.5 rounded text-white"
+                            className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
                             style={{ backgroundColor: dayColor }}
                           >
-                            Hari {day.dayNumber} • {activity.timeSlot}
+                            Hari {day.dayNumber} · {activity.timeSlot}
                           </span>
-                          <span className="text-[11px] font-semibold text-slate-600">
+                          <span className="text-[11px] font-medium text-stone-500">
                             Kab. {activity.regency}
                           </span>
                         </div>
 
-                        <h4 className="font-bold text-sm text-slate-950 leading-snug">
+                        <h4 className="font-bold text-sm text-stone-900">
                           {activity.villageName}
                         </h4>
-                        <p className="text-xs font-medium text-emerald-800">
+                        <p className="text-xs font-medium text-[#0D4732]">
                           {activity.activityTitle}
-                        </p>
-                        <p className="text-xs text-slate-600 leading-relaxed">
-                          {activity.description}
                         </p>
 
                         {activity.localUmkmSpot && (
-                          <div className="bg-slate-100 p-1.5 rounded text-[11px] text-slate-700 flex items-start gap-1.5">
-                            <Store className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
-                            <span>
-                              <strong>UMKM Warga:</strong>{" "}
-                              {activity.localUmkmSpot}
-                            </span>
+                          <div className="bg-stone-50 p-1.5 rounded text-[11px] text-stone-700 flex items-start gap-1.5">
+                            <Store className="w-3.5 h-3.5 text-[#C85A32] shrink-0 mt-0.5" />
+                            <span>{activity.localUmkmSpot}</span>
                           </div>
                         )}
 
-                        {isRedirected && (
-                          <div className="bg-amber-50 border border-amber-300 p-1.5 rounded text-[11px] text-amber-900">
-                            <strong>Anti-Overtourism Redirect:</strong> Dialihkan
-                            dari {activity.originalSaturatedVillage} ke desa
-                            penyangga ini.
-                          </div>
-                        )}
-
-                        <div className="pt-1 border-t border-slate-200 flex items-center justify-between text-xs">
-                          <span className="text-slate-500">
-                            Estimasi Belanja Lokal:
+                        <div className="pt-1 border-t border-stone-100 flex items-center justify-between text-xs">
+                          <span className="text-stone-500">
+                            Belanja ke Warga:
                           </span>
-                          <span className="font-mono font-bold text-emerald-700">
+                          <span className="font-mono font-bold text-[#0D4732] tabular-nums">
                             {formatRupiah(activity.estimatedLocalSpendRp)}
                           </span>
                         </div>
@@ -503,34 +575,132 @@ export default function LeafletMap({
         })}
       </MapContainer>
 
-      {/* Bottom Spatial Legend Bar */}
-      <div className="absolute bottom-3 left-3 right-3 z-[500] flex flex-wrap items-center justify-between gap-2 bg-slate-950/90 backdrop-blur-md border border-slate-800/90 px-3 py-2 rounded-xl text-[11px] text-slate-300 pointer-events-auto">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="font-mono uppercase text-[10px] tracking-wider text-emerald-400 flex items-center gap-1">
-            <Compass className="w-3.5 h-3.5" />
-            Kode Warna Rute:
-          </span>
-          {Object.entries(DAY_COLORS).map(([dayNum, info]) => (
-            <span key={dayNum} className="flex items-center gap-1.5">
-              <span
-                className="w-2.5 h-2.5 rounded-full inline-block"
-                style={{ backgroundColor: info.hex }}
-              />
-              <span>{info.label}</span>
-            </span>
-          ))}
+      {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
+      {activeStep && activeVisualMeta && (
+        <div className="absolute bottom-3.5 left-3.5 right-3.5 z-[500] pointer-events-none">
+          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3.5 shadow-2xl pointer-events-auto transition-all">
+            {inspectorMinimized ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold shrink-0">
+                    H{activeStep.dayNumber}.{activeStep.stepNumber}
+                  </span>
+                  <span className="text-xs font-semibold truncate">
+                    {activeStep.activity.villageName} (Kab.{" "}
+                    {activeStep.activity.regency})
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleStepNavigation("prev")}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    aria-label="Destinasi sebelumnya"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleStepNavigation("next")}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    aria-label="Destinasi berikutnya"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInspectorMinimized(false)}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 cursor-pointer"
+                    aria-label="Perluas detail desa"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3.5 items-start">
+                {/* Thumbnail Foto Lanskap Desa */}
+                <div className="relative w-full sm:w-28 h-24 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-stone-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={activeVisualMeta.imageUrl}
+                    alt={activeStep.activity.villageName}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-emerald-300 flex items-center gap-1">
+                    <Mountain className="w-2.5 h-2.5" />
+                    {activeVisualMeta.elevationLabel}
+                  </span>
+                </div>
+
+                {/* Detail & Awig-Awig Desa Aktif */}
+                <div className="flex-1 min-w-0 space-y-1.5 w-full">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+                          Hari {activeStep.dayNumber} ·{" "}
+                          {activeStep.activity.timeSlot}
+                        </span>
+                        <span className="text-[11px] text-emerald-200/80 font-mono">
+                          Kab. {activeStep.activity.regency}
+                        </span>
+                        <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
+                          Kuota: {activeVisualMeta.quotaPercentage}% Terisi
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-display font-bold text-white mt-1 truncate">
+                        {activeStep.activity.villageName}
+                      </h4>
+                    </div>
+
+                    {/* Step Navigator & Minimize */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleStepNavigation("prev")}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                        title="Destinasi sebelumnya"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStepNavigation("next")}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                        title="Destinasi berikutnya"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setInspectorMinimized(true)}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-300 transition-colors cursor-pointer"
+                        title="Kecilkan panel"
+                      >
+                        <Minimize2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Awig-Awig & Etika Adat Kontekstual */}
+                  <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
+                    <ScrollText className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-amber-300">
+                        Awig-Awig Desa:{" "}
+                      </strong>
+                      {activeVillageEntity?.customsNote ||
+                        "Hormati kesucian kawasan pura dan jaga kelestarian irigasi subak setempat."}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-3 text-slate-400">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-            Klik pin untuk detail UMKM & Adat
-          </span>
-          <span className="hidden sm:flex items-center gap-1 text-amber-300">
-            <Sparkles className="w-3.5 h-3.5" />
-            Bobot Spasial 1.0 = Utara/Timur/Barat
-          </span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
