@@ -1,0 +1,200 @@
+{
+  "presets": [
+    {
+      "presetId": "east-north-heritage-3d",
+      "matchGate": "NgurahRaiAirport",
+      "defaultDuration": 3,
+      "tripTitle": "Ekspedisi Pusaka Karangasem, Kaldera Bangli & Pesisir Utara Buleleng",
+      "summaryNarrative": "Rute redistributif ini mengalihkan tekanan dari Bali Selatan (Sarbagita) langsung menuju koridor Timur dan Utara Bali. Menggabungkan lembah tenun tradisional Sidemen, desa penyangga bebas keramaian di Bangli, hingga konservasi garam piramida dan situs Bali Aga di Buleleng Timur dengan 91,7% durasi di kabupaten prioritas pemerataan.",
+      "days": [
+        {
+          "dayNumber": 1,
+          "themeTitle": "Hari 1: Lembah Tenun Sidemen & Harmoni Pusaka Karangasem",
+          "activities": [
+            {
+              "timeSlot": "Pagi",
+              "villageId": "desa-muncan",
+              "villageName": "Desa Wisata Muncan",
+              "regency": "Karangasem",
+              "activityTitle": "Trekking Sawah Vulkanik & Edukasi Pertanian Matekap",
+              "description": "Perjalanan pagi dari titik kedatangan langsung menembus lereng selatan Gunung Agung menuju Desa Muncan. Menyusuri terasering sawah beras merah vulkanik bersama petani subak lokal dan menikmati jaje laklak hangat yang dipanggang di atas tungku kayu kopi.",
+              "lat": -8.4581,
+              "lng": 115.4112,
+              "estimatedLocalSpendRp": 145000,
+              "antiOvertourismNote": "Penyangga sepi wisatawan yang menggantikan kepadatan terasering Tegallalang Selatan.",
+              "localUmkmSpot": "Kelompok Tani Beras Merah Muncan & Warung Jaje Laklak Bu Komang",
+              "capacityStatus": "OPTIMAL"
+            },
+            {
+              "timeSlot": "Siang",
+              "villageId": "desa-sidemen",
+              "villageName": "Desa Wisata Sidemen",
+              "regency": "Karangasem",
+              "activityTitle": "Lokakarya Tenun Songket & Endek Pewarna Alami",
+              "description": "Belajar memintal benang kapas dan pewarnaan indigo alami bersama penenun perempuan di Desa Sidemen, dilanjutkan santap siang pepes ikan sungai dan sayur pakis segar di warung keluarga warga.",
+              "lat": -8.4872,
+              "lng": 115.4419,
+              "estimatedLocalSpendRp": 220000,
+              "antiOvertourismNote": "100% belanja makan siang dan donasi lokakarya diterima langsung oleh Koperasi Perajin Sidemen.",
+              "localUmkmSpot": "Koperasi Tenun Pelangi Sidemen & Warung Dapur Bukit",
+              "capacityStatus": "OPTIMAL"
+            },
+            {
+              "timeSlot": "Sore",
+              "villageId": "desa-sibetan",
+              "villageName": "Desa Wisata Sibetan",
+              "regency": "Karangasem",
+              "activityTitle": "Agrowisata Kebun Salak Tua & Mencicipi Kopi Biji Salak",
+              "description": "Menjelajahi kebun agroforestri salak berusia ratusan tahun dengan 14 varietas lokal, memahami proses fermentasi sari salak oleh Kelompok Wanita Tani, dan menikmati senja berlatar siluet Gunung Agung.",
+              "lat": -8.4425,
+              "lng": 115.5228,
+              "estimatedLocalSpendRp": 135000,
+              "antiOvertourismNote": "Kunjungan terkendali (kurang dari 30% kuota harian) menjaga ekosistem kebun tetap hening.",
+              "localUmkmSpot": "Sentra Olahan Salak Bali & Agro Wine Sibetan",
+              "capacityStatus": "OPTIMAL"
+            }
+          ],
+          "recommendedStay": {
+            "name": "Pondok Subak Griya Sidemen",
+            "type": "Community Homestay",
+            "priceRangeRp": "Rp 280.000 - Rp 320.000 / malam",
+            "villageName": "Desa Wisata Sidemen",
+            "regency": "Karangasem"
+          }
+        },
+        {
+          "dayNumber": 2,
+          "themeTitle": "Hari 2: Koridor Desa Penyangga Bangli & Kaldera Geopark Batur",
+          "activities": [
+            {
+              "timeSlot": "Pagi",
+              "villageId": "desa-undisan",
+              "villageName": "Desa Wisata Undisan (Tembuku)",
+              "regency": "Bangli",
+              "activityTitle": "Jalur Hijau Sungai Jinah & Tempa Perak Tradisional",
+              "description": "Alih-alih menambah antrean bus wisata di Penglipuran yang mendekati batas kuota harian, sistem mengarahkan rute ke Desa Penyangga Undisan. Menikmati udara pagi di lembah Sungai Jinah, meracik jamu Loloh Cemcem, dan melihat perajin perak banjar.",
+              "lat": -8.4389,
+              "lng": 115.3881,
+              "estimatedLocalSpendRp": 165000,
+              "antiOvertourismNote": "CAPACITY GUARD AKTIF: Mengalihkan beban kunjungan dari Desa Penglipuran (98% kapasitas) ke Desa Penyangga Undisan (30% kapasitas).",
+              "localUmkmSpot": "Bengkel Perak Undisan Kelod & Warung Loloh Cemcem Ibu Nengah",
+              "capacityStatus": "REDIRECTED_BUFFER",
+              "originalSaturatedVillage": "Desa Wisata Penglipuran"
+            },
+            {
+              "timeSlot": "Siang",
+              "villageId": "desa-batur-selatan",
+              "villageName": "Desa Wisata Batur & Songan",
+              "regency": "Bangli",
+              "activityTitle": "Eksplorasi Geopark Kaldera & Seduh Kopi Arabika Kintamani",
+              "description": "Menuju dataran tinggi Kintamani untuk mempelajari siklus hidrologi suci Danau Batur yang menghidupi subak Bali. Mengunjungi kebun kopi tumpangsari jeruk milik petani lokal dengan metode pascapanen basah (wet-hull).",
+              "lat": -8.2764,
+              "lng": 115.3653,
+              "estimatedLocalSpendRp": 195000,
+              "antiOvertourismNote": "Mengutamakan warung petani lokal di Songan dibandingkan kafe waralaba komersial di tepi tebing.",
+              "localUmkmSpot": "Koperasi MPIG Kopi Arabika Kintamani & Warung Mujair Nyatnyat Danau",
+              "capacityStatus": "OPTIMAL"
+            },
+            {
+              "timeSlot": "Sore",
+              "villageId": "desa-trunyan",
+              "villageName": "Desa Bali Aga Trunyan & Kedisan",
+              "regency": "Bangli",
+              "activityTitle": "Pelayaran Perahu Koperasi Warga & Kisah Bali Mula",
+              "description": "Menyeberangi perairan tenang Danau Batur bersama nakhoda koperasi desa menuju Desa Trunyan. Mendengarkan penjelasan pemandu lokal mengenai filosofi pohon Taru Menyan dan tata krama adat Pancering Jagat.",
+              "lat": -8.2519,
+              "lng": 115.4214,
+              "estimatedLocalSpendRp": 230000,
+              "antiOvertourismNote": "Tarif perahu dan pemandu transparan sesuai ketetapan Pokdarwis Desa Trunyan.",
+              "localUmkmSpot": "Koperasi Angkutan Danau Batur & Pemandu Adat Trunyan",
+              "capacityStatus": "OPTIMAL"
+            }
+          ],
+          "recommendedStay": {
+            "name": "Batur Caldera Community Eco-Stay",
+            "type": "Community Homestay",
+            "priceRangeRp": "Rp 250.000 - Rp 290.000 / malam",
+            "villageName": "Desa Wisata Batur & Songan",
+            "regency": "Bangli"
+          }
+        },
+        {
+          "dayNumber": 3,
+          "themeTitle": "Hari 3: Jejak Megalitikum Bali Aga & Garam Palung Buleleng",
+          "activities": [
+            {
+              "timeSlot": "Pagi",
+              "villageId": "desa-sembiran",
+              "villageName": "Desa Bali Aga Sembiran",
+              "regency": "Buleleng",
+              "activityTitle": "Telusur Sejarah Desa Kuno & Tenun Kapas Sembiran",
+              "description": "Menuruni punggungan utara kaldera menuju Desa Sembiran di Buleleng. Mengunjungi balai desa kuno berarsitektur prasejarah dan berdialog dengan penenun kain kapas pintal tangan yang digunakan untuk ritual sakral.",
+              "lat": -8.1315,
+              "lng": 115.2884,
+              "estimatedLocalSpendRp": 150000,
+              "antiOvertourismNote": "Destinasi prioritas pemerataan Buleleng Timur dengan retensi manfaat 100% di komunitas adat.",
+              "localUmkmSpot": "Kelompok Tenun Kapas Bali Aga Sembiran & Madu Hutan Desa",
+              "capacityStatus": "OPTIMAL"
+            },
+            {
+              "timeSlot": "Siang",
+              "villageId": "desa-les",
+              "villageName": "Desa Wisata Les (Tejakula)",
+              "regency": "Buleleng",
+              "activityTitle": "Konservasi Terumbu Karang & Panen Garam Piramida Palung",
+              "description": "Melihat proses kristalisasi garam laut di atas palung batang kelapa oleh petani garam pesisir Desa Les, dilanjutkan snorkeling ramah lingkungan di area rehabilitasi karang yang dipulihkan oleh nelayan mantan pencari ikan hias.",
+              "lat": -8.1369,
+              "lng": 115.3672,
+              "estimatedLocalSpendRp": 210000,
+              "antiOvertourismNote": "Mendukung langsung transisi ekonomi ekologis nelayan pesisir Tejakula.",
+              "localUmkmSpot": "Petani Garam Palung Desa Les & Warung Ikan Segar Pesisir",
+              "capacityStatus": "OPTIMAL"
+            },
+            {
+              "timeSlot": "Sore",
+              "villageId": "desa-sudaji",
+              "villageName": "Desa Wisata Sudaji",
+              "regency": "Buleleng",
+              "activityTitle": "Jejak Subak Gandameru & Santap Kuliner Desa",
+              "description": "Menutup perjalanan di jantung hijau Buleleng, menyusuri saluran air subak di Desa Sudaji yang dikelilingi pohon durian dan aren, serta mencicipi kopi tubruk lokal bersama gula aren murni.",
+              "lat": -8.1925,
+              "lng": 115.1481,
+              "estimatedLocalSpendRp": 160000,
+              "antiOvertourismNote": "Memperkuat perputaran ekonomi desa peraih penghargaan Desa Wisata Terbaik tingkat nasional.",
+              "localUmkmSpot": "Rumah Pangan Gula Aren & Kopi Sudaji",
+              "capacityStatus": "OPTIMAL"
+            }
+          ],
+          "recommendedStay": {
+            "name": "Omah Subak Sudaji Homestay",
+            "type": "Community Homestay",
+            "priceRangeRp": "Rp 220.000 - Rp 250.000 / malam",
+            "villageName": "Desa Wisata Sudaji",
+            "regency": "Buleleng"
+          }
+        }
+      ],
+      "culturalEtiquette": [
+        {
+          "ruleTitle": "Busana Adat di Kawasan Pura & Griya",
+          "description": "Wajib mengenakan kamen (kain sarung adat) dan selendang pengikat pinggang saat memasuki area Pura Desa, Griya di Sidemen, serta pelataran Pura Ulun Danu Batur. Pakaian harus menutupi bahu.",
+          "applicableVillages": ["Desa Wisata Sidemen", "Desa Wisata Batur & Songan", "Desa Bali Aga Sembiran"],
+          "category": "Busana Pura"
+        },
+        {
+          "ruleTitle": "Pantangan Adat Cuntaka & Ketenangan Desa Bali Aga",
+          "description": "Wisatawan perempuan yang sedang dalam masa haid (cuntaka) dilarang memasuki pelataran suci pura dan mata air sakral. Di Desa Trunyan dan Sembiran, dilarang berbicara kasar atau mengambil benda apa pun dari situs adat.",
+          "applicableVillages": ["Desa Bali Aga Trunyan & Kedisan", "Desa Bali Aga Sembiran", "Desa Wisata Undisan (Tembuku)"],
+          "category": "Pantangan Adat"
+        },
+        {
+          "ruleTitle": "Perlindungan Ekologi Subak & Ladang Garam Adat",
+          "description": "Jangan menggeser batu pembagi air subak (tembuku) di Muncan dan Sudaji, serta jangan menginjak palung kayu kristalisasi garam di pesisir Desa Les. Gunakan tabir surya ramah karang saat berenang.",
+          "applicableVillages": ["Desa Wisata Muncan", "Desa Wisata Les (Tejakula)", "Desa Wisata Sudaji"],
+          "category": "Ekologi Subak & Laut"
+        }
+      ]
+    }
+  ]
+}
+
