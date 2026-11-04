@@ -61,7 +61,8 @@ export default function CulturalBriefing({
               <button
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? -1 : idx)}
-                className="w-full px-4 py-3 text-left flex items-center justify-between gap-3 hover:bg-slate-900/80 transition-colors"
+                aria-expanded={isOpen}
+                className="w-full px-4 py-3 text-left flex items-center justify-between gap-3 hover:bg-slate-900/80 transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
               >
                 <div className="flex items-center gap-2.5">
                   {idx === 0 ? (

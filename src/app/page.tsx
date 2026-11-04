@@ -247,7 +247,7 @@ export default function HomePage() {
                   </div>
                   <p className="text-[11px] text-slate-400">
                     Algoritma ulasan populer menumpuk 6,6 juta wisman di koridor
-                    Kuta–Canggu–Ubud, memicu krisis air & macet.
+                    Kuta-Canggu-Ubud, memicu krisis air & macet.
                   </p>
                 </div>
 
@@ -374,7 +374,7 @@ export default function HomePage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-display font-bold text-slate-200 text-sm">
                 <Compass className="w-4 h-4 text-emerald-400" />
-                <span>Eco Traveler — Bali DigiFest 2026</span>
+                <span>Eco Traveler - Bali DigiFest 2026</span>
               </div>
               <p className="leading-relaxed">
                 AI Redistributive Travel Planner untuk mengatasi overtourism
@@ -420,7 +420,7 @@ export default function HomePage() {
 
           <div className="pt-4 border-t border-slate-900 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
             <span>
-              © 2026 Eco Traveler MVP • Kategori Mahasiswa/Umum — Bidang Bali
+              © 2026 Eco Traveler MVP • Kategori Mahasiswa/Umum - Bidang Bali
               Smart Society
             </span>
             <span className="font-mono flex items-center gap-1.5 text-emerald-400/90">

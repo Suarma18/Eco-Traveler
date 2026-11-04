@@ -160,7 +160,7 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: true,
               })
             }
-            className="text-left px-3 py-2 rounded-xl bg-slate-950/90 hover:bg-emerald-950/50 border border-slate-800 hover:border-emerald-700/70 transition-all group"
+            className="text-left px-3 py-2 rounded-xl bg-slate-950/90 hover:bg-emerald-950/50 border border-slate-800 hover:border-emerald-700/70 transition-all group focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
           >
             <div className="text-xs font-semibold text-emerald-300 group-hover:text-emerald-200 flex items-center justify-between">
               <span>Koridor Timur & Kaldera (3H)</span>
@@ -184,7 +184,7 @@ export default function TripPlannerForm({
                 simulateCapacityAlert: false,
               })
             }
-            className="text-left px-3 py-2 rounded-xl bg-slate-950/90 hover:bg-emerald-950/50 border border-slate-800 hover:border-emerald-700/70 transition-all group"
+            className="text-left px-3 py-2 rounded-xl bg-slate-950/90 hover:bg-emerald-950/50 border border-slate-800 hover:border-emerald-700/70 transition-all group focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
           >
             <div className="text-xs font-semibold text-sky-300 group-hover:text-sky-200 flex items-center justify-between">
               <span>Lintas Barat & Pesisir Utara (4H)</span>
@@ -213,7 +213,7 @@ export default function TripPlannerForm({
                 key={day}
                 type="button"
                 onClick={() => onChange({ ...value, durationDays: day })}
-                className={`py-2.5 px-3 rounded-xl text-xs font-semibold border transition-all active:scale-[0.98] ${
+                className={`py-2.5 px-3 rounded-xl text-xs font-semibold border transition-all active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none ${
                   active
                     ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-950/50"
                     : "bg-slate-950/80 text-slate-300 border-slate-800 hover:border-slate-700"
@@ -254,7 +254,7 @@ export default function TripPlannerForm({
                 key={gate.id}
                 type="button"
                 onClick={() => onChange({ ...value, arrivalGate: gate.id })}
-                className={`p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 active:scale-[0.99] ${
+                className={`p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 active:scale-[0.99] cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none ${
                   active
                     ? "bg-emerald-950/80 border-emerald-500 text-slate-100 shadow-sm"
                     : "bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700"
@@ -297,7 +297,7 @@ export default function TripPlannerForm({
                 key={item.id}
                 type="button"
                 onClick={() => toggleInterest(item.id)}
-                className={`px-3 py-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-3 ${
+                className={`px-3 py-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-3 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none ${
                   selected
                     ? "bg-emerald-950/75 border-emerald-500/90 text-slate-100"
                     : "bg-slate-950/60 border-slate-800/90 text-slate-300 hover:border-slate-700"
@@ -351,7 +351,7 @@ export default function TripPlannerForm({
                 key={b.id}
                 type="button"
                 onClick={() => onChange({ ...value, budgetCategory: b.id })}
-                className={`p-2.5 rounded-xl border text-left transition-all ${
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none ${
                   active
                     ? "bg-emerald-950/80 border-emerald-500 text-slate-100"
                     : "bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700"
@@ -390,7 +390,7 @@ export default function TripPlannerForm({
           onChange={(e) =>
             onChange({ ...value, simulateCapacityAlert: e.target.checked })
           }
-          className="w-4 h-4 accent-emerald-500 rounded cursor-pointer shrink-0"
+          className="w-4 h-4 accent-emerald-500 rounded cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
           aria-label="Aktifkan simulasi kuota kapasitas penuh"
         />
       </div>
@@ -399,7 +399,7 @@ export default function TripPlannerForm({
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full py-3.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-slate-950 font-display font-bold text-sm tracking-wide transition-all active:scale-[0.99] shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2"
+        className="w-full py-3.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-slate-950 font-display font-bold text-sm tracking-wide transition-all active:scale-[0.99] cursor-pointer shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
       >
         {isLoading ? (
           <>

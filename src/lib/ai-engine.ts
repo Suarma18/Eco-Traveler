@@ -79,59 +79,59 @@ function buildDeterministicItinerary(request: TripRequest): ItineraryResponse {
   const corridorSequence: string[][] =
     gate === "GilimanukPort"
       ? [
-          // Hari 1: Bali Barat (Jembrana)
-          ["desa-blimbingsari", "desa-ekasari", "desa-medewi", "desa-gumbrih"],
-          // Hari 2: Bali Utara Barat & Tengah (Buleleng)
-          ["desa-pejarakan", "desa-pemuteran", "desa-munduk", "desa-gobleg"],
-          // Hari 3: Bali Utara Timur & Kaldera Bangli
-          ["desa-ambengan", "desa-sudaji", "desa-sembiran", "desa-les"],
-          // Hari 4: Kaldera Bangli & Bali Timur (Karangasem)
-          [
+        // Hari 1: Bali Barat (Jembrana)
+        ["desa-blimbingsari", "desa-ekasari", "desa-medewi", "desa-gumbrih"],
+        // Hari 2: Bali Utara Barat & Tengah (Buleleng)
+        ["desa-pejarakan", "desa-pemuteran", "desa-munduk", "desa-gobleg"],
+        // Hari 3: Bali Utara Timur & Kaldera Bangli
+        ["desa-ambengan", "desa-sudaji", "desa-sembiran", "desa-les"],
+        // Hari 4: Kaldera Bangli & Bali Timur (Karangasem)
+        [
+          "desa-batur-selatan",
+          "desa-trunyan",
+          "desa-penglipuran",
+          "desa-sidemen",
+        ],
+      ]
+      : [
+        // Hari 1: Transisi Tengah-Utara & Kaldera Bangli (atau Karangasem)
+        interests.includes("Agriculture")
+          ? [
+            "desa-jatiluwih",
+            "desa-wongaya-gede",
+            "desa-gobleg",
+            "desa-munduk",
+          ]
+          : [
+            "desa-taro",
+            "desa-penglipuran",
             "desa-batur-selatan",
             "desa-trunyan",
-            "desa-penglipuran",
-            "desa-sidemen",
           ],
-        ]
-      : [
-          // Hari 1: Transisi Tengah-Utara & Kaldera Bangli (atau Karangasem)
-          interests.includes("Agriculture")
-            ? [
-                "desa-jatiluwih",
-                "desa-wongaya-gede",
-                "desa-gobleg",
-                "desa-munduk",
-              ]
-            : [
-                "desa-taro",
-                "desa-penglipuran",
-                "desa-batur-selatan",
-                "desa-trunyan",
-              ],
-          // Hari 2: Bali Timur (Karangasem)
-          [
-            "desa-muncan",
-            "desa-sidemen",
-            "desa-sibetan",
-            "desa-tenganan",
-            "desa-budakeling",
-          ],
-          // Hari 3: Pesisir Timur ke Bali Utara (Karangasem -> Buleleng)
-          [
-            "desa-amed-purwakerti",
-            "desa-tulamben",
-            "desa-les",
-            "desa-sembiran",
-            "desa-sudaji",
-          ],
-          // Hari 4: Bali Utara Barat & Jembrana
-          [
-            "desa-ambengan",
-            "desa-pemuteran",
-            "desa-pejarakan",
-            "desa-blimbingsari",
-          ],
-        ];
+        // Hari 2: Bali Timur (Karangasem)
+        [
+          "desa-muncan",
+          "desa-sidemen",
+          "desa-sibetan",
+          "desa-tenganan",
+          "desa-budakeling",
+        ],
+        // Hari 3: Pesisir Timur ke Bali Utara (Karangasem -> Buleleng)
+        [
+          "desa-amed-purwakerti",
+          "desa-tulamben",
+          "desa-les",
+          "desa-sembiran",
+          "desa-sudaji",
+        ],
+        // Hari 4: Bali Utara Barat & Jembrana
+        [
+          "desa-ambengan",
+          "desa-pemuteran",
+          "desa-pejarakan",
+          "desa-blimbingsari",
+        ],
+      ];
 
   const dayThemeTitles: Record<string, string[]> = {
     GilimanukPort: [
@@ -187,8 +187,8 @@ function buildDeterministicItinerary(request: TripRequest): ItineraryResponse {
           slot === "Pagi"
             ? "Eksplorasi Pagi & Edukasi Komunitas:"
             : slot === "Siang"
-            ? "Lokakarya Warga & Kuliner UMKM:"
-            : "Telusur Senja & Kearifan Lokal:";
+              ? "Lokakarya Warga & Kuliner UMKM:"
+              : "Telusur Senja & Kearifan Lokal:";
 
         return {
           timeSlot: slot,
@@ -201,8 +201,8 @@ function buildDeterministicItinerary(request: TripRequest): ItineraryResponse {
           lng: village.lng,
           estimatedLocalSpendRp: estimatedSpend,
           antiOvertourismNote: PRIORITY_REGENCIES.has(village.regency)
-            ? `Prioritas Pemerataan ${village.regency} (Bobot Spasial 1.0) — mengalihkan beban wisata dari koridor Sarbagita.`
-            : `Zona Transisi Terkendali (${village.regency}) — penghubung bebas macet menuju Bali Utara/Timur.`,
+            ? `Prioritas Pemerataan ${village.regency} (Bobot Spasial 1.0) - mengalihkan beban wisata dari koridor Sarbagita.`
+            : `Zona Transisi Terkendali (${village.regency}) - penghubung bebas macet menuju Bali Utara/Timur.`,
           localUmkmSpot: village.localUmkm,
           capacityStatus: "OPTIMAL",
         };
@@ -217,9 +217,8 @@ function buildDeterministicItinerary(request: TripRequest): ItineraryResponse {
 
     rawDays.push({
       dayNumber: d + 1,
-      themeTitle: `Hari ${d + 1}: ${
-        dayThemeTitles[gate]?.[d] || "Eksplorasi Desa Wisata Mandiri"
-      }`,
+      themeTitle: `Hari ${d + 1}: ${dayThemeTitles[gate]?.[d] || "Eksplorasi Desa Wisata Mandiri"
+        }`,
       activities,
       recommendedStay: {
         name:
@@ -296,20 +295,16 @@ function buildDeterministicItinerary(request: TripRequest): ItineraryResponse {
     .join(", ");
 
   return {
-    tripTitle: `Rute Redistributif ${duration} Hari: ${
-      gate === "GilimanukPort"
+    tripTitle: `Rute Redistributif ${duration} Hari: ${gate === "GilimanukPort"
         ? "Lintas Barat Jembrana & Pesisir Utara Buleleng"
         : "Eksplorasi Pusaka Bangli, Karangasem & Buleleng"
-    }`,
-    summaryNarrative: `Rencana perjalanan ${duration} hari dari ${
-      ARRIVAL_GATES[gate].label
-    } ini dirancang khusus untuk mendistribusikan manfaat ekonomi keluar dari kawasan padat Bali Selatan. Mengutamakan minat ${focusSummary} dengan Spread Score ${
-      metrics.spreadScore
-    }/100 dan Local Benefit Index ${
-      metrics.localBenefitIndex
-    }% yang mengalir langsung ke homestay warga, koperasi subak, dan UMKM desa di ${metrics.primaryRegenciesBenefited.join(
-      ", "
-    )}.`,
+      }`,
+    summaryNarrative: `Rencana perjalanan ${duration} hari dari ${ARRIVAL_GATES[gate].label
+      } ini dirancang khusus untuk mendistribusikan manfaat ekonomi keluar dari kawasan padat Bali Selatan. Mengutamakan minat ${focusSummary} dengan Spread Score ${metrics.spreadScore
+      }/100 dan Local Benefit Index ${metrics.localBenefitIndex
+      }% yang mengalir langsung ke homestay warga, koperasi subak, dan UMKM desa di ${metrics.primaryRegenciesBenefited.join(
+        ", "
+      )}.`,
     days: guardedDays,
     metrics,
     culturalEtiquette,

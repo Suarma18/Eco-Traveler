@@ -171,7 +171,8 @@ export default function TelemetryCards({ itinerary }: TelemetryCardsProps) {
         <button
           type="button"
           onClick={() => setShowFormulaAudit((v) => !v)}
-          className="w-full px-4 py-2.5 flex items-center justify-between text-xs text-slate-300 hover:bg-slate-800/50 transition-colors"
+          aria-expanded={showFormulaAudit}
+          className="w-full px-4 py-2.5 flex items-center justify-between text-xs text-slate-300 hover:bg-slate-800/50 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
         >
           <div className="flex items-center gap-2">
             <Calculator className="w-3.5 h-3.5 text-emerald-400" />
@@ -179,7 +180,7 @@ export default function TelemetryCards({ itinerary }: TelemetryCardsProps) {
               Verifikasi Formula Matematis Telemetri (`src/lib/scoring.ts`)
             </span>
             <span className="hidden md:inline-block text-[11px] text-slate-400 font-mono">
-              — Transparansi Kalkulasi Panel Juri Bali DigiFest 2026
+              - Transparansi Kalkulasi Panel Juri Bali DigiFest 2026
             </span>
           </div>
           {showFormulaAudit ? (

@@ -112,10 +112,18 @@ export default function ItineraryTimeline({
                     return (
                       <div
                         key={`${day.dayNumber}-${activity.villageId}-${idx}`}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => onSelectActivity(activity)}
-                        className={`p-4 transition-all cursor-pointer ${
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onSelectActivity(activity);
+                          }
+                        }}
+                        className={`p-4 transition-all cursor-pointer rounded-xl focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none ${
                           isSelected
-                            ? "bg-emerald-950/40 border-l-4 border-l-emerald-400"
+                            ? "bg-emerald-950/60 ring-1 ring-emerald-500/80 shadow-md shadow-emerald-950/50"
                             : "hover:bg-slate-800/40"
                         }`}
                       >

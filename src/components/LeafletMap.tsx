@@ -284,7 +284,7 @@ export default function LeafletMap({
                   Zona Konsentrasi Sarbagita (Bobot 0.2)
                 </p>
                 <p className="text-xs leading-relaxed">
-                  Kawasan Kuta–Canggu–Seminyak menanggung beban kemacetan &
+                  Kawasan Kuta-Canggu-Seminyak menanggung beban kemacetan &
                   65,88% konsentrasi PDRB. Eco Traveler mengalihkan rute Anda ke
                   utara, timur, dan barat.
                 </p>
