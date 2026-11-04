@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import desaWisataData from "../../data/desa-wisata.json";
 import presetsFallbackData from "../../data/presets-fallback.json";
-import { DesaWisata } from "@/types/desa";
 import {
   TripRequest,
   ItineraryResponse,
   TripDayActivity,
 } from "@/types/trip";
-import { computeItineraryTelemetry } from "@/lib/scoring";
+import { DESA_DATASET, computeItineraryTelemetry } from "@/lib/scoring";
 import TripPlannerForm from "@/components/TripPlannerForm";
 import TelemetryCards from "@/components/TelemetryCards";
 import ItineraryTimeline from "@/components/ItineraryTimeline";
@@ -30,26 +28,27 @@ import {
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[540px] lg:h-[calc(100dvh-6.5rem)] rounded-2xl bg-stone-100 border border-stone-200/80 animate-pulse flex flex-col items-center justify-center p-6 text-center">
+    <div
+      className="w-full h-[540px] lg:h-[calc(100dvh-6.5rem)] rounded-2xl bg-stone-100 border border-stone-200/80 animate-pulse flex flex-col items-center justify-center p-6 text-center"
+      aria-live="polite"
+    >
       <div className="w-11 h-11 rounded-2xl bg-white border border-stone-200 flex items-center justify-center mb-3 shadow-sm">
-        <MapIcon className="w-5 h-5 text-[#0D4732]" />
+        <MapIcon className="w-5 h-5 text-[#0D4732]" aria-hidden="true" />
       </div>
       <p className="font-display text-sm font-bold text-stone-800">
-        Memuat Atlas Spasial Desa Wisata Bali...
+        Memuat Peta Desa Wisata Bali…
       </p>
       <p className="text-xs text-stone-500 mt-1">
-        Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian
+        Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian.
       </p>
     </div>
   ),
 });
 
-const ALL_VILLAGES = desaWisataData as DesaWisata[];
-
 function getInitialItinerary(): ItineraryResponse {
   const preset = presetsFallbackData.presets[0];
   const days = preset.days as ItineraryResponse["days"];
-  const metrics = computeItineraryTelemetry(days, ALL_VILLAGES, "Moderate");
+  const metrics = computeItineraryTelemetry(days, DESA_DATASET, "Moderate");
 
   return {
     tripTitle: preset.tripTitle,
@@ -109,16 +108,6 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => {
-    handleGenerate({
-      durationDays: 3,
-      interests: ["Culture", "Nature", "Culinary"],
-      budgetCategory: "Moderate",
-      arrivalGate: "NgurahRaiAirport",
-      simulateCapacityAlert: true,
-    });
-  }, [handleGenerate]);
-
   const handleDownloadPdf = () => {
     if (typeof window !== "undefined") {
       window.print();
@@ -133,47 +122,70 @@ export default function HomePage() {
           {/* Brand Identity */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#0D261C] text-white flex items-center justify-center shadow-sm">
-              <Compass className="w-4 h-4 text-emerald-300" />
+              <Compass
+                className="w-4 h-4 text-emerald-300"
+                aria-hidden="true"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-base font-bold tracking-tight text-[#0D261C]">
+                <span
+                  translate="no"
+                  className="font-display text-base font-bold tracking-tight text-[#0D261C]"
+                >
                   Eco Traveler
                 </span>
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/10 text-[#0D4732]">
+                <span
+                  translate="no"
+                  className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/10 text-[#0D4732]"
+                >
                   Subak Atelier
                 </span>
               </div>
               <p className="text-[11px] text-stone-500 hidden sm:block">
-                Atlas Spasial & Kurator Rute Berkeadilan Bali
+                Peta Spasial & Perencana Rute Desa Wisata Bali
               </p>
             </div>
           </div>
 
           {/* Center View Mode Switcher */}
-          <div className="flex items-center bg-stone-200/75 p-1 rounded-xl border border-stone-300/60">
+          <div
+            role="tablist"
+            aria-label="Mode tampilan"
+            className="flex items-center bg-stone-200/75 p-1 rounded-xl border border-stone-300/60"
+          >
             <button
               type="button"
+              role="tab"
+              aria-selected={activeView === "atlas"}
               onClick={() => setActiveView("atlas")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                 activeView === "atlas"
                   ? "bg-white text-stone-900 shadow-xs"
                   : "text-stone-600 hover:text-stone-900"
               }`}
             >
-              <MapIcon className="w-3.5 h-3.5 text-[#0D4732]" />
+              <MapIcon
+                className="w-3.5 h-3.5 text-[#0D4732]"
+                aria-hidden="true"
+              />
               <span>Eksplorasi Rute & Peta</span>
             </button>
             <button
               type="button"
+              role="tab"
+              aria-selected={activeView === "simulation"}
               onClick={() => setActiveView("simulation")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                 activeView === "simulation"
                   ? "bg-white text-stone-900 shadow-xs"
                   : "text-stone-600 hover:text-stone-900"
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5 text-[#C85A32]" />
+              <BarChart3
+                className="w-3.5 h-3.5 text-[#C85A32]"
+                aria-hidden="true"
+              />
               <span>Simulasi Dampak Regulasi</span>
             </button>
           </div>
@@ -183,9 +195,12 @@ export default function HomePage() {
             <button
               type="button"
               onClick={handleDownloadPdf}
-              className="px-3.5 py-2 rounded-xl bg-[#0D261C] hover:bg-[#0D4732] text-white font-semibold text-xs transition-all cursor-pointer inline-flex items-center gap-2 shadow-xs"
+              className="px-3.5 py-2 rounded-xl bg-[#0D261C] hover:bg-[#0D4732] text-white font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] focus-visible:ring-offset-2"
             >
-              <FileDown className="w-3.5 h-3.5 text-emerald-300" />
+              <FileDown
+                className="w-3.5 h-3.5 text-emerald-300"
+                aria-hidden="true"
+              />
               <span className="hidden md:inline">
                 Unduh Rencana Perjalanan (PDF)
               </span>
@@ -196,10 +211,13 @@ export default function HomePage() {
       </header>
 
       {/* Main Workspace Container */}
-      <main className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main
+        id="main-content"
+        className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-5"
+      >
         {activeView === "simulation" ? (
           <div className="space-y-5">
-            <TelemetryCards itinerary={itinerary} />
+            <TelemetryCards itinerary={itinerary} hideSimulationTriggers />
             <GovernmentBar
               itinerary={itinerary}
               inlineMode={true}
@@ -212,33 +230,43 @@ export default function HomePage() {
             <div className="w-full lg:w-[46%] space-y-5">
               {/* Editorial Hero Banner */}
               <section className="relative rounded-2xl overflow-hidden bg-[#0D261C] text-white p-5 sm:p-6 shadow-sm">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
-                  alt="Lanskap Subak Bali"
+                  alt=""
+                  aria-hidden="true"
+                  width={1200}
+                  height={400}
                   className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
                 />
                 <div className="relative z-10 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-emerald-200 border border-white/15">
-                      <Sparkles className="w-3 h-3 text-emerald-300" />
-                      28 Desa Wisata Terkurasi · Bali Smart Society
+                      <Sparkles
+                        className="w-3 h-3 text-emerald-300"
+                        aria-hidden="true"
+                      />
+                      28 Desa Wisata · Bali Smart Society
                     </span>
                     <span className="inline-flex items-center gap-1 text-[11px] font-mono text-stone-300">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      <CheckCircle2
+                        className="w-3.5 h-3.5 text-emerald-400"
+                        aria-hidden="true"
+                      />
                       {itinerary.engineMeta?.source === "gemini-ai"
                         ? "Gemini Spatial AI"
-                        : "Deterministic Spatial Engine"}
+                        : "Mesin Rute Deterministik"}
                     </span>
                   </div>
 
-                  <h1 className="font-display text-2xl sm:text-[28px] font-bold tracking-tight text-white leading-tight">
+                  <h1 className="font-display text-2xl sm:text-[28px] font-bold tracking-tight text-white leading-tight text-balance">
                     Perencana Rute Wisata Berkeadilan Bali
                   </h1>
 
                   <p className="text-xs sm:text-sm text-stone-200/90 leading-relaxed">
-                    Menyusun perjalanan bebas macet yang menyalurkan manfaat
-                    ekonomi langsung ke homestay warga, koperasi subak, dan UMKM
-                    desa di luar koridor padat Bali Selatan.
+                    Susun rute perjalanan ke desa-desa di Bali Utara, Timur, dan
+                    Barat. Biaya menginap, makan siang, dan pemandu langsung
+                    diterima oleh warga serta koperasi desa setempat.
                   </p>
                 </div>
               </section>
@@ -257,14 +285,20 @@ export default function HomePage() {
               <TelemetryCards itinerary={itinerary} />
 
               {/* Ringkasan Narasi Rute Aktif */}
-              <section className="bg-white border border-stone-200/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2">
+              <section
+                aria-live="polite"
+                className="bg-white border border-stone-200/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-1.5 font-semibold text-[#0D4732] bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/60">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                     Rencana Perjalanan {itinerary.days.length} Hari
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-stone-600 font-medium">
-                    <PlaneLanding className="w-3.5 h-3.5 text-[#C85A32]" />
+                    <PlaneLanding
+                      className="w-3.5 h-3.5 text-[#C85A32]"
+                      aria-hidden="true"
+                    />
                     Titik Masuk:{" "}
                     <strong className="text-stone-900">
                       {itinerary.engineMeta?.arrivalGateLabel ||
@@ -273,7 +307,7 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-stone-900 pt-0.5">
+                <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-stone-900 pt-0.5 text-balance">
                   {itinerary.tripTitle}
                 </h2>
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
@@ -284,7 +318,7 @@ export default function HomePage() {
               {/* Kartu Rute Timeline Harian (Editorial Visual Timeline) */}
               <ItineraryTimeline
                 days={itinerary.days}
-                allVillages={ALL_VILLAGES}
+                allVillages={DESA_DATASET}
                 selectedActivity={selectedActivity}
                 onSelectActivity={setSelectedActivity}
                 selectedDayFilter={selectedDayFilter}
@@ -294,15 +328,13 @@ export default function HomePage() {
               {/* Panduan Etika Adat Desa (Awig-Awig) */}
               <CulturalBriefing
                 itinerary={itinerary}
-                allVillages={ALL_VILLAGES}
+                allVillages={DESA_DATASET}
               />
 
               {/* Footer Ringkas */}
               <footer className="pt-3 pb-6 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
-                <span>
-                  Eco Traveler · Arsitektur Spasial Pariwisata Berkeadilan
-                </span>
-                <span>Dataset Terkurasi 28 Desa Wisata Bali</span>
+                <span translate="no">Eco Traveler · Bali Smart Society</span>
+                <span>Dataset 28 Desa Wisata Provinsi Bali</span>
               </footer>
             </div>
 
@@ -310,7 +342,7 @@ export default function HomePage() {
             <aside className="w-full lg:w-[54%] lg:sticky lg:top-[5.25rem]">
               <LeafletMap
                 days={itinerary.days}
-                allVillages={ALL_VILLAGES}
+                allVillages={DESA_DATASET}
                 selectedDayFilter={selectedDayFilter}
                 onSelectDayFilter={setSelectedDayFilter}
                 selectedActivity={selectedActivity}

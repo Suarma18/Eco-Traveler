@@ -1,4 +1,5 @@
 import { DesaWisata } from "@/types/desa";
+import { DESA_BY_ID } from "@/lib/scoring";
 
 export interface VillageVisualMeta {
   imageUrl: string;
@@ -8,9 +9,6 @@ export interface VillageVisualMeta {
   quotaLabel: string;
 }
 
-/**
- * Kurasi fotografi lanskap dan budaya Bali berdasarkan karakter ekologis tiap Desa Wisata
- */
 const VILLAGE_IMAGE_MAP: Record<string, { url: string; tag: string }> = {
   "desa-pemuteran": {
     url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=900&q=80",
@@ -128,9 +126,11 @@ const VILLAGE_IMAGE_MAP: Record<string, { url: string; tag: string }> = {
 
 export function getVillageVisualMeta(
   villageId: string,
-  allVillages: DesaWisata[]
+  allVillages?: DesaWisata[]
 ): VillageVisualMeta {
-  const village = allVillages.find((v) => v.id === villageId);
+  const village =
+    DESA_BY_ID.get(villageId) ||
+    allVillages?.find((v) => v.id === villageId);
   const mapped = VILLAGE_IMAGE_MAP[villageId] || {
     url: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=900&q=80",
     tag: "Desa Wisata Mandiri Bali",
@@ -149,4 +149,3 @@ export function getVillageVisualMeta(
     quotaLabel: `${load}/${quota} wisatawan/hari (${quotaPercentage}%)`,
   };
 }
-

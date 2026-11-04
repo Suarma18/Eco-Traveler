@@ -5,6 +5,7 @@ import { DayItinerary, TripDayActivity } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
 import { formatRupiah, DAY_COLORS } from "@/lib/utils";
 import { getVillageVisualMeta } from "@/lib/village-media";
+import { DESA_BY_ID } from "@/lib/scoring";
 import {
   Home,
   Store,
@@ -41,7 +42,7 @@ export default function ItineraryTimeline({
           <button
             type="button"
             onClick={() => onSelectDayFilter(null)}
-            className="font-semibold text-[#C85A32] hover:underline cursor-pointer"
+            className="font-semibold text-[#C85A32] hover:underline cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32]"
           >
             Tampilkan Semua Hari ({days.length}H)
           </button>
@@ -71,7 +72,7 @@ export default function ItineraryTimeline({
                     H{day.dayNumber}
                   </span>
                   <div>
-                    <h3 className="text-sm sm:text-base font-display font-bold text-stone-900 tracking-tight">
+                    <h3 className="text-sm sm:text-base font-display font-bold text-stone-900 tracking-tight text-balance">
                       {day.themeTitle}
                     </h3>
                     <span className="text-[11px] text-stone-500">
@@ -102,9 +103,9 @@ export default function ItineraryTimeline({
                     activity.villageId,
                     allVillages
                   );
-                  const villageEntity = allVillages.find(
-                    (v) => v.id === activity.villageId
-                  );
+                  const villageEntity =
+                    DESA_BY_ID.get(activity.villageId) ||
+                    allVillages.find((v) => v.id === activity.villageId);
 
                   return (
                     <div
@@ -118,7 +119,7 @@ export default function ItineraryTimeline({
                           onSelectActivity(activity);
                         }
                       }}
-                      className={`group relative bg-white rounded-2xl p-4 border transition-all cursor-pointer focus-visible:outline-none ${
+                      className={`group relative bg-white rounded-2xl p-4 border transition-[border-color,box-shadow] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                         isSelected
                           ? "border-[#0D4732] ring-2 ring-[#0D4732]/15 shadow-md"
                           : "border-stone-200/90 hover:border-stone-300 shadow-2xs"
@@ -126,6 +127,7 @@ export default function ItineraryTimeline({
                     >
                       {/* Node Dot on Vertical Timeline */}
                       <span
+                        aria-hidden="true"
                         className="absolute -left-[27px] top-6 w-3 h-3 rounded-full border-2 border-[#F6F5F0]"
                         style={{ backgroundColor: colorInfo.hex }}
                       />
@@ -137,6 +139,8 @@ export default function ItineraryTimeline({
                           <img
                             src={visualMeta.imageUrl}
                             alt={activity.villageName}
+                            width={144}
+                            height={144}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
@@ -147,7 +151,10 @@ export default function ItineraryTimeline({
                             H{day.dayNumber}.{idx + 1} · {activity.timeSlot}
                           </span>
                           <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-[10px] font-mono text-white flex items-center gap-1">
-                            <Mountain className="w-2.5 h-2.5 text-emerald-300" />
+                            <Mountain
+                              className="w-2.5 h-2.5 text-emerald-300"
+                              aria-hidden="true"
+                            />
                             {visualMeta.elevationLabel}
                           </span>
                         </div>
@@ -166,7 +173,10 @@ export default function ItineraryTimeline({
                                 </span>
                                 {isRedirected && (
                                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-orange-50 text-[#C85A32] border border-orange-200/70">
-                                    <ArrowRightLeft className="w-3 h-3" />
+                                    <ArrowRightLeft
+                                      className="w-3 h-3"
+                                      aria-hidden="true"
+                                    />
                                     Desa Penyangga
                                   </span>
                                 )}
@@ -193,20 +203,29 @@ export default function ItineraryTimeline({
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               {activity.localUmkmSpot && (
                                 <div className="flex items-center gap-1.5 text-stone-700 font-medium">
-                                  <Store className="w-3.5 h-3.5 text-[#C85A32] shrink-0" />
+                                  <Store
+                                    className="w-3.5 h-3.5 text-[#C85A32] shrink-0"
+                                    aria-hidden="true"
+                                  />
                                   <span>{activity.localUmkmSpot}</span>
                                 </div>
                               )}
 
                               <div className="flex items-center gap-1.5 text-[11px] font-mono text-stone-500 tabular-nums">
-                                <Users className="w-3 h-3 text-[#0D4732]" />
+                                <Users
+                                  className="w-3 h-3 text-[#0D4732]"
+                                  aria-hidden="true"
+                                />
                                 <span>{visualMeta.quotaLabel}</span>
                               </div>
                             </div>
 
                             {villageEntity?.customsNote && (
                               <div className="flex items-start gap-1.5 text-[11px] text-stone-500">
-                                <ScrollText className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                                <ScrollText
+                                  className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5"
+                                  aria-hidden="true"
+                                />
                                 <span>
                                   <strong className="text-stone-700">
                                     Etika Adat:{" "}
@@ -225,9 +244,15 @@ export default function ItineraryTimeline({
                 {/* Rekomendasi Homestay / Eco-Lodge Warga di Akhir Hari */}
                 {day.recommendedStay && (
                   <div className="relative bg-[#0D261C] text-white rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm">
-                    <span className="absolute -left-[27px] top-4 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#F6F5F0]" />
+                    <span
+                      aria-hidden="true"
+                      className="absolute -left-[27px] top-4 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#F6F5F0]"
+                    />
                     <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4 text-emerald-300 shrink-0" />
+                      <Home
+                        className="w-4 h-4 text-emerald-300 shrink-0"
+                        aria-hidden="true"
+                      />
                       <span>
                         <strong className="text-emerald-200">
                           Akomodasi Warga (Malam H{day.dayNumber}):

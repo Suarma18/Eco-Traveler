@@ -2,23 +2,22 @@
   "name": "eco-traveler",
   "version": "1.0.0",
   "private": true,
-  "description": "Eco Traveler - AI Redistributive Travel Planner for Bali (Bali DigiFest 2026)",
+  "description": "Eco Traveler - Perencana Rute Wisata Berkeadilan Bali",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test tests/scoring.test.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
-    "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.454.0",
     "next": "14.2.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-leaflet": "^4.2.1",
-    "tailwind-merge": "^2.5.4"
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",

@@ -16,6 +16,7 @@ import { DayItinerary, TripDayActivity } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
 import { formatRupiah, DAY_COLORS } from "@/lib/utils";
 import { getVillageVisualMeta } from "@/lib/village-media";
+import { DESA_BY_ID } from "@/lib/scoring";
 import {
   Layers,
   Store,
@@ -188,7 +189,10 @@ export default function LeafletMap({
   const activeStep = flatActivities[activeStepIndex] || flatActivities[0];
   const activeVillageEntity = useMemo(() => {
     if (!activeStep) return undefined;
-    return allVillages.find((v) => v.id === activeStep.activity.villageId);
+    return (
+      DESA_BY_ID.get(activeStep.activity.villageId) ||
+      allVillages.find((v) => v.id === activeStep.activity.villageId)
+    );
   }, [activeStep, allVillages]);
 
   const activeVisualMeta = useMemo(() => {
@@ -256,11 +260,16 @@ export default function LeafletMap({
       {/* Top Floating Glassmorphic HUD */}
       <div className="absolute top-3.5 left-3.5 right-3.5 z-[500] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Filter Hari */}
-        <div className="flex flex-wrap items-center gap-1 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md">
+        <div
+          role="group"
+          aria-label="Filter hari perjalanan"
+          className="flex flex-wrap items-center gap-1 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md"
+        >
           <button
             type="button"
+            aria-pressed={selectedDayFilter === null}
             onClick={() => onSelectDayFilter(null)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
               selectedDayFilter === null
                 ? "bg-[#0D261C] text-white shadow-xs"
                 : "text-stone-600 hover:bg-stone-100"
@@ -275,16 +284,18 @@ export default function LeafletMap({
               <button
                 key={d.dayNumber}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() =>
                   onSelectDayFilter(isActive ? null : d.dayNumber)
                 }
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
                   isActive
                     ? "bg-stone-900 text-white shadow-xs"
                     : "text-stone-700 hover:bg-stone-100"
                 }`}
               >
                 <span
+                  aria-hidden="true"
                   className="w-2.5 h-2.5 rounded-full inline-block"
                   style={{ backgroundColor: colorInfo.hex }}
                 />
@@ -298,32 +309,35 @@ export default function LeafletMap({
         <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-stone-200/90 p-1.5 rounded-xl pointer-events-auto shadow-md">
           <button
             type="button"
+            aria-pressed={showAllCuratedVillages}
             onClick={() => setShowAllCuratedVillages((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] ${
               showAllCuratedVillages
                 ? "bg-emerald-50 text-[#0D4732] font-semibold"
                 : "text-stone-500 hover:text-stone-800"
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
+            <Layers className="w-3.5 h-3.5" aria-hidden="true" />
             <span>28 Desa</span>
           </button>
 
           <button
             type="button"
+            aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C85A32] ${
               showSouthHotspotZone
                 ? "bg-orange-50 text-[#C85A32] font-semibold"
                 : "text-stone-500 hover:text-stone-800"
             }`}
           >
-            <ShieldAlert className="w-3.5 h-3.5" />
+            <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Zona Padat</span>
           </button>
 
           <button
             type="button"
+            aria-label="Ganti gaya peta dasar"
             onClick={() => {
               if (CARTO_API_KEY) {
                 setTileTheme((t) =>
@@ -335,7 +349,7 @@ export default function LeafletMap({
                 );
               }
             }}
-            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-stone-700 hover:text-stone-950 bg-stone-100 transition-all cursor-pointer"
+            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium text-stone-700 hover:text-stone-950 bg-stone-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732]"
             title="Ganti gaya peta dasar"
           >
             {tileTheme === "carto-voyager"
@@ -386,9 +400,9 @@ export default function LeafletMap({
                   Zona Padat Bali Selatan (65,88% PDRB)
                 </p>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Koridor Kuta-Canggu-Seminyak mengalami beban lalu lintas
-                  tinggi. Rute Anda dialihkan menuju desa mandiri di utara,
-                  timur, dan barat.
+                  Koridor Kuta, Canggu, dan Seminyak mengalami kepadatan lalu
+                  lintas tinggi. Rute Anda dialihkan ke desa wisata di Bali
+                  Utara, Timur, dan Barat.
                 </p>
               </div>
             </Popup>
@@ -552,7 +566,10 @@ export default function LeafletMap({
 
                         {activity.localUmkmSpot && (
                           <div className="bg-stone-50 p-1.5 rounded text-[11px] text-stone-700 flex items-start gap-1.5">
-                            <Store className="w-3.5 h-3.5 text-[#C85A32] shrink-0 mt-0.5" />
+                            <Store
+                              className="w-3.5 h-3.5 text-[#C85A32] shrink-0 mt-0.5"
+                              aria-hidden="true"
+                            />
                             <span>{activity.localUmkmSpot}</span>
                           </div>
                         )}
@@ -578,7 +595,7 @@ export default function LeafletMap({
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
       {activeStep && activeVisualMeta && (
         <div className="absolute bottom-3.5 left-3.5 right-3.5 z-[500] pointer-events-none">
-          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3.5 shadow-2xl pointer-events-auto transition-all">
+          <div className="bg-[#0D261C]/95 backdrop-blur-md text-white border border-emerald-800/60 rounded-2xl p-3.5 shadow-2xl pointer-events-auto transition-opacity">
             {inspectorMinimized ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -594,26 +611,26 @@ export default function LeafletMap({
                   <button
                     type="button"
                     onClick={() => handleStepNavigation("prev")}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
                     aria-label="Destinasi sebelumnya"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleStepNavigation("next")}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
                     aria-label="Destinasi berikutnya"
                   >
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setInspectorMinimized(false)}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 cursor-pointer"
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
                     aria-label="Perluas detail desa"
                   >
-                    <Maximize2 className="w-3.5 h-3.5" />
+                    <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -625,11 +642,13 @@ export default function LeafletMap({
                   <img
                     src={activeVisualMeta.imageUrl}
                     alt={activeStep.activity.villageName}
+                    width={112}
+                    height={96}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
                   <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-emerald-300 flex items-center gap-1">
-                    <Mountain className="w-2.5 h-2.5" />
+                    <Mountain className="w-2.5 h-2.5" aria-hidden="true" />
                     {activeVisualMeta.elevationLabel}
                   </span>
                 </div>
@@ -637,7 +656,7 @@ export default function LeafletMap({
                 {/* Detail & Awig-Awig Desa Aktif */}
                 <div className="flex-1 min-w-0 space-y-1.5 w-full">
                   <div className="flex items-start justify-between gap-2">
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
                           Hari {activeStep.dayNumber} ·{" "}
@@ -660,33 +679,45 @@ export default function LeafletMap({
                       <button
                         type="button"
                         onClick={() => handleStepNavigation("prev")}
-                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                        aria-label="Destinasi sebelumnya"
                         title="Destinasi sebelumnya"
                       >
-                        <ChevronLeft className="w-3.5 h-3.5" />
+                        <ChevronLeft
+                          className="w-3.5 h-3.5"
+                          aria-hidden="true"
+                        />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleStepNavigation("next")}
-                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                        aria-label="Destinasi berikutnya"
                         title="Destinasi berikutnya"
                       >
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <ChevronRight
+                          className="w-3.5 h-3.5"
+                          aria-hidden="true"
+                        />
                       </button>
                       <button
                         type="button"
                         onClick={() => setInspectorMinimized(true)}
-                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-300 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                        aria-label="Kecilkan panel"
                         title="Kecilkan panel"
                       >
-                        <Minimize2 className="w-3.5 h-3.5" />
+                        <Minimize2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
 
                   {/* Awig-Awig & Etika Adat Kontekstual */}
                   <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
-                    <ScrollText className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
+                    <ScrollText
+                      className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
                     <div>
                       <strong className="text-amber-300">
                         Awig-Awig Desa:{" "}
