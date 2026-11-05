@@ -164,17 +164,9 @@ function MapViewportController({
 
     observer.observe(container);
 
-    const handleWindowResize = () => {
-      map.invalidateSize({ animate: false });
-    };
-    window.addEventListener("resize", handleWindowResize);
-    window.addEventListener("orientationchange", handleWindowResize);
-
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
-      window.removeEventListener("resize", handleWindowResize);
-      window.removeEventListener("orientationchange", handleWindowResize);
     };
   }, [map]);
 
@@ -186,7 +178,7 @@ function MapViewportController({
         map.invalidateSize({ animate: false });
         if (allRouteCoords.length > 1 && !focusCoords) {
           const bounds = L.latLngBounds(allRouteCoords);
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+          map.fitBounds(bounds, { padding: [36, 36], maxZoom: 11 });
         }
       }, 150);
       return () => clearTimeout(timer);
@@ -210,7 +202,7 @@ function MapViewportController({
   useEffect(() => {
     if (!focusCoords && allRouteCoords.length > 1) {
       const bounds = L.latLngBounds(allRouteCoords);
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+      map.fitBounds(bounds, { padding: [46, 46], maxZoom: 11 });
     }
   }, [allRouteCoords, focusCoords, map]);
 
@@ -345,16 +337,13 @@ export default function LeafletMap({
 
   const allRouteCoords = useMemo(() => {
     const coords: [number, number][] = [];
-    if (arrivalCoords) {
-      coords.push(arrivalCoords);
-    }
     for (const day of visibleDays) {
       for (const act of day.activities) {
         coords.push([act.lat, act.lng]);
       }
     }
     return coords;
-  }, [visibleDays, arrivalCoords]);
+  }, [visibleDays]);
 
   const focusCoords: [number, number] | null = selectedActivity
     ? [selectedActivity.lat, selectedActivity.lng]
@@ -422,11 +411,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={selectedDayFilter === null}
             onClick={() => onSelectDayFilter(null)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-              selectedDayFilter === null
-                ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
-                : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
-            }`}
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${selectedDayFilter === null
+              ? "bg-[#0D261C] dark:bg-emerald-600 text-white shadow-2xs"
+              : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
+              }`}
           >
             {t.allDaysBtn(days.length)}
           </button>
@@ -444,11 +432,10 @@ export default function LeafletMap({
                 onClick={() =>
                   onSelectDayFilter(isActive ? null : d.dayNumber)
                 }
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-                  isActive
-                    ? "bg-slate-900 dark:bg-emerald-700 text-white shadow-2xs"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
-                }`}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${isActive
+                  ? "bg-slate-900 dark:bg-emerald-700 text-white shadow-2xs"
+                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#16231c]"
+                  }`}
               >
                 <span
                   aria-hidden="true"
@@ -467,11 +454,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showAllCuratedVillages}
             onClick={() => setShowAllCuratedVillages((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-              showAllCuratedVillages
-                ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${showAllCuratedVillages
+              ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
           >
             <Layers className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{t.villagesLayerBtn}</span>
@@ -481,16 +467,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
-            title={
-              locale === "en"
-                ? "South Bali Congested Hub (Kuta, Canggu, Seminyak - absorbs 65.88% of Bali tourism GDP)"
-                : "Zona Padat Pariwisata Bali Selatan (Kuta, Canggu, Seminyak - menyerap 65,88% PDRB pariwisata)"
-            }
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
-              showSouthHotspotZone
-                ? "bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] font-semibold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${showSouthHotspotZone
+              ? "bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] font-semibold"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{t.hotspotZoneBtn}</span>
@@ -500,11 +480,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showNearbyAttractions}
             onClick={() => setShowNearbyAttractions((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
-              showNearbyAttractions
-                ? "bg-orange-50 dark:bg-orange-950/80 text-[#EA580C] dark:text-[#FB923C] font-semibold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${showNearbyAttractions
+              ? "bg-orange-50 dark:bg-orange-950/80 text-[#EA580C] dark:text-[#FB923C] font-semibold"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
           >
             <Compass className="w-3.5 h-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">{t.layerAttractionsBtn}</span>
@@ -515,11 +494,10 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showAccommodations}
             onClick={() => setShowAccommodations((v) => !v)}
-            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400 ${
-              showAccommodations
-                ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400 ${showAccommodations
+              ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
           >
             <BedDouble className="w-3.5 h-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">{t.layerStaysBtn}</span>
@@ -534,22 +512,22 @@ export default function LeafletMap({
                 prev === "osm-clean"
                   ? "carto-voyager"
                   : prev === "carto-voyager"
-                  ? "carto-positron"
-                  : prev === "carto-positron"
-                  ? "carto-dark"
-                  : "osm-clean"
+                    ? "carto-positron"
+                    : prev === "carto-positron"
+                      ? "carto-dark"
+                      : "osm-clean"
               );
             }}
             className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white bg-slate-100 dark:bg-[#16231c] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
-            title={`${t.switchBasemapLabel}: OpenStreetMap (OSM) / Carto`}
+            title={t.switchBasemapLabel}
           >
             {tileTheme === "osm-clean"
               ? "OSM"
               : tileTheme === "carto-voyager"
-              ? "Voyager"
-              : tileTheme === "carto-positron"
-              ? "Positron"
-              : "Dark"}
+                ? "Voyager"
+                : tileTheme === "carto-positron"
+                  ? "Positron"
+                  : "Dark"}
           </button>
         </div>
       </div>
@@ -741,11 +719,7 @@ export default function LeafletMap({
           )}
 
         {/* Pin Titik Kedatangan */}
-        <Marker
-          position={arrivalCoords}
-          icon={createGateIcon()}
-          zIndexOffset={600}
-        >
+        <Marker position={arrivalCoords} icon={createGateIcon()}>
           <Popup>
             <div className="text-stone-900 dark:text-stone-100 min-w-[180px]">
               <p className="text-[10px] font-mono uppercase tracking-wider text-stone-500 dark:text-stone-400">
@@ -859,46 +833,29 @@ export default function LeafletMap({
                   locale
                 );
                 return (
-                  <React.Fragment key={`leg-pair-${day.dayNumber}-${actIdx}`}>
-                    {/* Outline / Casing Line for High Contrast on Light/Dark/Satellite Basemaps */}
-                    <Polyline
-                      positions={[
-                        [prevAct.lat, prevAct.lng],
-                        [act.lat, act.lng],
-                      ]}
-                      pathOptions={{
-                        color: useDarkMapColors ? "#05130D" : "#FFFFFF",
-                        weight: 6,
-                        opacity: 0.75,
-                        lineCap: "round",
-                        lineJoin: "round",
-                      }}
-                    />
-                    <Polyline
-                      positions={[
-                        [prevAct.lat, prevAct.lng],
-                        [act.lat, act.lng],
-                      ]}
-                      pathOptions={{
-                        color: dayColor,
-                        weight: 3.5,
-                        opacity: 0.95,
-                        lineCap: "round",
-                        lineJoin: "round",
-                      }}
-                    >
-                      <Tooltip sticky>
-                        <div className="font-sans text-xs space-y-0.5">
-                          <div className="font-semibold text-slate-800 dark:text-slate-100">
-                            {prevAct.villageName} ➔ {act.villageName}
-                          </div>
-                          <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
-                            {legTransit.formattedSummary}
-                          </div>
+                  <Polyline
+                    key={`leg-${day.dayNumber}-${actIdx}`}
+                    positions={[
+                      [prevAct.lat, prevAct.lng],
+                      [act.lat, act.lng],
+                    ]}
+                    pathOptions={{
+                      color: dayColor,
+                      weight: 4,
+                      opacity: 0.95,
+                    }}
+                  >
+                    <Tooltip sticky>
+                      <div className="font-sans text-xs space-y-0.5">
+                        <div className="font-semibold text-slate-800 dark:text-slate-100">
+                          {prevAct.villageName} ➔ {act.villageName}
                         </div>
-                      </Tooltip>
-                    </Polyline>
-                  </React.Fragment>
+                        <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
+                          {legTransit.formattedSummary}
+                        </div>
+                      </div>
+                    </Tooltip>
+                  </Polyline>
                 );
               })}
 
@@ -913,7 +870,6 @@ export default function LeafletMap({
                   <Marker
                     key={`${day.dayNumber}-${activity.villageId}-${actIdx}`}
                     position={[activity.lat, activity.lng]}
-                    zIndexOffset={isSelected ? 1500 : 800 + actIdx * 10}
                     icon={createDayMarkerIcon(
                       day.dayNumber,
                       actIdx + 1,
@@ -982,47 +938,6 @@ export default function LeafletMap({
             </React.Fragment>
           );
         })}
-
-        {/* Polyline Kaki Transit Pulang ke Pintu Keberangkatan */}
-        {visibleDays.length > 0 &&
-          visibleDays[visibleDays.length - 1].dayNumber === days.length &&
-          arrivalCoords && (() => {
-            const lastDay = visibleDays[visibleDays.length - 1];
-            if (lastDay.activities.length === 0) return null;
-            const lastAct = lastDay.activities[lastDay.activities.length - 1];
-            const returnTransit = estimateBaliTransit(
-              lastAct.lat,
-              lastAct.lng,
-              arrivalCoords[0],
-              arrivalCoords[1],
-              locale
-            );
-            return (
-              <Polyline
-                positions={[
-                  [lastAct.lat, lastAct.lng],
-                  arrivalCoords,
-                ]}
-                pathOptions={{
-                  color: useDarkMapColors ? "#FB923C" : "#EA580C",
-                  weight: 2.5,
-                  dashArray: "6 8",
-                  opacity: 0.85,
-                }}
-              >
-                <Tooltip sticky>
-                  <div className="font-sans text-xs space-y-0.5">
-                    <div className="font-semibold text-slate-800 dark:text-slate-100">
-                      {lastAct.villageName} ➔ {arrivalLabel || "Ngurah Rai"}
-                    </div>
-                    <div className="font-mono text-[11px] text-[#EA580C] dark:text-[#FB923C] font-bold tabular-nums">
-                      {returnTransit.formattedSummary}
-                    </div>
-                  </div>
-                </Tooltip>
-              </Polyline>
-            );
-          })()}
       </MapContainer>
 
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}
@@ -1108,10 +1023,7 @@ export default function LeafletMap({
                           <Mountain className="w-2.5 h-2.5" aria-hidden="true" />
                           {activeVisualMeta.elevationLabel}
                         </span>
-                        <span
-                          className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums"
-                          title={t.quotaTooltip}
-                        >
+                        <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
                           {t.quotaFilled(activeVisualMeta.quotaPercentage)}
                         </span>
                         {activeTransitEstimate && (
@@ -1184,33 +1096,30 @@ export default function LeafletMap({
                     <button
                       type="button"
                       onClick={() => setInspectorTab("overview")}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-                        inspectorTab === "overview"
-                          ? "bg-white/20 text-white shadow-2xs"
-                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
-                      }`}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${inspectorTab === "overview"
+                        ? "bg-white/20 text-white shadow-2xs"
+                        : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                        }`}
                     >
                       {t.tabOverview}
                     </button>
                     <button
                       type="button"
                       onClick={() => setInspectorTab("stays")}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-                        inspectorTab === "stays"
-                          ? "bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 shadow-2xs"
-                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
-                      }`}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${inspectorTab === "stays"
+                        ? "bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 shadow-2xs"
+                        : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                        }`}
                     >
                       {t.tabStays(activeAccommodations.length)}
                     </button>
                     <button
                       type="button"
                       onClick={() => setInspectorTab("attractions")}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
-                        inspectorTab === "attractions"
-                          ? "bg-orange-500/30 text-orange-200 border border-orange-400/40 shadow-2xs"
-                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
-                      }`}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${inspectorTab === "attractions"
+                        ? "bg-orange-500/30 text-orange-200 border border-orange-400/40 shadow-2xs"
+                        : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                        }`}
                     >
                       {t.tabAttractions(activeAttractions.length)}
                     </button>
@@ -1218,28 +1127,18 @@ export default function LeafletMap({
 
                   {/* Tab Content 1: Awig-Awig & Etika Adat Kontekstual */}
                   {inspectorTab === "overview" && (
-                    <div className="p-2.5 rounded-lg bg-white/10 border border-white/10 text-xs text-emerald-50 leading-relaxed space-y-1.5">
-                      <div className="flex items-start gap-2">
-                        <ScrollText
-                          className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
-                          aria-hidden="true"
-                        />
-                        <div>
-                          <strong className="text-amber-300 font-semibold">
-                            {t.awigAwigPrefix}{" "}
-                          </strong>
-                          {activeVillageText?.customsNote ||
-                            "Respect sacred temple areas and preserve local subak irrigation channels."}
-                        </div>
+                    <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
+                      <ScrollText
+                        className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <div className="line-clamp-2 sm:line-clamp-none">
+                        <strong className="text-amber-300">
+                          {t.awigAwigPrefix}{" "}
+                        </strong>
+                        {activeVillageText?.customsNote ||
+                          "Respect sacred temple areas and preserve local subak irrigation channels."}
                       </div>
-                      <p className="text-[10px] text-emerald-200/70 italic pl-5">
-                        {activeVillageEntity?.adatVerifiedBy
-                          ? t.adatVerifiedLabel(
-                              activeVillageEntity.adatVerifiedBy,
-                              activeVillageEntity.adatVerifiedAt
-                            )
-                          : t.adatPendingVerification}
-                      </p>
                     </div>
                   )}
 
@@ -1314,8 +1213,8 @@ export default function LeafletMap({
                             locale === "en"
                               ? `${poi.distanceKm} km`
                               : `${poi.distanceKm
-                                  .toString()
-                                  .replace(".", ",")} km`;
+                                .toString()
+                                .replace(".", ",")} km`;
                           return (
                             <div
                               key={poi.id}

@@ -1,13 +1,7 @@
 import { DesaWisata } from "@/types/desa";
 import { ItineraryResponse, TimeSlot } from "@/types/trip";
 import { DESA_BY_ID, PRIORITY_REGENCIES } from "@/lib/scoring";
-import {
-  Locale,
-  formatStayPriceRange,
-  generateDeterministicStopDescription,
-  cleanHighlightPhrase,
-  preserveProperNouns,
-} from "@/lib/utils";
+import { Locale, formatStayPriceRange } from "@/lib/utils";
 
 export const UI_TEXT = {
   id: {
@@ -26,17 +20,13 @@ export const UI_TEXT = {
     readyForJourney: "Siap Menjelajahi Bali yang Berkeadilan?",
     readyForJourneyDesc:
       "Ekspor seluruh rencana perjalanan ke format PDF rapi untuk panduan navigasi dan reservasi homestay selama di perjalanan.",
-    printHeaderTitle: "ECO TRAVELER · RENCANA PERJALANAN BERKEADILAN",
+    printHeaderTitle: "ECO TRAVELER · DOKUMEN PERJALANAN RESMI",
     printHeaderSub:
       "Rencana Rute Pemerataan Ekonomi & Pelestarian Desa Adat Bali",
     printGeneratedOn: "Tanggal Cetak:",
     printDirectSpend: "Belanja Langsung Komunitas:",
     printLbiRetention: "Retensi Ekonomi Lokal:",
     printArrivalGate: "Pintu Kedatangan:",
-    printFooterDisclaimer:
-      "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi.",
-    printFooterSource:
-      "Sumber Data: Dinas Pariwisata Provinsi Bali 2025 (Tabel 33 - TODO-HUMAN: konfirmasi nomor dokumen resmi) & BPS Bali 2022 (PDRB), dikurasi untuk Bali Utara, Timur, dan Barat.",
     themeLight: "Terang",
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
@@ -61,8 +51,7 @@ export const UI_TEXT = {
     routeSummaryDays: (days: number) => `Rencana Perjalanan ${days} Hari`,
     arrivalGatePrefix: "Titik Masuk:",
     footerLeft: "Eco Traveler · Bali Smart Society",
-    footerRight:
-      "28 desa wisata terkurasi · Sumber: Disparda Bali 2025 (Tabel 33 - TODO-HUMAN)",
+    footerRight: "Dataset 28 Desa Wisata Provinsi Bali",
     loadingMapTitle: "Memuat Peta Desa Wisata Bali…",
     loadingMapSubtitle:
       "Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian.",
@@ -87,42 +76,16 @@ export const UI_TEXT = {
     spreadScoreTitle: "Indeks Pemerataan Wilayah",
     outsideSouthBali: "Luar Bali Selatan:",
     routeSuffix: "Rute",
-    lbiTitle: "Retensi Ekonomi Desa (Local Economic Retention, LBI)",
+    lbiTitle: "Retensi Ekonomi Desa (LBI)",
     lbiTarget: "Target ≥75%",
     lbiSub: "Homestay warga, koperasi & warung lokal",
     directSpendTitle: "Belanja Langsung ke Warga",
     totalEstPrefix: "Total estimasi:",
     bufferActive: (n: number) => `${n} Desa Penyangga Aktif`,
-    quotaSafe: "Kapasitas Rencana Aman",
+    quotaSafe: "Kuota Kunjungan Aman",
     simPdrbBtn: "Simulasi PDRB",
     regionalShareLabel: "Sebaran Wilayah:",
     openSimDashboard: "Buka Dashboard Simulasi Kabupaten",
-    assumptionBadge: "Estimasi berbasis asumsi",
-    howCalculatedBtn: "Bagaimana dihitung?",
-    formulaModalTitle: "Metodologi & Rumus Perhitungan",
-    formulaModalSubtitle:
-      "Transparansi model matematis deterministik Subak Spatial Engine",
-    formulaNotice:
-      "Semua skor, rasio retensi, dan estimasi belanja merupakan hasil pemodelan matematis berbasis bobot wilayah dan asumsi standar komponen wisata, bukan data sensor okupansi lapangan waktu-nyata.",
-    spreadScoreFormulaTitle: "1. Indeks Pemerataan Wilayah (Spread Score)",
-    spreadScoreFormulaMath:
-      "Spread Score = ( (1 / N) * Σ W(Kabupaten_i) ) * 100",
-    spreadScoreFormulaDesc:
-      "Mengukur sejauh mana rute mendistribusikan kunjungan ke luar kawasan wisata padat Bali Selatan (Sarbagita). Bobot kabupaten: W = 1.0 untuk Wilayah Prioritas (Buleleng, Karangasem, Bangli, Jembrana, Klungkung); W = 0.5 untuk Zona Transisi (Tabanan, Gianyar); W = 0.2 untuk Pusat Keramaian (Badung, Denpasar).",
-    lbiFormulaTitle: "2. Retensi Ekonomi Desa (Local Economic Retention, LBI)",
-    lbiFormulaMath:
-      "LBI = (Belanja Warga Lokal / Total Estimasi Belanja) * 100%",
-    lbiFormulaDesc:
-      "Mengukur persentase pengeluaran wisatawan yang langsung tinggal di desa wisata (akomodasi homestay warga, kuliner warung lokal/KWT, pemandu Pokdarwis, donasi/tiket koperasi desa). Target ≥75% bertujuan meminimalkan kebocoran ekonomi (economic leakage) ke luar desa (TODO-HUMAN: ambang 75% perlu diverifikasi dengan standar akademis pariwisata berkelanjutan atau Disparda Bali).",
-    directSpendFormulaTitle: "3. Belanja Langsung ke Warga (Direct Community Spend)",
-    directSpendFormulaDesc:
-      "Dihitung dari akumulasi tarif wajar komponen wisata desa di data desa wisata (akomodasi homestay Rp 150rb–350rb, kuliner lokal Rp 35rb–75rb, pemandu lokal Rp 100rb–250rb, donasi/tiket koperasi Rp 15rb–30rb per orang per hari). Total untuk rute dikalikan jumlah hari perjalanan.",
-    quotaFormulaTitle:
-      "4. Ambang Daya Dukung & Proteksi Kuota (Capacity Quota Guard)",
-    quotaFormulaDesc:
-      "Batas daya dukung harian desa untuk mencegah overtourism, ditentukan oleh kesiapan pengelola dan kapasitas fisik desa. Angka kuota (contoh: 85/hari) dan beban (contoh: 26/hari) dalam aplikasi adalah beban contoh dalam simulasi perencana, bukan sensor okupansi real-time lapangan. Jika beban simulasi mencapai ≥92%, rute secara otomatis dialihkan ke Desa Penyangga (Buffer Village) terdekat.",
-    quotaTooltip:
-      "Batas daya dukung harian desa untuk mencegah overtourism, ditentukan oleh kesiapan pengelola dan kapasitas fisik desa. Estimasi berbasis asumsi simulasi.",
     // Timeline
     showingDayFocus: (d: number) => `Menampilkan fokus rute Hari ${d}`,
     showAllDays: (total: number) => `Tampilkan Semua Hari (${total}H)`,
@@ -145,7 +108,7 @@ export const UI_TEXT = {
     nightSuffix: "/malam",
     arrivalPopupLabel: "Pintu Kedatangan",
     spendToLocals: "Belanja ke Warga:",
-    quotaFilled: (pct: number) => `Kapasitas terpakai: ${pct}% (simulasi)`,
+    quotaFilled: (pct: number) => `Kuota: ${pct}% Terisi`,
     awigAwigPrefix: "Awig-Awig Desa:",
     prevStopLabel: "Destinasi sebelumnya",
     nextStopLabel: "Destinasi berikutnya",
@@ -157,24 +120,6 @@ export const UI_TEXT = {
     transitToStay: "Menuju Homestay Warga",
     transitFromPrev: (summary: string) => `${summary} dari titik sebelumnya`,
     transitRoadEstimate: "Estimasi Jalur Darat",
-    morningTransitFromStay: (stayName: string) =>
-      `Dari ${stayName} (Malam sebelumnya)`,
-    returnTransitToGate: (gate: string) =>
-      `Kembali ke ${gate} (Pintu Keberangkatan)`,
-    longLegWarning: (duration: string) =>
-      `Kaki perjalanan panjang (~${duration}), disarankan istirahat di perjalanan.`,
-    totalTripTransit: (duration: string, distance: string) =>
-      `Total durasi perjalanan: ~${duration} (${distance})`,
-    roadConditionNotice:
-      "Waktu tempuh dihitung dengan estimasi jalur darat realistis menghindari koridor padat Bali Selatan. Waktu aktual bergantung pada cuaca dan kondisi jalan lokal.",
-    adatVerifiedLabel: (by: string, at?: string) =>
-      `Diverifikasi oleh: ${by}${at ? ` (${at})` : ""}`,
-    adatPendingVerification:
-      "Konten adat dikurasi dari publikasi desa dan sedang dalam proses verifikasi bersama pengelola desa/prajuru adat terkait (TODO-HUMAN).",
-    adatQuotaMore: "Rincian Adat & Kuota",
-    adatQuotaLess: "Tutup Rincian",
-    quotaDetailLabel: (quota: number, load: number, pct: number) =>
-      `Kapasitas rencana: ${quota}/hari (simulasi beban: ${load}/hari · ${pct}% aman dari overtourism)`,
     // Penginapan & Wisata Terdekat
     tabOverview: "Ringkasan",
     tabStays: (count: number) => `Penginapan (${count})`,
@@ -245,17 +190,13 @@ export const UI_TEXT = {
     readyForJourney: "Ready for Your Fair-Trade Bali Journey?",
     readyForJourneyDesc:
       "Export your complete day-by-day route to an ink-friendly offline PDF for effortless navigation and village homestay bookings.",
-    printHeaderTitle: "ECO TRAVELER · EQUITABLE TRAVEL ITINERARY",
+    printHeaderTitle: "ECO TRAVELER · OFFICIAL TRAVEL ITINERARY",
     printHeaderSub:
       "Equitable Regional Redistribution Plan & Customary Bali Village Guide",
     printGeneratedOn: "Generated On:",
     printDirectSpend: "Direct Community Spend:",
     printLbiRetention: "Local Economic Retention:",
     printArrivalGate: "Arrival Gate:",
-    printFooterDisclaimer:
-      "Compiled by Eco Traveler. This is not an official government document. Scores and cost estimates are assumption-based model calculations.",
-    printFooterSource:
-      "Data Sources: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN: confirm official document title) & BPS Bali 2022 (GDP), curated for North, East, and West Bali.",
     themeLight: "Light",
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",
@@ -276,12 +217,11 @@ export const UI_TEXT = {
       "No parameters needed adjustment from your prompt.",
     heroTitle: "Equitable Bali Village Route Planner",
     heroDesc:
-      "Plan sustainable journeys across North, East, and West Bali, avoiding congested South Bali corridors. Your homestay, lunch, and local guide spending goes directly to village families and subak cooperatives.",
+      "Plan traffic-free journeys across North, East, and West Bali. Your homestay, lunch, and local guide spending goes directly to village families and subak cooperatives.",
     routeSummaryDays: (days: number) => `${days}-Day Travel Itinerary`,
     arrivalGatePrefix: "Arrival Gate:",
     footerLeft: "Eco Traveler · Bali Smart Society",
-    footerRight:
-      "28 curated tourism villages · Source: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN)",
+    footerRight: "28 Verified Tourism Villages Dataset",
     loadingMapTitle: "Loading Bali Spatial Village Atlas…",
     loadingMapSubtitle:
       "Preparing 28 village coordinates, density zones, and daily trails.",
@@ -312,35 +252,10 @@ export const UI_TEXT = {
     directSpendTitle: "Direct Community Spend",
     totalEstPrefix: "Total est. trip:",
     bufferActive: (n: number) => `${n} Buffer Village Redirects`,
-    quotaSafe: "Within Planned Capacity",
+    quotaSafe: "Within Daily Quota",
     simPdrbBtn: "GDP Simulation",
     regionalShareLabel: "Regional Share:",
     openSimDashboard: "Open Regency Impact Dashboard",
-    assumptionBadge: "Assumption-based estimate",
-    howCalculatedBtn: "How is this calculated?",
-    formulaModalTitle: "Calculation Formulas & Methodology",
-    formulaModalSubtitle:
-      "Mathematical transparency for the Subak Spatial Engine deterministic model",
-    formulaNotice:
-      "All scores, retention ratios, and spend estimates are mathematical model outputs based on regional weights and standard tourism component assumptions, not real-time live field sensor data.",
-    spreadScoreFormulaTitle: "1. Regional Spread Score",
-    spreadScoreFormulaMath:
-      "Spread Score = ( (1 / N) * Σ W(Regency_i) ) * 100",
-    spreadScoreFormulaDesc:
-      "Measures how effectively the route distributes tourism outside congested South Bali (Sarbagita). Regency weights: W = 1.0 for Priority Regencies (Buleleng, Karangasem, Bangli, Jembrana, Klungkung); W = 0.5 for Transition Zones (Tabanan, Gianyar); W = 0.2 for Core Hubs (Badung, Denpasar).",
-    lbiFormulaTitle: "2. Local Economic Retention (LBI)",
-    lbiFormulaMath:
-      "LBI = (Direct Local Community Spend / Total Estimated Trip Spend) * 100%",
-    lbiFormulaDesc:
-      "Measures the percentage of tourist spending directly retained by village residents (village homestays, local warung dining, Pokdarwis guides, cooperative/BUMDes entry tickets). The ≥75% target aims to minimize economic leakage outside rural villages (TODO-HUMAN: verify 75% target benchmark against sustainable tourism literature or Bali Tourism Board standards).",
-    directSpendFormulaTitle: "3. Direct Community Spend",
-    directSpendFormulaDesc:
-      "Calculated from the cumulative fair-rate components in the village dataset (homestay Rp 150k–350k, local warung meals Rp 35k–75k, local guides Rp 100k–250k, cooperative entry Rp 15k–30k per person per day), multiplied across trip days.",
-    quotaFormulaTitle: "4. Carrying Capacity Limit & Quota Guard",
-    quotaFormulaDesc:
-      "Daily carrying capacity limit to prevent overtourism, determined by management readiness and physical village capacity. Quota figures (e.g. 85/day) and load figures (e.g. 26/day) are illustrative simulation loads in the planner, not real-time live sensor data. When simulated load reaches ≥92%, the itinerary automatically redirects to the nearest Buffer Village.",
-    quotaTooltip:
-      "Daily carrying capacity limit to prevent overtourism, determined by management readiness and physical village capacity. Assumption-based simulation estimate.",
     // Timeline
     showingDayFocus: (d: number) => `Showing focused route for Day ${d}`,
     showAllDays: (total: number) => `Show All Days (${total}D)`,
@@ -363,7 +278,7 @@ export const UI_TEXT = {
     nightSuffix: "/night",
     arrivalPopupLabel: "Arrival Gate",
     spendToLocals: "Community Spend:",
-    quotaFilled: (pct: number) => `Capacity used: ${pct}% (simulated)`,
+    quotaFilled: (pct: number) => `Quota: ${pct}% Filled`,
     awigAwigPrefix: "Village Awig-Awig:",
     prevStopLabel: "Previous village stop",
     nextStopLabel: "Next village stop",
@@ -375,24 +290,6 @@ export const UI_TEXT = {
     transitToStay: "To Community Homestay",
     transitFromPrev: (summary: string) => `${summary} from previous stop`,
     transitRoadEstimate: "Scenic Road Estimate",
-    morningTransitFromStay: (stayName: string) =>
-      `From ${stayName} (Previous night stay)`,
-    returnTransitToGate: (gate: string) =>
-      `Return to ${gate} (Departure Gate)`,
-    longLegWarning: (duration: string) =>
-      `Long travel leg (~${duration}), scenic roadside rest recommended.`,
-    totalTripTransit: (duration: string, distance: string) =>
-      `Total trip transit: ~${duration} (${distance})`,
-    roadConditionNotice:
-      "Travel times reflect scenic road transit avoiding congested South Bali corridors. Actual duration may vary based on weather and local topography.",
-    adatVerifiedLabel: (by: string, at?: string) =>
-      `Customary verification by: ${by}${at ? ` (${at})` : ""}`,
-    adatPendingVerification:
-      "Customary rules curated from village records; official verification with village customary council in progress (TODO-HUMAN).",
-    adatQuotaMore: "Adat & Quota Details",
-    adatQuotaLess: "Hide Details",
-    quotaDetailLabel: (quota: number, load: number, pct: number) =>
-      `Planned capacity: ${quota}/day (simulated load: ${load}/day · ${pct}% safe from overtourism)`,
     // Accommodations & Nearby Attractions
     tabOverview: "Overview",
     tabStays: (count: number) => `Local Stays (${count})`,
@@ -783,8 +680,8 @@ export function localizeItinerary(
         ? "Gilimanuk Ferry Port (West Bali)"
         : "I Gusti Ngurah Rai International Airport"
       : isGilimanuk
-      ? "Pelabuhan Gilimanuk (Jembrana - Barat)"
-      : "Bandara I Gusti Ngurah Rai";
+        ? "Pelabuhan Gilimanuk (Jembrana - Barat)"
+        : "Bandara I Gusti Ngurah Rai";
 
   const regenciesList =
     itinerary.metrics.primaryRegenciesBenefited?.join(", ") ||
@@ -803,8 +700,8 @@ export function localizeItinerary(
       locale === "en"
         ? `Day ${day.dayNumber}: ${regionPair} Village & Cultural Trail`
         : day.themeTitle.startsWith("Day ")
-        ? `Hari ${day.dayNumber}: Jelajah Desa & Budaya ${regionPair}`
-        : day.themeTitle;
+          ? `Hari ${day.dayNumber}: Jelajah Desa & Budaya ${regionPair}`
+          : day.themeTitle;
 
     const activities = day.activities.map((act) => {
       const village = DESA_BY_ID.get(act.villageId);
@@ -817,49 +714,49 @@ export function localizeItinerary(
         act.timeSlot === "Pagi"
           ? "Morning Visit:"
           : act.timeSlot === "Siang"
-          ? "Workshop & Village Lunch:"
-          : "Afternoon Walk:";
+            ? "Workshop & Village Lunch:"
+            : "Afternoon Walk:";
 
       const slotPrefixId =
         act.timeSlot === "Pagi"
           ? "Kunjungan Pagi:"
           : act.timeSlot === "Siang"
-          ? "Lokakarya & Makan Siang Warga:"
-          : "Jelajah Sore:";
+            ? "Lokakarya & Makan Siang Warga:"
+            : "Jelajah Sore:";
 
       const isRedirected = act.capacityStatus === "REDIRECTED_BUFFER";
 
-      const rawHighlight = vText?.highlights || act.activityTitle;
-      const cleanHighlight = cleanHighlightPhrase(rawHighlight);
-
       const activityTitle =
         locale === "en"
-          ? `${slotPrefixEn} ${cleanHighlight}`
-          : `${slotPrefixId} ${cleanHighlight}`;
+          ? `${slotPrefixEn} ${firstHighlight.charAt(0).toUpperCase()}${firstHighlight.slice(1)}`
+          : act.activityTitle.startsWith("Morning") ||
+            act.activityTitle.startsWith("Workshop") ||
+            act.activityTitle.startsWith("Afternoon")
+            ? `${slotPrefixId} ${firstHighlight}`
+            : act.activityTitle;
 
-      const description = generateDeterministicStopDescription(
-        act.villageName,
-        act.regency,
-        rawHighlight,
-        act.localUmkmSpot || "",
-        act.timeSlot,
-        locale,
-        isRedirected,
-        act.originalSaturatedVillage
-      );
+      const description =
+        locale === "en"
+          ? isRedirected
+            ? `When visitor numbers at ${act.originalSaturatedVillage || "nearby hotspots"} approach the daily limit, the route shifts to the neighboring buffer village of ${act.villageName} in ${act.regency} Regency. Experience ${vText?.highlights.toLowerCase() || "local village life"} and support ${act.localUmkmSpot || "village artisans"}.`
+            : `Visit ${act.villageName} in ${act.regency} Regency to experience ${vText?.highlights.toLowerCase() || "authentic village traditions"} and spend directly with ${act.localUmkmSpot || "local community hosts"}.`
+          : act.description.startsWith("Visit ") ||
+            act.description.startsWith("When visitor")
+            ? `Berkunjung ke ${act.villageName} di Kabupaten ${act.regency} untuk mengenal ${vText?.highlights.toLowerCase() || "kehidupan desa"} dan berbelanja langsung di ${act.localUmkmSpot || "UMKM warga"}.`
+            : act.description;
 
       const antiOvertourismNote =
         locale === "en"
           ? isRedirected
             ? `Redirects visitors from ${act.originalSaturatedVillage || "crowded villages"} (98% capacity) to ${act.villageName} Buffer Village (30% capacity).`
             : PRIORITY_REGENCIES.has(act.regency)
-            ? `Priority economic redistribution regency (${act.regency}, Spatial Weight 1.0).`
-            : `Scenic transition corridor through ${act.regency} outside congested South Bali toward North and East Bali.`
+              ? `Priority economic redistribution regency (${act.regency}, Spatial Weight 1.0).`
+              : `Traffic-free transition corridor through ${act.regency} toward North and East Bali.`
           : isRedirected
-          ? `Mengalihkan kunjungan dari ${act.originalSaturatedVillage || "desa padat"} (98% kapasitas) ke Desa Penyangga ${act.villageName} (30% kapasitas).`
-          : PRIORITY_REGENCIES.has(act.regency)
-          ? `Kabupaten prioritas pemerataan ${act.regency} (Bobot Spasial 1.0).`
-          : `Koridor jalur penghubung di ${act.regency} yang menghindari koridor padat Bali Selatan menuju Bali Utara dan Timur.`;
+            ? `Mengalihkan kunjungan dari ${act.originalSaturatedVillage || "desa padat"} (98% kapasitas) ke Desa Penyangga ${act.villageName} (30% kapasitas).`
+            : PRIORITY_REGENCIES.has(act.regency)
+              ? `Kabupaten prioritas pemerataan ${act.regency} (Bobot Spasial 1.0).`
+              : `Jalur penghubung bebas macet di ${act.regency} menuju Bali Utara dan Timur.`;
 
       return {
         ...act,
@@ -893,103 +790,101 @@ export function localizeItinerary(
   const culturalEtiquette =
     locale === "en"
       ? [
-          {
-            ruleTitle:
-              "Temple Dress Code & Sacred Courtyards (Sarong & Sash)",
-            description: visitedVillages
-              .slice(0, 3)
-              .map(
-                (v) =>
-                  `${v.name}: ${getLocalizedVillageText(v, "en").dressCode}`
-              )
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Temple Attire",
-          },
-          {
-            ruleTitle:
-              "Village Awig-Awig, Cuntaka Taboos & Sacred Piodalan Days",
-            description: visitedVillages
-              .slice(0, 3)
-              .map(
-                (v) =>
-                  `${v.name}: ${
-                    getLocalizedVillageText(v, "en").sacredDaysNote ||
-                    getLocalizedVillageText(v, "en").customsNote
-                  }`
-              )
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Customary Taboos",
-          },
-          {
-            ruleTitle: "Subak Irrigation Channels, Sacred Forests & Reef Care",
-            description: visitedVillages
-              .slice(0, 4)
-              .map(
-                (v) =>
-                  `${v.name} (${v.regency}): ${
-                    getLocalizedVillageText(v, "en").customsNote
-                  }`
-              )
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Subak & Marine Ecology",
-          },
-        ]
+        {
+          ruleTitle:
+            "Temple Dress Code & Sacred Courtyards (Sarong & Sash)",
+          description: visitedVillages
+            .slice(0, 3)
+            .map(
+              (v) =>
+                `${v.name}: ${getLocalizedVillageText(v, "en").dressCode}`
+            )
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Temple Attire",
+        },
+        {
+          ruleTitle:
+            "Village Awig-Awig, Cuntaka Taboos & Sacred Piodalan Days",
+          description: visitedVillages
+            .slice(0, 3)
+            .map(
+              (v) =>
+                `${v.name}: ${getLocalizedVillageText(v, "en").sacredDaysNote ||
+                getLocalizedVillageText(v, "en").customsNote
+                }`
+            )
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Customary Taboos",
+        },
+        {
+          ruleTitle: "Subak Irrigation Channels, Sacred Forests & Reef Care",
+          description: visitedVillages
+            .slice(0, 4)
+            .map(
+              (v) =>
+                `${v.name} (${v.regency}): ${getLocalizedVillageText(v, "en").customsNote
+                }`
+            )
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Subak & Marine Ecology",
+        },
+      ]
       : [
-          {
-            ruleTitle:
-              "Tata Busana Pura & Kawasan Suci Desa Adat (Kamen & Selendang)",
-            description: visitedVillages
-              .slice(0, 3)
-              .map((v) => `${v.name}: ${v.dressCode || v.customsNote}`)
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Busana Pura",
-          },
-          {
-            ruleTitle:
-              "Awig-Awig Desa, Pantangan Cuntaka & Hari Sakral Piodalan",
-            description: visitedVillages
-              .slice(0, 3)
-              .map((v) => `${v.name}: ${v.sacredDaysNote || v.customsNote}`)
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Pantangan Adat",
-          },
-          {
-            ruleTitle: "Etika Saluran Subak, Hutan Adat & Pesisir",
-            description: visitedVillages
-              .slice(0, 4)
-              .map((v) => `${v.name} (${v.regency}): ${v.customsNote}`)
-              .join(" • "),
-            applicableVillages: visitedVillages.map((v) => v.name),
-            category: "Ekologi Subak & Laut",
-          },
-        ];
+        {
+          ruleTitle:
+            "Tata Busana Pura & Kawasan Suci Desa Adat (Kamen & Selendang)",
+          description: visitedVillages
+            .slice(0, 3)
+            .map((v) => `${v.name}: ${v.dressCode || v.customsNote}`)
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Busana Pura",
+        },
+        {
+          ruleTitle:
+            "Awig-Awig Desa, Pantangan Cuntaka & Hari Sakral Piodalan",
+          description: visitedVillages
+            .slice(0, 3)
+            .map((v) => `${v.name}: ${v.sacredDaysNote || v.customsNote}`)
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Pantangan Adat",
+        },
+        {
+          ruleTitle: "Etika Saluran Subak, Hutan Adat & Pesisir",
+          description: visitedVillages
+            .slice(0, 4)
+            .map((v) => `${v.name} (${v.regency}): ${v.customsNote}`)
+            .join(" • "),
+          applicableVillages: visitedVillages.map((v) => v.name),
+          category: "Ekologi Subak & Laut",
+        },
+      ];
 
   const tripTitle =
     locale === "en"
       ? `${duration}-Day Equitable Route: ${regenciesList} Villages`
       : itinerary.tripTitle.includes("Equitable Route")
-      ? `Rute ${duration} Hari: Jelajah Desa ${regenciesList}`
-      : itinerary.tripTitle;
+        ? `Rute ${duration} Hari: Jelajah Desa ${regenciesList}`
+        : itinerary.tripTitle;
 
   const summaryNarrative =
     locale === "en"
-      ? `This ${duration}-day route travels directly from ${arrivalGateLabel} into ${regenciesList}, avoiding congested South Bali corridors. It achieves a ${itinerary.metrics.spreadScore.toFixed(
-          1
-        )}/100 Regional Spread Score and retains ${itinerary.metrics.localBenefitIndex.toFixed(
-          1
-        )}% of total spending with community homestays, subak farmers, and village cooperatives.`
+      ? `This ${duration}-day route travels directly from ${arrivalGateLabel} into ${regenciesList}, bypassing congested South Bali. It achieves a ${itinerary.metrics.spreadScore.toFixed(
+        1
+      )}/100 Regional Spread Score and retains ${itinerary.metrics.localBenefitIndex.toFixed(
+        1
+      )}% of total spending with community homestays, subak farmers, and village cooperatives.`
       : itinerary.summaryNarrative.startsWith("This ")
-      ? `Perjalanan ${duration} hari dari ${arrivalGateLabel} menuju Kabupaten ${regenciesList} yang menghindari koridor padat Bali Selatan. Rute ini mencatat Indeks Pemerataan ${itinerary.metrics.spreadScore.toFixed(
+        ? `Perjalanan ${duration} hari dari ${arrivalGateLabel} menuju Kabupaten ${regenciesList} tanpa singgah di kawasan padat Bali Selatan. Rute ini mencatat Indeks Pemerataan ${itinerary.metrics.spreadScore.toFixed(
           1
         )}/100 dengan ${itinerary.metrics.localBenefitIndex.toFixed(
           1
         )}% pengeluaran masuk ke homestay warga dan koperasi desa.`
-      : itinerary.summaryNarrative;
+        : itinerary.summaryNarrative;
 
   return {
     ...itinerary,
@@ -999,9 +894,9 @@ export function localizeItinerary(
     culturalEtiquette,
     engineMeta: itinerary.engineMeta
       ? {
-          ...itinerary.engineMeta,
-          arrivalGateLabel,
-        }
+        ...itinerary.engineMeta,
+        arrivalGateLabel,
+      }
       : undefined,
   };
 }

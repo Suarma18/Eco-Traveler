@@ -32,7 +32,6 @@ import {
   Compass,
   ChevronDown,
   Sparkles,
-  AlertTriangle,
 } from "lucide-react";
 
 interface ItineraryTimelineProps {
@@ -68,7 +67,6 @@ export default function ItineraryTimeline({
   const [expandedSubSection, setExpandedSubSection] = useState<
     Record<string, "stays" | "attractions" | null>
   >({});
-  const [expandedAdat, setExpandedAdat] = useState<Record<string, boolean>>({});
 
   const toggleSubSection = (key: string, section: "stays" | "attractions") => {
     setExpandedSubSection((prev) => ({
@@ -77,178 +75,8 @@ export default function ItineraryTimeline({
     }));
   };
 
-  const toggleAdat = (key: string) => {
-    setExpandedAdat((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
-  // Hitung total akumulasi waktu tempuh dan jarak seluruh rute (seluruh hari + pintu kedatangan + kepulangan)
-  const tripTransitTotals = React.useMemo(() => {
-    let minutes = 0;
-    let km = 0;
-
-    for (let d = 0; d < days.length; d++) {
-      const day = days[d];
-      if (day.activities.length === 0) continue;
-
-      // Hari 1: pintu kedatangan ke titik pertama
-      if (day.dayNumber === 1 && arrivalCoords) {
-        const gateEst = estimateBaliTransit(
-          arrivalCoords[0],
-          arrivalCoords[1],
-          day.activities[0].lat,
-          day.activities[0].lng,
-          locale
-        );
-        minutes += gateEst.durationMinutes;
-        km += gateEst.roadDistanceKm;
-      }
-
-      // Hari 2+: kaki pagi dari tempat menginap malam sebelumnya ke titik pertama
-      if (day.dayNumber > 1) {
-        const prevDay = days[d - 1];
-        if (prevDay && prevDay.activities.length > 0) {
-          const prevLastAct = prevDay.activities[prevDay.activities.length - 1];
-          const stayVillage = prevDay.recommendedStay
-            ? allVillages.find((v) =>
-                prevDay.recommendedStay.name
-                  .toLowerCase()
-                  .includes(v.name.toLowerCase())
-              ) ||
-              allVillages.find(
-                (v) =>
-                  prevDay.recommendedStay.villageName &&
-                  v.name
-                    .toLowerCase()
-                    .includes(
-                      prevDay.recommendedStay.villageName.toLowerCase()
-                    )
-              ) ||
-              DESA_BY_ID.get(prevLastAct.villageId)
-            : DESA_BY_ID.get(prevLastAct.villageId);
-
-          const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
-          const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
-          const mornEst = estimateBaliTransit(
-            startLat,
-            startLng,
-            day.activities[0].lat,
-            day.activities[0].lng,
-            locale
-          );
-          minutes += mornEst.durationMinutes;
-          km += mornEst.roadDistanceKm;
-        }
-      }
-
-      // Kaki antar-titik hari berjalan
-      for (let i = 1; i < day.activities.length; i++) {
-        const segEst = estimateBaliTransit(
-          day.activities[i - 1].lat,
-          day.activities[i - 1].lng,
-          day.activities[i].lat,
-          day.activities[i].lng,
-          locale
-        );
-        minutes += segEst.durationMinutes;
-        km += segEst.roadDistanceKm;
-      }
-
-      // Kaki menuju homestay
-      if (day.recommendedStay && day.activities.length > 0) {
-        const lastAct = day.activities[day.activities.length - 1];
-        const stayVillage =
-          allVillages.find((v) =>
-            day.recommendedStay.name
-              .toLowerCase()
-              .includes(v.name.toLowerCase())
-          ) ||
-          allVillages.find(
-            (v) =>
-              day.recommendedStay.villageName &&
-              v.name
-                .toLowerCase()
-                .includes(day.recommendedStay.villageName.toLowerCase())
-          ) ||
-          DESA_BY_ID.get(lastAct.villageId);
-
-        const stayTargetLat = stayVillage ? stayVillage.lat : lastAct.lat;
-        const stayTargetLng = stayVillage ? stayVillage.lng : lastAct.lng;
-        const stayEst = estimateBaliTransit(
-          lastAct.lat,
-          lastAct.lng,
-          stayTargetLat,
-          stayTargetLng,
-          locale
-        );
-        minutes += stayEst.durationMinutes;
-        km += stayEst.roadDistanceKm;
-      }
-
-      // Hari terakhir: kaki kembali ke pintu kedatangan/keberangkatan
-      if (day.dayNumber === days.length && arrivalCoords) {
-        const lastAct = day.activities[day.activities.length - 1];
-        const retEst = estimateBaliTransit(
-          lastAct.lat,
-          lastAct.lng,
-          arrivalCoords[0],
-          arrivalCoords[1],
-          locale
-        );
-        minutes += retEst.durationMinutes;
-        km += retEst.roadDistanceKm;
-      }
-    }
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    const durationFormatted =
-      hours > 0
-        ? locale === "en"
-          ? `${hours}h ${mins}m`
-          : `${hours}j ${mins}m`
-        : locale === "en"
-        ? `${mins} mins`
-        : `${mins} mnt`;
-
-    const distanceFormatted =
-      locale === "en"
-        ? `${km.toFixed(1)} km`
-        : `${km.toFixed(1).replace(".", ",")} km`;
-
-    return {
-      minutes,
-      km,
-      durationFormatted,
-      distanceFormatted,
-    };
-  }, [days, arrivalCoords, allVillages, locale]);
-
   return (
     <div className="space-y-6 sm:space-y-7">
-      {/* Banner Total Perjalanan Seluruh Rute */}
-      {tripTransitTotals.minutes > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-xs text-slate-700 dark:text-slate-300 print-avoid-break">
-          <div className="flex items-center gap-2">
-            <Car
-              className="w-4 h-4 text-[#EA580C] dark:text-[#FB923C] shrink-0"
-              aria-hidden="true"
-            />
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
-              {t.totalTripTransit(
-                tripTransitTotals.durationFormatted,
-                tripTransitTotals.distanceFormatted
-              )}
-            </span>
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">
-            {t.roadConditionNotice}
-          </span>
-        </div>
-      )}
-
       {selectedDayFilter !== null && (
         <div className="flex items-center justify-between bg-emerald-50/90 dark:bg-emerald-950/60 border border-emerald-900/15 dark:border-emerald-700/40 px-4 py-2.5 rounded-xl text-xs">
           <span className="text-slate-800 dark:text-slate-200 font-medium">
@@ -290,44 +118,6 @@ export default function ItineraryTimeline({
             );
             totalDayTransitMinutes += gateEst.durationMinutes;
             totalDayTransitKm += gateEst.roadDistanceKm;
-          }
-
-          // Hari 2+: Kaki transit pagi
-          if (day.dayNumber > 1 && day.activities.length > 0) {
-            const prevDay = days.find((d) => d.dayNumber === day.dayNumber - 1);
-            if (prevDay && prevDay.activities.length > 0) {
-              const prevLastAct =
-                prevDay.activities[prevDay.activities.length - 1];
-              const stayVillage = prevDay.recommendedStay
-                ? allVillages.find((v) =>
-                    prevDay.recommendedStay.name
-                      .toLowerCase()
-                      .includes(v.name.toLowerCase())
-                  ) ||
-                  allVillages.find(
-                    (v) =>
-                      prevDay.recommendedStay.villageName &&
-                      v.name
-                        .toLowerCase()
-                        .includes(
-                          prevDay.recommendedStay.villageName.toLowerCase()
-                        )
-                  ) ||
-                  DESA_BY_ID.get(prevLastAct.villageId)
-                : DESA_BY_ID.get(prevLastAct.villageId);
-
-              const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
-              const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
-              const mornEst = estimateBaliTransit(
-                startLat,
-                startLng,
-                day.activities[0].lat,
-                day.activities[0].lng,
-                locale
-              );
-              totalDayTransitMinutes += mornEst.durationMinutes;
-              totalDayTransitKm += mornEst.roadDistanceKm;
-            }
           }
 
           for (let i = 1; i < day.activities.length; i++) {
@@ -372,31 +162,13 @@ export default function ItineraryTimeline({
             totalDayTransitKm += stayEst.roadDistanceKm;
           }
 
-          // Hari terakhir: kaki kembali ke pintu keberangkatan
-          if (
-            day.dayNumber === days.length &&
-            arrivalCoords &&
-            day.activities.length > 0
-          ) {
-            const lastAct = day.activities[day.activities.length - 1];
-            const retEst = estimateBaliTransit(
-              lastAct.lat,
-              lastAct.lng,
-              arrivalCoords[0],
-              arrivalCoords[1],
-              locale
-            );
-            totalDayTransitMinutes += retEst.durationMinutes;
-            totalDayTransitKm += retEst.roadDistanceKm;
-          }
-
           const dailyTransitSummary =
             totalDayTransitMinutes > 0
               ? formatDailyTransitSummary(
-                  totalDayTransitMinutes,
-                  totalDayTransitKm,
-                  locale
-                )
+                totalDayTransitMinutes,
+                totalDayTransitKm,
+                locale
+              )
               : null;
 
           return (
@@ -434,7 +206,7 @@ export default function ItineraryTimeline({
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
                     {t.activityAllocLabel}
                   </span>
                   <span className="text-xs font-mono font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
@@ -471,88 +243,6 @@ export default function ItineraryTimeline({
                             ({gateTransit.formattedDistance})
                           </span>
                         </div>
-                        {gateTransit.isLongLeg && (
-                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
-                            <AlertTriangle
-                              className="w-3 h-3 text-amber-600 shrink-0"
-                              aria-hidden="true"
-                            />
-                            <span>
-                              {t.longLegWarning(gateTransit.formattedDuration)}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                {/* Hari 2+: Kaki Transit Pagi dari Homestay Malam Sebelumnya */}
-                {day.dayNumber > 1 &&
-                  day.activities.length > 0 && (() => {
-                    const prevDay = days.find(
-                      (d) => d.dayNumber === day.dayNumber - 1
-                    );
-                    if (!prevDay || prevDay.activities.length === 0) return null;
-                    const prevLastAct =
-                      prevDay.activities[prevDay.activities.length - 1];
-                    const stayVillage = prevDay.recommendedStay
-                      ? allVillages.find((v) =>
-                          prevDay.recommendedStay.name
-                            .toLowerCase()
-                            .includes(v.name.toLowerCase())
-                        ) ||
-                        allVillages.find(
-                          (v) =>
-                            prevDay.recommendedStay.villageName &&
-                            v.name
-                              .toLowerCase()
-                              .includes(
-                                prevDay.recommendedStay.villageName.toLowerCase()
-                              )
-                        ) ||
-                        DESA_BY_ID.get(prevLastAct.villageId)
-                      : DESA_BY_ID.get(prevLastAct.villageId);
-
-                    const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
-                    const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
-                    const stayName =
-                      prevDay.recommendedStay?.name ||
-                      (stayVillage ? stayVillage.name : prevLastAct.villageName);
-
-                    const mornTransit = estimateBaliTransit(
-                      startLat,
-                      startLng,
-                      day.activities[0].lat,
-                      day.activities[0].lng,
-                      locale
-                    );
-
-                    return (
-                      <div className="relative py-1 print-avoid-break">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
-                          <Navigation
-                            className="w-3 h-3 text-[#0D4732] dark:text-emerald-400 shrink-0"
-                            aria-hidden="true"
-                          />
-                          <span>
-                            {t.morningTransitFromStay(stayName)}:{" "}
-                            <strong className="text-slate-800 dark:text-slate-100 font-semibold">
-                              {mornTransit.formattedDuration}
-                            </strong>{" "}
-                            ({mornTransit.formattedDistance})
-                          </span>
-                        </div>
-                        {mornTransit.isLongLeg && (
-                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
-                            <AlertTriangle
-                              className="w-3 h-3 text-amber-600 shrink-0"
-                              aria-hidden="true"
-                            />
-                            <span>
-                              {t.longLegWarning(mornTransit.formattedDuration)}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     );
                   })()}
@@ -583,12 +273,12 @@ export default function ItineraryTimeline({
                   const prevAct = idx > 0 ? day.activities[idx - 1] : null;
                   const transitFromPrev = prevAct
                     ? estimateBaliTransit(
-                        prevAct.lat,
-                        prevAct.lng,
-                        activity.lat,
-                        activity.lng,
-                        locale
-                      )
+                      prevAct.lat,
+                      prevAct.lng,
+                      activity.lat,
+                      activity.lng,
+                      locale
+                    )
                     : null;
 
                   return (
@@ -614,503 +304,409 @@ export default function ItineraryTimeline({
                               · {t.transitRoadEstimate}
                             </span>
                           </div>
-                          {transitFromPrev.isLongLeg && (
-                            <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
-                              <AlertTriangle
-                                className="w-3 h-3 text-amber-600 shrink-0"
-                                aria-hidden="true"
-                              />
-                              <span>
-                                {t.longLegWarning(
-                                  transitFromPrev.formattedDuration
-                                )}
-                              </span>
-                            </div>
-                          )}
                         </div>
                       )}
 
                       <div
                         role="button"
-                      tabIndex={0}
-                      onClick={() => onSelectActivity(activity)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onSelectActivity(activity);
-                        }
-                      }}
-                      className={`group relative bg-white dark:bg-[#111914] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer print-avoid-break focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-                        isSelected
+                        tabIndex={0}
+                        onClick={() => onSelectActivity(activity)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onSelectActivity(activity);
+                          }
+                        }}
+                        className={`group relative bg-white dark:bg-[#111914] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer print-avoid-break focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${isSelected
                           ? "border-[#0D4732] dark:border-emerald-400 ring-2 ring-[#0D4732]/10 dark:ring-emerald-400/20 shadow-sm"
                           : "border-slate-200/80 dark:border-emerald-900/40 hover:border-slate-300 dark:hover:border-emerald-700/60 shadow-2xs"
-                      }`}
-                    >
-                      {/* Node Dot on Vertical Timeline */}
-                      <span
-                        aria-hidden="true"
-                        className="absolute -left-[23px] sm:-left-[27px] top-6 w-3 h-3 rounded-full border-2 border-[#F8F9FA] dark:border-[#090E0B]"
-                        style={{ backgroundColor: colorInfo.hex }}
-                      />
+                          }`}
+                      >
+                        {/* Node Dot on Vertical Timeline */}
+                        <span
+                          aria-hidden="true"
+                          className="absolute -left-[23px] sm:-left-[27px] top-6 w-3 h-3 rounded-full border-2 border-[#F8F9FA] dark:border-[#090E0B]"
+                          style={{ backgroundColor: colorInfo.hex }}
+                        />
 
-                      <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4">
-                        {/* Visual Thumbnail Desa */}
-                        <div className="relative w-full sm:w-36 h-40 sm:h-auto rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={visualMeta.imageUrl}
-                            alt={visualMeta.altText}
-                            width={144}
-                            height={144}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                          <span
-                            className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold text-white shadow-xs"
-                            style={{ backgroundColor: colorInfo.hex }}
-                          >
-                            {dayPrefix}
-                            {day.dayNumber}.{idx + 1} ·{" "}
-                            {formatTimeSlot(activity.timeSlot, locale)}
-                          </span>
-                        </div>
-
-                        {/* Content Body */}
-                        <div className="flex-1 min-w-0 flex flex-col justify-between space-y-2.5">
-                          <div>
-                            {/* Top Meta Row: Nama Desa, Kabupaten, Badge Ketinggian (mdpl) & Buffer */}
-                            <div className="flex items-start justify-between gap-2 mb-1">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="text-xs font-bold text-[#0D4732] dark:text-emerald-400">
-                                  {activity.villageName}
-                                </span>
-                                <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#16231c] text-slate-600 dark:text-slate-300">
-                                  {locale === "en"
-                                    ? `${activity.regency}`
-                                    : `Kab. ${activity.regency}`}
-                                </span>
-                                {/* Badge Ketinggian dipindah ke baris info agar tidak hilang saat foto diganti */}
-                                <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#16231c] text-slate-600 dark:text-slate-300">
-                                  <Mountain
-                                    className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
-                                    aria-hidden="true"
-                                  />
-                                  {visualMeta.elevationLabel}
-                                </span>
-                                {isRedirected && (
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] border border-orange-200/70 dark:border-orange-800/50">
-                                    <ArrowRightLeft
-                                      className="w-3 h-3"
-                                      aria-hidden="true"
-                                    />
-                                    {t.bufferBadge}
-                                  </span>
-                                )}
-                              </div>
-
-                              <span className="font-mono text-xs font-semibold text-slate-800 dark:text-emerald-200 bg-slate-100 dark:bg-[#16231c] px-2.5 py-1 rounded-lg tabular-nums shrink-0">
-                                {formatCurrency(
-                                  activity.estimatedLocalSpendRp,
-                                  locale
-                                )}
-                              </span>
-                            </div>
-
-                            {/* Activity Title */}
-                            <h4 className="font-display font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base leading-snug mb-1">
-                              {activity.activityTitle}
-                            </h4>
-
-                            {/* Description */}
-                            {isAiActive && aiStopNarratives?.[activity.villageId] ? (
-                              <div className="space-y-1">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/50">
-                                  <Sparkles
-                                    className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
-                                    aria-hidden="true"
-                                  />
-                                  {t.aiStopBadge}
-                                </span>
-                                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
-                                  {aiStopNarratives[activity.villageId]}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {activity.description}
-                              </p>
-                            )}
+                        <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4">
+                          {/* Visual Thumbnail Desa */}
+                          <div className="relative w-full sm:w-36 h-40 sm:h-auto rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={visualMeta.imageUrl}
+                              alt={visualMeta.altText}
+                              width={144}
+                              height={144}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                            <span
+                              className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold text-white shadow-xs"
+                              style={{ backgroundColor: colorInfo.hex }}
+                            >
+                              {dayPrefix}
+                              {day.dayNumber}.{idx + 1} ·{" "}
+                              {formatTimeSlot(activity.timeSlot, locale)}
+                            </span>
                           </div>
 
-                          {/* Bottom Impact & Etiquette Footer */}
-                          <div className="pt-2.5 border-t border-slate-100 dark:border-emerald-900/30 space-y-1.5 text-xs">
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                              {activity.localUmkmSpot && (
-                                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-                                  <Store
-                                    className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C] shrink-0"
-                                    aria-hidden="true"
-                                  />
-                                  <span>{activity.localUmkmSpot}</span>
-                                </div>
-                              )}
-
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-slate-400 tabular-nums"
-                                  title={t.quotaTooltip}
-                                >
-                                  <Users
-                                    className="w-3 h-3 text-[#0D4732] dark:text-emerald-400"
-                                    aria-hidden="true"
-                                  />
-                                  <span>{visualMeta.quotaLabel}</span>
-                                </div>
-
-                                {onJumpToMap && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onJumpToMap(activity);
-                                    }}
-                                    className="no-print lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
-                                  >
-                                    <MapPin
-                                      className="w-3 h-3"
+                          {/* Content Body */}
+                          <div className="flex-1 min-w-0 flex flex-col justify-between space-y-2.5">
+                            <div>
+                              {/* Top Meta Row: Nama Desa, Kabupaten, Badge Ketinggian (mdpl) & Buffer */}
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-xs font-bold text-[#0D4732] dark:text-emerald-400">
+                                    {activity.villageName}
+                                  </span>
+                                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#16231c] text-slate-600 dark:text-slate-300">
+                                    {locale === "en"
+                                      ? `${activity.regency}`
+                                      : `Kab. ${activity.regency}`}
+                                  </span>
+                                  {/* Badge Ketinggian dipindah ke baris info agar tidak hilang saat foto diganti */}
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#16231c] text-slate-600 dark:text-slate-300">
+                                    <Mountain
+                                      className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
                                       aria-hidden="true"
                                     />
-                                    <span>{t.viewOnMapBtn}</span>
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            {vText?.customsNote && (() => {
-                              const isAdatExpanded = Boolean(expandedAdat[cardKey]);
-                              return (
-                                <div className="space-y-1.5 pt-0.5">
-                                  {/* Single-line summary by default, full when expanded or in print */}
-                                  <div className="flex items-start justify-between gap-2">
-                                    <div className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300 min-w-0">
-                                      <ScrollText
-                                        className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5"
+                                    {visualMeta.elevationLabel}
+                                  </span>
+                                  {isRedirected && (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] border border-orange-200/70 dark:border-orange-800/50">
+                                      <ArrowRightLeft
+                                        className="w-3 h-3"
                                         aria-hidden="true"
                                       />
-                                      <div className="leading-relaxed">
-                                        <strong className="text-slate-900 dark:text-slate-100 font-semibold">
-                                          {t.customsNotePrefix}{" "}
-                                        </strong>
-                                        <span className={isAdatExpanded ? "" : "line-clamp-1"}>
-                                          {vText.customsNote}
-                                        </span>
-                                      </div>
-                                    </div>
+                                      {t.bufferBadge}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <span className="font-mono text-xs font-semibold text-slate-800 dark:text-emerald-200 bg-slate-100 dark:bg-[#16231c] px-2.5 py-1 rounded-lg tabular-nums shrink-0">
+                                  {formatCurrency(
+                                    activity.estimatedLocalSpendRp,
+                                    locale
+                                  )}
+                                </span>
+                              </div>
+
+                              {/* Activity Title */}
+                              <h4 className="font-display font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base leading-snug mb-1">
+                                {activity.activityTitle}
+                              </h4>
+
+                              {/* Description */}
+                              {isAiActive && aiStopNarratives?.[activity.villageId] ? (
+                                <div className="space-y-1">
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/50">
+                                    <Sparkles
+                                      className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
+                                      aria-hidden="true"
+                                    />
+                                    {t.aiStopBadge}
+                                  </span>
+                                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
+                                    {aiStopNarratives[activity.villageId]}
+                                  </p>
+                                </div>
+                              ) : (
+                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                  {activity.description}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Bottom Impact & Etiquette Footer */}
+                            <div className="pt-2.5 border-t border-slate-100 dark:border-emerald-900/30 space-y-1.5 text-xs">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                {activity.localUmkmSpot && (
+                                  <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                                    <Store
+                                      className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C] shrink-0"
+                                      aria-hidden="true"
+                                    />
+                                    <span>{activity.localUmkmSpot}</span>
+                                  </div>
+                                )}
+
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-slate-400 tabular-nums">
+                                    <Users
+                                      className="w-3 h-3 text-[#0D4732] dark:text-emerald-400"
+                                      aria-hidden="true"
+                                    />
+                                    <span>{visualMeta.quotaLabel}</span>
+                                  </div>
+
+                                  {onJumpToMap && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        toggleAdat(cardKey);
+                                        onJumpToMap(activity);
                                       }}
-                                      className="no-print shrink-0 text-[11px] font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer flex items-center gap-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#0D4732]"
+                                      className="no-print lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
                                     >
-                                      <span>{isAdatExpanded ? t.adatQuotaLess : t.adatQuotaMore}</span>
-                                      <ChevronDown
-                                        className={`w-3 h-3 transition-transform ${isAdatExpanded ? "rotate-180" : ""}`}
+                                      <MapPin
+                                        className="w-3 h-3"
                                         aria-hidden="true"
                                       />
+                                      <span>{t.viewOnMapBtn}</span>
                                     </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {vText?.customsNote && (
+                                <div className="flex items-start gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                                  <ScrollText
+                                    className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5"
+                                    aria-hidden="true"
+                                  />
+                                  <span>
+                                    <strong className="text-slate-700 dark:text-slate-200">
+                                      {t.customsNotePrefix}{" "}
+                                    </strong>
+                                    {vText.customsNote}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Sub-Section Toggle Buttons: Penginapan Warga & Wisata Terdekat */}
+                              {(accommodations.length > 0 ||
+                                nearbyAttractions.length > 0) && (
+                                  <div className="pt-2 border-t border-slate-100 dark:border-emerald-900/30 flex flex-wrap items-center gap-2">
+                                    {accommodations.length > 0 && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleSubSection(cardKey, "stays");
+                                        }}
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${activeSection === "stays"
+                                          ? "bg-[#0D4732] dark:bg-emerald-600 text-white shadow-2xs"
+                                          : "bg-slate-100 dark:bg-[#16231c] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-emerald-950/60"
+                                          }`}
+                                      >
+                                        <BedDouble
+                                          className="w-3.5 h-3.5"
+                                          aria-hidden="true"
+                                        />
+                                        <span>
+                                          {t.staysCountPill(accommodations.length)}
+                                        </span>
+                                        <ChevronDown
+                                          className={`w-3 h-3 transition-transform ${activeSection === "stays"
+                                            ? "rotate-180"
+                                            : ""
+                                            }`}
+                                          aria-hidden="true"
+                                        />
+                                      </button>
+                                    )}
+
+                                    {nearbyAttractions.length > 0 && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleSubSection(cardKey, "attractions");
+                                        }}
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${activeSection === "attractions"
+                                          ? "bg-[#EA580C] dark:bg-orange-600 text-white shadow-2xs"
+                                          : "bg-slate-100 dark:bg-[#16231c] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-orange-950/60"
+                                          }`}
+                                      >
+                                        <Compass
+                                          className="w-3.5 h-3.5"
+                                          aria-hidden="true"
+                                        />
+                                        <span>
+                                          {t.attractionsCountPill(
+                                            nearbyAttractions.length
+                                          )}
+                                        </span>
+                                        <ChevronDown
+                                          className={`w-3 h-3 transition-transform ${activeSection === "attractions"
+                                            ? "rotate-180"
+                                            : ""
+                                            }`}
+                                          aria-hidden="true"
+                                        />
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+
+                              {/* Expanded List: Penginapan di Daerah Tersebut */}
+                              {activeSection === "stays" && (
+                                <div
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="mt-2 space-y-2 p-3 rounded-xl bg-emerald-50/50 dark:bg-[#142019] border border-emerald-900/15 dark:border-emerald-800/40 text-xs"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                                      <BedDouble
+                                        className="w-3.5 h-3.5 text-[#0D4732] dark:text-emerald-400"
+                                        aria-hidden="true"
+                                      />
+                                      {t.localStaysTitle}
+                                    </span>
+                                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                                      {activity.villageName}
+                                    </span>
                                   </div>
 
-                                  {/* Expanded Adat Rules, Dress Code, Sacred Days, Quota Details & Verification */}
-                                  {isAdatExpanded && (
-                                    <div className="space-y-1.5 pl-5 pt-1 text-xs text-slate-600 dark:text-slate-300 bg-slate-50/70 dark:bg-[#142019] p-2.5 rounded-xl border border-slate-200/60 dark:border-emerald-900/30">
-                                      {vText.dressCode && (
-                                        <p className="leading-relaxed">
-                                          <strong className="text-slate-800 dark:text-slate-200 font-medium">
-                                            {t.dressAndEtiquetteLabel}:{" "}
-                                          </strong>
-                                          {vText.dressCode}
-                                        </p>
-                                      )}
-                                      {vText.sacredDaysNote && (
-                                        <p className="leading-relaxed text-[#EA580C] dark:text-[#FB923C] font-medium">
-                                          <strong className="font-semibold">{t.sacredDaysLabel}: </strong>
-                                          {vText.sacredDaysNote}
-                                        </p>
-                                      )}
-                                      {villageEntity && (
-                                        <p className="leading-relaxed text-[11px] font-mono text-slate-600 dark:text-slate-400">
-                                          {t.quotaDetailLabel(
-                                            villageEntity.dailyQuota || 90,
-                                            villageEntity.currentSimulatedLoad || 25,
-                                            visualMeta.quotaPercentage
-                                          )}
-                                        </p>
-                                      )}
-                                      <div className="text-[10px] text-slate-500 dark:text-slate-400 italic pt-0.5">
-                                        {villageEntity?.adatVerifiedBy
-                                          ? t.adatVerifiedLabel(
-                                              villageEntity.adatVerifiedBy,
-                                              villageEntity.adatVerifiedAt
-                                            )
-                                          : t.adatPendingVerification}
-                                      </div>
-                                    </div>
-                                  )}
+                                  <div className="grid grid-cols-1 gap-2 pt-0.5">
+                                    {accommodations.map((stay) => {
+                                      const stayName =
+                                        locale === "en" && stay.nameEn
+                                          ? stay.nameEn
+                                          : stay.name;
+                                      const features =
+                                        locale === "en" && stay.featuresEn
+                                          ? stay.featuresEn
+                                          : stay.features;
+                                      const bookingNote =
+                                        locale === "en" && stay.bookingNoteEn
+                                          ? stay.bookingNoteEn
+                                          : stay.bookingNote;
 
-                                  {/* Print-only complete verification note if not manually expanded */}
-                                  {!isAdatExpanded && (
-                                    <div className="hidden print:block text-[10px] text-slate-500 italic pl-5">
-                                      {villageEntity?.adatVerifiedBy
-                                        ? t.adatVerifiedLabel(
-                                            villageEntity.adatVerifiedBy,
-                                            villageEntity.adatVerifiedAt
-                                          )
-                                        : t.adatPendingVerification}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })()}
-
-                            {/* Sub-Section Toggle Buttons: Penginapan Warga & Wisata Terdekat */}
-                            {(accommodations.length > 0 ||
-                              nearbyAttractions.length > 0) && (
-                              <div className="no-print pt-2 border-t border-slate-100 dark:border-emerald-900/30 flex flex-wrap items-center gap-2">
-                                {accommodations.length > 0 && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleSubSection(cardKey, "stays");
-                                    }}
-                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-                                      activeSection === "stays"
-                                        ? "bg-[#0D4732] dark:bg-emerald-600 text-white shadow-2xs"
-                                        : "bg-slate-100 dark:bg-[#16231c] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-emerald-950/60"
-                                    }`}
-                                  >
-                                    <BedDouble
-                                      className="w-3.5 h-3.5"
-                                      aria-hidden="true"
-                                    />
-                                    <span>
-                                      {t.staysCountPill(accommodations.length)}
-                                    </span>
-                                    <ChevronDown
-                                      className={`w-3 h-3 transition-transform ${
-                                        activeSection === "stays"
-                                          ? "rotate-180"
-                                          : ""
-                                      }`}
-                                      aria-hidden="true"
-                                    />
-                                  </button>
-                                )}
-
-                                {nearbyAttractions.length > 0 && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleSubSection(cardKey, "attractions");
-                                    }}
-                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
-                                      activeSection === "attractions"
-                                        ? "bg-[#EA580C] dark:bg-orange-600 text-white shadow-2xs"
-                                        : "bg-slate-100 dark:bg-[#16231c] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-orange-950/60"
-                                    }`}
-                                  >
-                                    <Compass
-                                      className="w-3.5 h-3.5"
-                                      aria-hidden="true"
-                                    />
-                                    <span>
-                                      {t.attractionsCountPill(
-                                        nearbyAttractions.length
-                                      )}
-                                    </span>
-                                    <ChevronDown
-                                      className={`w-3 h-3 transition-transform ${
-                                        activeSection === "attractions"
-                                          ? "rotate-180"
-                                          : ""
-                                      }`}
-                                      aria-hidden="true"
-                                    />
-                                  </button>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Expanded List: Penginapan di Daerah Tersebut */}
-                            {activeSection === "stays" && (
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="mt-2 space-y-2 p-3 rounded-xl bg-emerald-50/50 dark:bg-[#142019] border border-emerald-900/15 dark:border-emerald-800/40 text-xs"
-                              >
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                                    <BedDouble
-                                      className="w-3.5 h-3.5 text-[#0D4732] dark:text-emerald-400"
-                                      aria-hidden="true"
-                                    />
-                                    {t.localStaysTitle}
-                                  </span>
-                                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                                    {activity.villageName}
-                                  </span>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-2 pt-0.5">
-                                  {accommodations.map((stay) => {
-                                    const stayName =
-                                      locale === "en" && stay.nameEn
-                                        ? stay.nameEn
-                                        : stay.name;
-                                    const features =
-                                      locale === "en" && stay.featuresEn
-                                        ? stay.featuresEn
-                                        : stay.features;
-                                    const bookingNote =
-                                      locale === "en" && stay.bookingNoteEn
-                                        ? stay.bookingNoteEn
-                                        : stay.bookingNote;
-
-                                    return (
-                                      <div
-                                        key={stay.id}
-                                        className="p-2.5 rounded-lg bg-white dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-900/40 space-y-1.5 shadow-2xs"
-                                      >
-                                        <div className="flex flex-wrap items-center justify-between gap-1.5">
-                                          <div className="flex items-center gap-1.5 min-w-0">
-                                            <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                                              {stayName}
-                                            </span>
-                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 shrink-0">
-                                              {stay.type}
-                                            </span>
-                                          </div>
-                                          <span className="font-mono text-xs font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums shrink-0">
-                                            {formatCurrency(
-                                              stay.pricePerNightRp,
-                                              locale
-                                            )}
-                                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans font-normal ml-0.5">
-                                              {t.perNightLabel}
-                                            </span>
-                                          </span>
-                                        </div>
-
-                                        {features && features.length > 0 && (
-                                          <div className="flex flex-wrap items-center gap-1">
-                                            {features.map((feat, fIdx) => (
-                                              <span
-                                                key={fIdx}
-                                                className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-[#1a2b22] text-slate-600 dark:text-slate-300 font-medium"
-                                              >
-                                                ✓ {feat}
+                                      return (
+                                        <div
+                                          key={stay.id}
+                                          className="p-2.5 rounded-lg bg-white dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-900/40 space-y-1.5 shadow-2xs"
+                                        >
+                                          <div className="flex flex-wrap items-center justify-between gap-1.5">
+                                            <div className="flex items-center gap-1.5 min-w-0">
+                                              <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                                                {stayName}
                                               </span>
-                                            ))}
+                                              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 shrink-0">
+                                                {stay.type}
+                                              </span>
+                                            </div>
+                                            <span className="font-mono text-xs font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums shrink-0">
+                                              {formatCurrency(
+                                                stay.pricePerNightRp,
+                                                locale
+                                              )}
+                                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans font-normal ml-0.5">
+                                                {t.perNightLabel}
+                                              </span>
+                                            </span>
                                           </div>
-                                        )}
 
-                                        {bookingNote && (
-                                          <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
-                                            {bookingNote}
-                                          </p>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
+                                          {features && features.length > 0 && (
+                                            <div className="flex flex-wrap items-center gap-1">
+                                              {features.map((feat, fIdx) => (
+                                                <span
+                                                  key={fIdx}
+                                                  className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-[#1a2b22] text-slate-600 dark:text-slate-300 font-medium"
+                                                >
+                                                  ✓ {feat}
+                                                </span>
+                                              ))}
+                                            </div>
+                                          )}
+
+                                          {bookingNote && (
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                                              {bookingNote}
+                                            </p>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* Expanded List: Wisata Terdekat */}
-                            {activeSection === "attractions" && (
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="mt-2 space-y-2 p-3 rounded-xl bg-orange-50/60 dark:bg-[#1c1813] border border-orange-200/60 dark:border-orange-900/40 text-xs"
-                              >
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                                    <Compass
-                                      className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
-                                      aria-hidden="true"
-                                    />
-                                    {t.nearbyAttractionsTitle}
-                                  </span>
-                                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                                    {activity.villageName}
-                                  </span>
-                                </div>
+                              {/* Expanded List: Wisata Terdekat */}
+                              {activeSection === "attractions" && (
+                                <div
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="mt-2 space-y-2 p-3 rounded-xl bg-orange-50/60 dark:bg-[#1c1813] border border-orange-200/60 dark:border-orange-900/40 text-xs"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                                      <Compass
+                                        className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
+                                        aria-hidden="true"
+                                      />
+                                      {t.nearbyAttractionsTitle}
+                                    </span>
+                                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                                      {activity.villageName}
+                                    </span>
+                                  </div>
 
-                                <div className="grid grid-cols-1 gap-2 pt-0.5">
-                                  {nearbyAttractions.map((poi) => {
-                                    const poiName =
-                                      locale === "en" && poi.nameEn
-                                        ? poi.nameEn
-                                        : poi.name;
-                                    const desc =
-                                      locale === "en" && poi.descriptionEn
-                                        ? poi.descriptionEn
-                                        : poi.description;
-                                    const highlights =
-                                      locale === "en" && poi.highlightsEn
-                                        ? poi.highlightsEn
-                                        : poi.highlights;
-                                    const distKmFormatted =
-                                      locale === "en"
-                                        ? `${poi.distanceKm} km`
-                                        : `${poi.distanceKm
+                                  <div className="grid grid-cols-1 gap-2 pt-0.5">
+                                    {nearbyAttractions.map((poi) => {
+                                      const poiName =
+                                        locale === "en" && poi.nameEn
+                                          ? poi.nameEn
+                                          : poi.name;
+                                      const desc =
+                                        locale === "en" && poi.descriptionEn
+                                          ? poi.descriptionEn
+                                          : poi.description;
+                                      const highlights =
+                                        locale === "en" && poi.highlightsEn
+                                          ? poi.highlightsEn
+                                          : poi.highlights;
+                                      const distKmFormatted =
+                                        locale === "en"
+                                          ? `${poi.distanceKm} km`
+                                          : `${poi.distanceKm
                                             .toString()
                                             .replace(".", ",")} km`;
 
-                                    return (
-                                      <div
-                                        key={poi.id}
-                                        className="p-2.5 rounded-lg bg-white dark:bg-[#1e1c18] border border-orange-200/50 dark:border-orange-900/30 space-y-1.5 shadow-2xs"
-                                      >
-                                        <div className="flex flex-wrap items-center justify-between gap-1.5">
-                                          <div className="flex items-center gap-1.5 min-w-0">
-                                            <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                                              {poiName}
-                                            </span>
-                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-50 dark:bg-orange-950/80 text-[#EA580C] dark:text-[#FB923C] shrink-0">
-                                              {poi.category}
+                                      return (
+                                        <div
+                                          key={poi.id}
+                                          className="p-2.5 rounded-lg bg-white dark:bg-[#1e1c18] border border-orange-200/50 dark:border-orange-900/30 space-y-1.5 shadow-2xs"
+                                        >
+                                          <div className="flex flex-wrap items-center justify-between gap-1.5">
+                                            <div className="flex items-center gap-1.5 min-w-0">
+                                              <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                                                {poiName}
+                                              </span>
+                                              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-50 dark:bg-orange-950/80 text-[#EA580C] dark:text-[#FB923C] shrink-0">
+                                                {poi.category}
+                                              </span>
+                                            </div>
+                                            <span className="font-mono text-[11px] text-slate-600 dark:text-slate-300 tabular-nums shrink-0">
+                                              {t.distanceFromVillage(
+                                                poi.durationMinutes,
+                                                distKmFormatted
+                                              )}
                                             </span>
                                           </div>
-                                          <span className="font-mono text-[11px] text-slate-600 dark:text-slate-300 tabular-nums shrink-0">
-                                            {t.distanceFromVillage(
-                                              poi.durationMinutes,
-                                              distKmFormatted
-                                            )}
-                                          </span>
+
+                                          <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            {desc}
+                                          </p>
+
+                                          {highlights && (
+                                            <div className="text-[10px] font-medium text-[#EA580C] dark:text-[#FB923C] flex items-center gap-1">
+                                              <span>✦</span>
+                                              <span>{highlights}</span>
+                                            </div>
+                                          )}
                                         </div>
-
-                                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                          {desc}
-                                        </p>
-
-                                        {highlights && (
-                                          <div className="text-[10px] font-medium text-[#EA580C] dark:text-[#FB923C] flex items-center gap-1">
-                                            <span>✦</span>
-                                            <span>{highlights}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </React.Fragment>
+                    </React.Fragment>
                   );
                 })}
 
@@ -1164,17 +760,6 @@ export default function ItineraryTimeline({
                             ({stayTransit.formattedDistance})
                           </span>
                         </div>
-                        {stayTransit.isLongLeg && (
-                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
-                            <AlertTriangle
-                              className="w-3 h-3 text-amber-600 shrink-0"
-                              aria-hidden="true"
-                            />
-                            <span>
-                              {t.longLegWarning(stayTransit.formattedDuration)}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     );
                   })()}
@@ -1206,50 +791,6 @@ export default function ItineraryTimeline({
                     </span>
                   </div>
                 )}
-
-                {/* Hari Terakhir: Kaki Transit Pulang Kembali ke Pintu Kedatangan/Keberangkatan */}
-                {day.dayNumber === days.length &&
-                  arrivalCoords &&
-                  day.activities.length > 0 && (() => {
-                    const lastAct = day.activities[day.activities.length - 1];
-                    const returnTransit = estimateBaliTransit(
-                      lastAct.lat,
-                      lastAct.lng,
-                      arrivalCoords[0],
-                      arrivalCoords[1],
-                      locale
-                    );
-                    return (
-                      <div className="relative py-2 print-avoid-break">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
-                          <Navigation
-                            className="w-3 h-3 text-[#EA580C] dark:text-[#FB923C] shrink-0 rotate-180"
-                            aria-hidden="true"
-                          />
-                          <span>
-                            {t.returnTransitToGate(arrivalLabel || "Ngurah Rai")}:{" "}
-                            <strong className="text-slate-800 dark:text-slate-100 font-semibold">
-                              {returnTransit.formattedDuration}
-                            </strong>{" "}
-                            ({returnTransit.formattedDistance})
-                          </span>
-                        </div>
-                        {returnTransit.isLongLeg && (
-                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
-                            <AlertTriangle
-                              className="w-3 h-3 text-amber-600 shrink-0"
-                              aria-hidden="true"
-                            />
-                            <span>
-                              {t.longLegWarning(
-                                returnTransit.formattedDuration
-                              )}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
               </div>
             </section>
           );
