@@ -344,3 +344,37 @@ test("T7: Absence of unqualified 'official' and 'verified' claims, and data sour
     "DATA-SOURCES.md must document Disparda origin and mark TODO-HUMAN"
   );
 });
+
+test("T8: Map viewport invalidation, marker z-index hierarchy, and contrast casing polylines", () => {
+  const mapCode = fs.readFileSync(
+    path.resolve("src/components/LeafletMap.tsx"),
+    "utf8"
+  );
+
+  // Verify invalidateSize is connected to ResizeObserver and window events
+  assert.ok(
+    mapCode.includes("map.invalidateSize") &&
+      mapCode.includes("ResizeObserver") &&
+      mapCode.includes("orientationchange"),
+    "LeafletMap must listen to ResizeObserver, resize, and orientationchange"
+  );
+
+  // Verify fitBounds incorporates padding and maxZoom
+  assert.ok(
+    mapCode.includes("map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 })"),
+    "LeafletMap must call fitBounds with padding and maxZoom"
+  );
+
+  // Verify stop markers have elevated zIndexOffset to stay above polylines
+  assert.ok(
+    mapCode.includes("zIndexOffset={isSelected ? 1500 : 800 + actIdx * 10}"),
+    "LeafletMap stop markers must have zIndexOffset higher than polylines"
+  );
+
+  // Verify arrivalCoords is added to allRouteCoords for complete fitBounds
+  assert.ok(
+    mapCode.includes("if (arrivalCoords) {") &&
+      mapCode.includes("coords.push(arrivalCoords);"),
+    "allRouteCoords must include arrivalCoords in bounds calculation"
+  );
+});

@@ -164,9 +164,17 @@ function MapViewportController({
 
     observer.observe(container);
 
+    const handleWindowResize = () => {
+      map.invalidateSize({ animate: false });
+    };
+    window.addEventListener("resize", handleWindowResize);
+    window.addEventListener("orientationchange", handleWindowResize);
+
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
+      window.removeEventListener("resize", handleWindowResize);
+      window.removeEventListener("orientationchange", handleWindowResize);
     };
   }, [map]);
 
@@ -178,7 +186,7 @@ function MapViewportController({
         map.invalidateSize({ animate: false });
         if (allRouteCoords.length > 1 && !focusCoords) {
           const bounds = L.latLngBounds(allRouteCoords);
-          map.fitBounds(bounds, { padding: [36, 36], maxZoom: 11 });
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
         }
       }, 150);
       return () => clearTimeout(timer);
@@ -202,7 +210,7 @@ function MapViewportController({
   useEffect(() => {
     if (!focusCoords && allRouteCoords.length > 1) {
       const bounds = L.latLngBounds(allRouteCoords);
-      map.fitBounds(bounds, { padding: [46, 46], maxZoom: 11 });
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
     }
   }, [allRouteCoords, focusCoords, map]);
 
@@ -728,7 +736,11 @@ export default function LeafletMap({
           )}
 
         {/* Pin Titik Kedatangan */}
-        <Marker position={arrivalCoords} icon={createGateIcon()}>
+        <Marker
+          position={arrivalCoords}
+          icon={createGateIcon()}
+          zIndexOffset={600}
+        >
           <Popup>
             <div className="text-stone-900 dark:text-stone-100 min-w-[180px]">
               <p className="text-[10px] font-mono uppercase tracking-wider text-stone-500 dark:text-stone-400">
@@ -842,29 +854,46 @@ export default function LeafletMap({
                   locale
                 );
                 return (
-                  <Polyline
-                    key={`leg-${day.dayNumber}-${actIdx}`}
-                    positions={[
-                      [prevAct.lat, prevAct.lng],
-                      [act.lat, act.lng],
-                    ]}
-                    pathOptions={{
-                      color: dayColor,
-                      weight: 4,
-                      opacity: 0.95,
-                    }}
-                  >
-                    <Tooltip sticky>
-                      <div className="font-sans text-xs space-y-0.5">
-                        <div className="font-semibold text-slate-800 dark:text-slate-100">
-                          {prevAct.villageName} ➔ {act.villageName}
+                  <React.Fragment key={`leg-pair-${day.dayNumber}-${actIdx}`}>
+                    {/* Outline / Casing Line for High Contrast on Light/Dark/Satellite Basemaps */}
+                    <Polyline
+                      positions={[
+                        [prevAct.lat, prevAct.lng],
+                        [act.lat, act.lng],
+                      ]}
+                      pathOptions={{
+                        color: useDarkMapColors ? "#05130D" : "#FFFFFF",
+                        weight: 6,
+                        opacity: 0.75,
+                        lineCap: "round",
+                        lineJoin: "round",
+                      }}
+                    />
+                    <Polyline
+                      positions={[
+                        [prevAct.lat, prevAct.lng],
+                        [act.lat, act.lng],
+                      ]}
+                      pathOptions={{
+                        color: dayColor,
+                        weight: 3.5,
+                        opacity: 0.95,
+                        lineCap: "round",
+                        lineJoin: "round",
+                      }}
+                    >
+                      <Tooltip sticky>
+                        <div className="font-sans text-xs space-y-0.5">
+                          <div className="font-semibold text-slate-800 dark:text-slate-100">
+                            {prevAct.villageName} ➔ {act.villageName}
+                          </div>
+                          <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
+                            {legTransit.formattedSummary}
+                          </div>
                         </div>
-                        <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
-                          {legTransit.formattedSummary}
-                        </div>
-                      </div>
-                    </Tooltip>
-                  </Polyline>
+                      </Tooltip>
+                    </Polyline>
+                  </React.Fragment>
                 );
               })}
 
@@ -879,6 +908,7 @@ export default function LeafletMap({
                   <Marker
                     key={`${day.dayNumber}-${activity.villageId}-${actIdx}`}
                     position={[activity.lat, activity.lng]}
+                    zIndexOffset={isSelected ? 1500 : 800 + actIdx * 10}
                     icon={createDayMarkerIcon(
                       day.dayNumber,
                       actIdx + 1,

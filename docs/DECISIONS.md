@@ -80,6 +80,17 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
   3. **Disclaimer Kaki Cetak:** Menambahkan catatan kaki cetak eksplisit: "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi."
   4. **Dokumentasi Asal-Usul Data:** Menyusun `docs/DATA-SOURCES.md` yang merinci asal data dari Dinas Pariwisata Provinsi Bali 2025 (Tabel 33) dan PDRB BPS Bali 2022, serta mencatat bagian-bagian yang masih dalam proses verifikasi manusia (`TODO-HUMAN`).
 
+---
+
+## [2026-11-05] T8: Peta: Perbaikan Tile dan Rendering di Mobile/Desktop
+- **Konteks:** Pada tampilan mobile, perpindahan tab memicu sebagian tile Leaflet menjadi abu-abu karena ukuran kontainer DOM belum selesai dihitung saat mount. Selain itu pada layar desktop, garis rute sering tertutup atau nomor urut stop tertimpa garis polyline.
+- **Keputusan:**
+  1. **Invalidasi Ukuran Multitier:** `map.invalidateSize()` diikat ke `ResizeObserver`, event `resize`, dan `orientationchange` dengan jeda debounce (150ms) saat tab mobile "Spatial Map" aktif agar kontainer Leaflet selalu terisi penuh tanpa area abu-abu.
+  2. **Hierarki Z-Index Stop vs Garis:** Menetapkan `zIndexOffset={isSelected ? 1500 : 800 + actIdx * 10}` pada pin destinasi dan `zIndexOffset={600}` pada pintu kedatangan sehingga nomor urut (H1.1, H1.2, dsb.) selalu berada di atas seluruh garis polyline dan overlay kawasan padat.
+  3. **Garis Casing Kontras Tinggi:** Menambahkan garis dasar pelindung (casing polyline `weight: 6`) di bawah garis utama harian (`weight: 3.5`) agar jalur perjalanan memiliki kontras tajam di atas semua jenis tile (OpenStreetMap, Carto Dark, Carto Light, maupun foto satelit).
+  4. **FitBounds Menyeluruh:** Memasukkan koordinat pintu kedatangan/keberangkatan ke dalam `allRouteCoords` dan memanggil `fitBounds(bounds, { padding: [40, 40], maxZoom: 12 })` saat rute dimuat.
+
+
 
 
 
