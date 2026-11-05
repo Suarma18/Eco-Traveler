@@ -453,8 +453,12 @@ export function getVillageVisualMeta(
     imageUrl,
     altText:
       locale === "en"
-        ? `Illustration of ${villageName}`
-        : `Ilustrasi ${villageName}`,
+        ? isIllustration
+          ? `Illustration of ${villageName}`
+          : `Photo of ${villageName}`
+        : isIllustration
+          ? `Ilustrasi ${villageName}`
+          : `Foto ${villageName}`,
     landscapeTag: locale === "en" ? def.tagEn : def.tagId,
     elevationLabel: locale === "en" ? `${elevation}m ASL` : `${elevation} mdpl`,
     quotaPercentage,

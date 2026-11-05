@@ -44,3 +44,4 @@ test('UI/UX Refactor 3: Soft & Earthy Card styling and relaxed activity descript
     'Activity descriptions must use relaxed text-sm text-stone-600 leading-relaxed font styling'
   );
 });
+

@@ -1090,6 +1090,14 @@ export default function LeafletMap({
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  {activeVisualMeta.imageCredit && (
+                    <span
+                      className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/70 text-[8px] text-white/90 backdrop-blur-xs font-mono max-w-[95%] truncate pointer-events-none"
+                      title={activeVisualMeta.imageCredit}
+                    >
+                      {activeVisualMeta.imageCredit}
+                    </span>
+                  )}
                 </div>
 
                 {/* Detail & Awig-Awig Desa Aktif */}

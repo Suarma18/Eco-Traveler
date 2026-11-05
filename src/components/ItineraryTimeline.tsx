@@ -673,6 +673,14 @@ export default function ItineraryTimeline({
                             {day.dayNumber}.{idx + 1} ·{" "}
                             {formatTimeSlot(activity.timeSlot, locale)}
                           </span>
+                          {visualMeta.imageCredit && (
+                            <span
+                              className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/60 text-[9px] text-white/90 backdrop-blur-xs font-mono max-w-[90%] truncate pointer-events-none"
+                              title={visualMeta.imageCredit}
+                            >
+                              {visualMeta.imageCredit}
+                            </span>
+                          )}
                         </div>
 
                         {/* Content Body */}

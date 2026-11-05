@@ -73,3 +73,26 @@ test("Codebase has zero unverified unsplash URLs in UI components and forms", ()
     "page.tsx must not contain unverified unsplash URLs"
   );
 });
+
+test("All 28 villages have valid authentic local images and image credits", () => {
+  for (const village of desaDataset) {
+    assert.ok(
+      village.image && village.image.startsWith("/img/villages/"),
+      `Village ${village.id} must have image path starting with /img/villages/`
+    );
+    const localFilePath = path.resolve(`public${village.image}`);
+    assert.ok(
+      fs.existsSync(localFilePath),
+      `Image file must exist on disk: ${localFilePath}`
+    );
+    const stat = fs.statSync(localFilePath);
+    assert.ok(
+      stat.size > 10000,
+      `Image file for ${village.id} must be > 10KB (was ${stat.size} bytes)`
+    );
+    assert.ok(
+      village.imageCredit && village.imageCredit.trim() !== "",
+      `Village ${village.id} must have a valid non-empty imageCredit`
+    );
+  }
+});
