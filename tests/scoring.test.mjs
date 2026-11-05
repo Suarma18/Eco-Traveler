@@ -296,3 +296,51 @@ test("T5: Complete transit legs, long leg warnings, and absence of misleading tr
     "ai-engine must not contain misleading 'bebas macet' claims"
   );
 });
+
+test("T7: Absence of unqualified 'official' and 'verified' claims, and data sources documentation", () => {
+  const i18nContent = fs.readFileSync(
+    path.resolve("src/lib/i18n.ts"),
+    "utf8"
+  );
+
+  // Check PDF title does not claim to be an official government document
+  assert.ok(
+    !i18nContent.includes("OFFICIAL TRAVEL ITINERARY"),
+    "PDF title must not use 'OFFICIAL TRAVEL ITINERARY'"
+  );
+  assert.ok(
+    !i18nContent.includes("DOKUMEN PERJALANAN RESMI"),
+    "PDF title must not use 'DOKUMEN PERJALANAN RESMI'"
+  );
+
+  // Check footerRight uses curated instead of unqualified verified
+  assert.ok(
+    !i18nContent.includes("28 Verified Tourism Villages Dataset"),
+    "footerRight must use curated phrasing instead of '28 Verified Tourism Villages Dataset'"
+  );
+
+  // Check print footer disclaimers are present
+  assert.ok(
+    i18nContent.includes("printFooterDisclaimer:"),
+    "i18n must include printFooterDisclaimer"
+  );
+  assert.ok(
+    i18nContent.includes("printFooterSource:"),
+    "i18n must include printFooterSource"
+  );
+
+  // Verify docs/DATA-SOURCES.md exists and documents origin
+  assert.ok(
+    fs.existsSync(path.resolve("docs/DATA-SOURCES.md")),
+    "docs/DATA-SOURCES.md must exist"
+  );
+  const dataSourcesMd = fs.readFileSync(
+    path.resolve("docs/DATA-SOURCES.md"),
+    "utf8"
+  );
+  assert.ok(
+    dataSourcesMd.includes("Dinas Pariwisata Provinsi Bali") &&
+      dataSourcesMd.includes("TODO-HUMAN"),
+    "DATA-SOURCES.md must document Disparda origin and mark TODO-HUMAN"
+  );
+});

@@ -70,6 +70,17 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
   2. **Tiga Pola Template Berbeda:** Menyediakan `generateDeterministicStopDescription` dengan 3 variasi pembuka kalimat berbeda sesuai slot waktu aktivitas (Pagi/Morning, Siang/Afternoon, Sore/Sunset, serta variasi mitigasi overtourism untuk pengalihan desa penyangga).
   3. **Pengujian Otomatis:** Menambahkan rangkaian tes unit di `tests/text-capitalization.test.mjs` untuk memverifikasi preservasi kapitalisasi dan keragaman kalimat.
 
+---
+
+## [2026-11-05] T7: Hapus Klaim "Verified" dan "Official" yang Berlebihan
+- **Konteks:** Frasa seperti "28 Verified Tourism Villages" dan "OFFICIAL TRAVEL ITINERARY" berisiko memberi kesan bahwa dokumen dan seleksi desa telah diverifikasi resmi oleh pemerintah atau instansi pengesah eksternal, padahal merupakan kurasi internal tim berbasis data terbuka.
+- **Keputusan:**
+  1. **Penggantian Frasa:** Mengganti "28 Verified Tourism Villages" menjadi "28 desa wisata terkurasi" (ID) / "28 curated tourism villages" (EN).
+  2. **Template Cetak & PDF Jujur:** Mengganti header cetak "OFFICIAL TRAVEL ITINERARY" menjadi "ECO TRAVELER · EQUITABLE TRAVEL ITINERARY" (EN) dan "ECO TRAVELER · RENCANA PERJALANAN BERKEADILAN" (ID).
+  3. **Disclaimer Kaki Cetak:** Menambahkan catatan kaki cetak eksplisit: "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi."
+  4. **Dokumentasi Asal-Usul Data:** Menyusun `docs/DATA-SOURCES.md` yang merinci asal data dari Dinas Pariwisata Provinsi Bali 2025 (Tabel 33) dan PDRB BPS Bali 2022, serta mencatat bagian-bagian yang masih dalam proses verifikasi manusia (`TODO-HUMAN`).
+
+
 
 
 

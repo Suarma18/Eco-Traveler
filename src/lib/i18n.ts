@@ -26,13 +26,17 @@ export const UI_TEXT = {
     readyForJourney: "Siap Menjelajahi Bali yang Berkeadilan?",
     readyForJourneyDesc:
       "Ekspor seluruh rencana perjalanan ke format PDF rapi untuk panduan navigasi dan reservasi homestay selama di perjalanan.",
-    printHeaderTitle: "ECO TRAVELER · DOKUMEN PERJALANAN RESMI",
+    printHeaderTitle: "ECO TRAVELER · RENCANA PERJALANAN BERKEADILAN",
     printHeaderSub:
       "Rencana Rute Pemerataan Ekonomi & Pelestarian Desa Adat Bali",
     printGeneratedOn: "Tanggal Cetak:",
     printDirectSpend: "Belanja Langsung Komunitas:",
     printLbiRetention: "Retensi Ekonomi Lokal:",
     printArrivalGate: "Pintu Kedatangan:",
+    printFooterDisclaimer:
+      "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi.",
+    printFooterSource:
+      "Sumber Data: Dinas Pariwisata Provinsi Bali 2025 (Tabel 33 - TODO-HUMAN: konfirmasi nomor dokumen resmi) & BPS Bali 2022 (PDRB), dikurasi untuk Bali Utara, Timur, dan Barat.",
     themeLight: "Terang",
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
@@ -57,7 +61,8 @@ export const UI_TEXT = {
     routeSummaryDays: (days: number) => `Rencana Perjalanan ${days} Hari`,
     arrivalGatePrefix: "Titik Masuk:",
     footerLeft: "Eco Traveler · Bali Smart Society",
-    footerRight: "Dataset 28 Desa Wisata Provinsi Bali",
+    footerRight:
+      "28 desa wisata terkurasi · Sumber: Disparda Bali 2025 (Tabel 33 - TODO-HUMAN)",
     loadingMapTitle: "Memuat Peta Desa Wisata Bali…",
     loadingMapSubtitle:
       "Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian.",
@@ -232,13 +237,17 @@ export const UI_TEXT = {
     readyForJourney: "Ready for Your Fair-Trade Bali Journey?",
     readyForJourneyDesc:
       "Export your complete day-by-day route to an ink-friendly offline PDF for effortless navigation and village homestay bookings.",
-    printHeaderTitle: "ECO TRAVELER · OFFICIAL TRAVEL ITINERARY",
+    printHeaderTitle: "ECO TRAVELER · EQUITABLE TRAVEL ITINERARY",
     printHeaderSub:
       "Equitable Regional Redistribution Plan & Customary Bali Village Guide",
     printGeneratedOn: "Generated On:",
     printDirectSpend: "Direct Community Spend:",
     printLbiRetention: "Local Economic Retention:",
     printArrivalGate: "Arrival Gate:",
+    printFooterDisclaimer:
+      "Compiled by Eco Traveler. This is not an official government document. Scores and cost estimates are assumption-based model calculations.",
+    printFooterSource:
+      "Data Sources: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN: confirm official document title) & BPS Bali 2022 (GDP), curated for North, East, and West Bali.",
     themeLight: "Light",
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",
@@ -263,7 +272,8 @@ export const UI_TEXT = {
     routeSummaryDays: (days: number) => `${days}-Day Travel Itinerary`,
     arrivalGatePrefix: "Arrival Gate:",
     footerLeft: "Eco Traveler · Bali Smart Society",
-    footerRight: "28 Verified Tourism Villages Dataset",
+    footerRight:
+      "28 curated tourism villages · Source: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN)",
     loadingMapTitle: "Loading Bali Spatial Village Atlas…",
     loadingMapSubtitle:
       "Preparing 28 village coordinates, density zones, and daily trails.",

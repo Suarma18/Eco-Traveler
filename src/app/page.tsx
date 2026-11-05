@@ -528,7 +528,7 @@ export default function HomePage() {
                 mobileTab === "map" ? "hidden lg:block" : "block"
               }`}
             >
-              {/* PRINT-ONLY OFFICIAL HEADER BANNER */}
+              {/* PRINT-ONLY EQUITABLE HEADER BANNER */}
               <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 text-slate-900">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -750,6 +750,16 @@ export default function HomePage() {
                 aiStopNarratives={aiNarrative?.stops}
                 isAiActive={isAiActive}
               />
+
+              {/* PRINT-ONLY FOOTER DISCLAIMER */}
+              <div className="hidden print:block mt-8 pt-4 border-t border-slate-300 text-[10px] text-slate-600 space-y-1">
+                <p className="font-semibold text-slate-800">
+                  {t.printFooterDisclaimer}
+                </p>
+                <p>
+                  {t.printFooterSource}
+                </p>
+              </div>
 
               {/* Closing Action Card: Export Itinerary to PDF */}
               <section className="no-print bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

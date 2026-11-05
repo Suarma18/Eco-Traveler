@@ -34,10 +34,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Eco Traveler | Equitable Bali Travel Route Planner",
   description:
-    "Design community-first itineraries to 28 verified tourist villages across North, East, and West Bali. Direct tourist spend to local homestays and adhere to customary Awig-Awig rules.",
+    "Design community-first itineraries to 28 curated tourist villages across North, East, and West Bali. Direct tourist spend to local homestays and adhere to customary Awig-Awig rules.",
   keywords: [
     "Eco Traveler Bali",
-    "Bali DigiFest 2026",
+    "Baligivation 2026",
+    "AI Web Innovation Challenge",
     "Bali Smart Society",
     "Desa Wisata Bali",
     "Bali Sustainable Tourism",
