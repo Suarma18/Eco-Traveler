@@ -8,7 +8,11 @@ import {
   ItineraryResponse,
   TripDayActivity,
 } from "@/types/trip";
-import { DESA_DATASET, computeItineraryTelemetry } from "@/lib/scoring";
+import {
+  DESA_DATASET,
+  DESA_BY_ID,
+  computeItineraryTelemetry,
+} from "@/lib/scoring";
 import { Locale, formatCurrency } from "@/lib/utils";
 import { UI_TEXT, localizeItinerary } from "@/lib/i18n";
 import TripPlannerForm from "@/components/TripPlannerForm";
@@ -159,6 +163,56 @@ export default function HomePage() {
     "plan"
   );
 
+  // 1A. AI-Generated Narrative State
+  const [aiNarrative, setAiNarrative] = useState<{
+    summary: string;
+    stops: Record<string, string>;
+  } | null>(null);
+  const [isAiActive, setIsAiActive] = useState<boolean>(false);
+
+  const fetchAiNarrative = useCallback(
+    async (itin: ItineraryResponse, currentLocale: Locale) => {
+      try {
+        const stopsPayload = itin.days
+          .flatMap((d) => d.activities)
+          .map((a) => {
+            const v = DESA_BY_ID.get(a.villageId);
+            return {
+              id: a.villageId,
+              name: a.villageName,
+              regency: a.regency,
+              highlights: v?.highlights || [],
+              customsNote: v?.customsNote,
+              localUmkmSpot: a.localUmkmSpot,
+            };
+          });
+
+        const res = await fetch("/api/ai/narrate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stops: stopsPayload, locale: currentLocale }),
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success && data.isAiGenerated && data.summary) {
+          setAiNarrative({
+            summary: data.summary,
+            stops: data.stops || {},
+          });
+          setIsAiActive(true);
+        } else {
+          setAiNarrative(null);
+          setIsAiActive(false);
+        }
+      } catch (err) {
+        console.warn("AI narrative fetch failed, staying deterministic:", err);
+        setAiNarrative(null);
+        setIsAiActive(false);
+      }
+    },
+    []
+  );
+
   // Sync React state with initial theme & locale applied in <head>
   useEffect(() => {
     try {
@@ -171,10 +225,15 @@ export default function HomePage() {
       if (savedLocale === "id") {
         setLocale("id");
         setRequest((prev) => ({ ...prev, locale: "id" }));
-        setItinerary((prev) => localizeItinerary(prev, "id"));
+        setItinerary((prev) => {
+          const locItin = localizeItinerary(prev, "id");
+          fetchAiNarrative(locItin, "id");
+          return locItin;
+        });
         document.documentElement.lang = "id";
       } else {
         document.documentElement.lang = "en";
+        fetchAiNarrative(itinerary, "en");
       }
     } catch {
       // ignore storage errors
@@ -185,7 +244,11 @@ export default function HomePage() {
     if (nextLocale === locale) return;
     setLocale(nextLocale);
     setRequest((prev) => ({ ...prev, locale: nextLocale }));
-    setItinerary((prev) => localizeItinerary(prev, nextLocale));
+    setItinerary((prev) => {
+      const loc = localizeItinerary(prev, nextLocale);
+      fetchAiNarrative(loc, nextLocale);
+      return loc;
+    });
     if (typeof document !== "undefined") {
       document.documentElement.lang = nextLocale;
     }
@@ -222,7 +285,11 @@ export default function HomePage() {
         });
         if (res.ok) {
           const data: ItineraryResponse = await res.json();
-          setItinerary(locale === "en" ? localizeItinerary(data, "en") : data);
+          const finalItin =
+            locale === "en" ? localizeItinerary(data, "en") : data;
+          setItinerary(finalItin);
+          // Trigger AI narrative synthesis
+          fetchAiNarrative(finalItin, locale);
         }
       } catch (err) {
         console.error("Failed to fetch itinerary:", err);
@@ -230,7 +297,7 @@ export default function HomePage() {
         setIsLoading(false);
       }
     },
-    [locale]
+    [locale, fetchAiNarrative]
   );
 
   // Auto-Light Print Guard: Temporarily switch to Light Mode during window.print() so PDF is ink-friendly
@@ -560,7 +627,9 @@ export default function HomePage() {
                         className="w-3 h-3 text-emerald-400"
                         aria-hidden="true"
                       />
-                      {itinerary.engineMeta?.source === "gemini-ai"
+                      {isAiActive
+                        ? t.engineAiPlus
+                        : itinerary.engineMeta?.source === "gemini-ai"
                         ? t.engineAi
                         : t.engineDeterministic}
                     </span>
@@ -614,6 +683,15 @@ export default function HomePage() {
                             : "Bandara I Gusti Ngurah Rai")}
                       </strong>
                     </span>
+                    {isAiActive && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-200 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700">
+                        <Sparkles
+                          className="w-3 h-3 text-emerald-600 dark:text-emerald-400"
+                          aria-hidden="true"
+                        />
+                        {t.aiNarrativeBadge}
+                      </span>
+                    )}
                   </div>
 
                   {/* Primary PDF Download Action */}
@@ -635,8 +713,15 @@ export default function HomePage() {
                   {itinerary.tripTitle}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {itinerary.summaryNarrative}
+                  {isAiActive && aiNarrative?.summary
+                    ? aiNarrative.summary
+                    : itinerary.summaryNarrative}
                 </p>
+                {isAiActive && (
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 italic pt-0.5">
+                    {t.aiDisclaimer}
+                  </p>
+                )}
               </section>
 
               {/* Kartu Rute Timeline Harian */}
@@ -651,6 +736,8 @@ export default function HomePage() {
                 onJumpToMap={handleJumpToMapOnMobile}
                 arrivalCoords={itinerary.engineMeta?.arrivalCoords}
                 arrivalLabel={itinerary.engineMeta?.arrivalGateLabel}
+                aiStopNarratives={aiNarrative?.stops}
+                isAiActive={isAiActive}
               />
 
               {/* Closing Action Card: Export Itinerary to PDF */}

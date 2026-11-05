@@ -31,7 +31,20 @@ export const UI_TEXT = {
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
     engineAi: "Gemini Spatial AI",
+    engineAiPlus: "Mesin rute + AI",
     engineDeterministic: "Mesin Rute Deterministik",
+    aiNarrativeBadge: "Narasi disusun AI",
+    aiStopBadge: "Narasi AI",
+    aiDisclaimer:
+      "Dibuat AI, bisa keliru. Skor, jarak, dan biaya dihitung mesin rute.",
+    aiCustomizeTitle: "Sesuaikan dengan AI",
+    aiCustomizePlaceholder:
+      "Misal: lebih santai, tambah kuliner, hindari jalan terlalu jauh… (maks 300 karakter)",
+    aiCustomizeSubmit: "Sesuaikan Rute",
+    aiCustomizing: "Menganalisis permintaan…",
+    aiChangePrefix: "Parameter Diperbarui:",
+    aiNoChangeNotice:
+      "Tidak ada parameter yang perlu diubah dari permintaan Anda.",
     heroTitle: "Perencana Rute Wisata Berkeadilan Bali",
     heroDesc:
       "Susun rute perjalanan ke desa-desa di Bali Utara, Timur, dan Barat. Biaya menginap, makan siang, dan pemandu langsung diterima oleh warga serta koperasi desa setempat.",
@@ -179,7 +192,20 @@ export const UI_TEXT = {
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",
     engineAi: "Gemini Spatial AI",
+    engineAiPlus: "Spatial Engine + AI",
     engineDeterministic: "Deterministic Spatial Engine",
+    aiNarrativeBadge: "AI-Generated Narrative",
+    aiStopBadge: "AI Narrative",
+    aiDisclaimer:
+      "AI-generated, may contain inaccuracies. Scores, distance, and costs are computed by the spatial engine.",
+    aiCustomizeTitle: "Customize with AI",
+    aiCustomizePlaceholder:
+      "e.g., more relaxed pace, add culinary, avoid long drives… (max 300 chars)",
+    aiCustomizeSubmit: "Apply with AI",
+    aiCustomizing: "Analyzing request…",
+    aiChangePrefix: "Updated Parameters:",
+    aiNoChangeNotice:
+      "No parameters needed adjustment from your prompt.",
     heroTitle: "Equitable Bali Village Route Planner",
     heroDesc:
       "Plan traffic-free journeys across North, East, and West Bali. Your homestay, lunch, and local guide spending goes directly to village families and subak cooperatives.",

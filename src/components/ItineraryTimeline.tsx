@@ -31,6 +31,7 @@ import {
   BedDouble,
   Compass,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 
 interface ItineraryTimelineProps {
@@ -44,6 +45,8 @@ interface ItineraryTimelineProps {
   onJumpToMap?: (activity: TripDayActivity) => void;
   arrivalCoords?: [number, number];
   arrivalLabel?: string;
+  aiStopNarratives?: Record<string, string>;
+  isAiActive?: boolean;
 }
 
 export default function ItineraryTimeline({
@@ -57,6 +60,8 @@ export default function ItineraryTimeline({
   onJumpToMap,
   arrivalCoords,
   arrivalLabel,
+  aiStopNarratives,
+  isAiActive = false,
 }: ItineraryTimelineProps) {
   const t = UI_TEXT[locale];
   const [expandedSubSection, setExpandedSubSection] = useState<
@@ -393,9 +398,24 @@ export default function ItineraryTimeline({
                             </h4>
 
                             {/* Description */}
-                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                              {activity.description}
-                            </p>
+                            {isAiActive && aiStopNarratives?.[activity.villageId] ? (
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/50">
+                                  <Sparkles
+                                    className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
+                                    aria-hidden="true"
+                                  />
+                                  {t.aiStopBadge}
+                                </span>
+                                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
+                                  {aiStopNarratives[activity.villageId]}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                {activity.description}
+                              </p>
+                            )}
                           </div>
 
                           {/* Bottom Impact & Etiquette Footer */}
