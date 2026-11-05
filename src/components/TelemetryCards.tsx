@@ -73,7 +73,7 @@ export default function TelemetryCards({
       : "Bali Utara 45% · Bali Timur 35% · Bali Barat 20%";
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 print-avoid-break">
       {/* 3-Cell Bento Impact Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Cell 1: Anchor Dark Forest Card - Spread Score */}
@@ -177,7 +177,7 @@ export default function TelemetryCards({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-0.5 font-semibold text-[#EA580C] dark:text-[#FB923C] hover:underline cursor-pointer shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-[#FB923C]"
+                className="no-print inline-flex items-center gap-0.5 font-semibold text-[#EA580C] dark:text-[#FB923C] hover:underline cursor-pointer shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-[#FB923C]"
               >
                 <span>{t.simPdrbBtn}</span>
                 <ArrowUpRight className="w-3 h-3" aria-hidden="true" />
@@ -208,7 +208,7 @@ export default function TelemetryCards({
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="text-xs font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer shrink-0 flex items-center gap-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
+            className="no-print text-xs font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer shrink-0 flex items-center gap-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
           >
             <span>{t.openSimDashboard}</span>
             <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />

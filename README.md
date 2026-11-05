@@ -40,11 +40,12 @@
 - **Local Benefit Index (LBI %):** Mengukur porsi belanja langsung ke homestay warga, kuliner lokal, dan pemandu Pokdarwis terhadap total anggaran harian (Target $\ge 75\%$).
 - **Anti-Overtourism Capacity Quota Guard:** Otomatis mendeteksi beban kunjungan harian desa ($\ge 92\%$ kapasitas) dan mengalihkan rute ke Desa Penyangga (*Buffer Village*) terdekat untuk menjaga daya dukung lingkungan.
 
-### 6. Desain Clean & Modern serta Aksesibilitas
+### 6. Desain Clean & Modern, Ekspor Dokumen & Aksesibilitas
 - **Palet Warna Harmonis:** Subak Deep Emerald (`#0D4732`), Warm Terracotta (`#EA580C`), Light Surface (`#F8F9FA`), Dark Surface (`#090E0B`).
 - **Tipografi Formal:** Font `Inter` untuk display/headings, `Plus Jakarta Sans` untuk teks bacaan, dan `JetBrains Mono` dengan `tabular-nums` untuk angka serta metrik finansial.
-- **Dukungan Bilingual (ID | EN):** Penyesuaian bahasa dan konversi mata uang otomatis (IDR ke USD) dengan saklar instan.
-- **Ekspor Dokumen (PDF):** Dukungan pencetakan ramah tinta (*Auto-Light Print Guard*) yang otomatis beralih ke latar belakang putih saat dokumen dicetak.
+- **Default Bahasa Inggris (EN) & Bilingual (ID | EN):** Saat website pertama kali diakses, aplikasi langsung menyajikan antarmuka bahasa Inggris resmi internasional (EN & USD $) dengan saklar instan ke Bahasa Indonesia (ID & Rp).
+- **Ekspor Dokumen PDF Berkualitas Tinggi:** Tombol unduh PDF ditempatkan strategis di bawah formulir rute dan di akhir timeline rute. Dilengkapi lembar kop cetak resmi (*Print Header Banner*), layout *full-width* 100% A4, proteksi pemotongan halaman (*page-break clipping prevention*), dan *Auto-Light Print Guard* ramah tinta.
+- **Responsif Mobile & Spatial Map Fix:** Dilengkapi bilah navigasi bawah ponsel (*bottom bar*) dan pemulihan ukuran peta instan (*ResizeObserver* + `invalidateSize()`) saat berpindah tab.
 
 ---
 

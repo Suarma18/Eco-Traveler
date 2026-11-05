@@ -13,7 +13,20 @@ export const UI_TEXT = {
     tabSimulation: "Simulasi Dampak Regulasi",
     tabSimShort: "Simulasi",
     downloadPdfFull: "Unduh Rencana Perjalanan (PDF)",
-    downloadPdfShort: "PDF",
+    downloadPdfShort: "Cetak / PDF",
+    pdfExportTitle: "Cetak & Ekspor Rencana Perjalanan",
+    pdfExportDesc:
+      "Bawa rencana perjalanan ini dalam dokumen PDF luring (offline) dengan estimasi waktu tempuh dan etika adat Awig-Awig.",
+    readyForJourney: "Siap Menjelajahi Bali yang Berkeadilan?",
+    readyForJourneyDesc:
+      "Ekspor seluruh rencana perjalanan ke format PDF rapi untuk panduan navigasi dan reservasi homestay selama di perjalanan.",
+    printHeaderTitle: "ECO TRAVELER · DOKUMEN PERJALANAN RESMI",
+    printHeaderSub:
+      "Rencana Rute Pemerataan Ekonomi & Pelestarian Desa Adat Bali",
+    printGeneratedOn: "Tanggal Cetak:",
+    printDirectSpend: "Belanja Langsung Komunitas:",
+    printLbiRetention: "Retensi Ekonomi Lokal:",
+    printArrivalGate: "Pintu Kedatangan:",
     themeLight: "Terang",
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
@@ -148,7 +161,20 @@ export const UI_TEXT = {
     tabSimulation: "Policy Impact Simulation",
     tabSimShort: "Impact Sim",
     downloadPdfFull: "Download Itinerary (PDF)",
-    downloadPdfShort: "PDF",
+    downloadPdfShort: "Print / PDF",
+    pdfExportTitle: "Export & Print Itinerary",
+    pdfExportDesc:
+      "Keep this itinerary handy as an offline PDF complete with transit estimates and customary Awig-Awig rules.",
+    readyForJourney: "Ready for Your Fair-Trade Bali Journey?",
+    readyForJourneyDesc:
+      "Export your complete day-by-day route to an ink-friendly offline PDF for effortless navigation and village homestay bookings.",
+    printHeaderTitle: "ECO TRAVELER · OFFICIAL TRAVEL ITINERARY",
+    printHeaderSub:
+      "Equitable Regional Redistribution Plan & Customary Bali Village Guide",
+    printGeneratedOn: "Generated On:",
+    printDirectSpend: "Direct Community Spend:",
+    printLbiRetention: "Local Economic Retention:",
+    printArrivalGate: "Arrival Gate:",
     themeLight: "Light",
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",

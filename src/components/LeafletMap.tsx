@@ -136,16 +136,59 @@ function createGateIcon() {
 function MapViewportController({
   focusCoords,
   allRouteCoords,
+  isMobileActive,
 }: {
   focusCoords: [number, number] | null;
   allRouteCoords: [number, number][];
+  isMobileActive?: boolean;
 }) {
   const map = useMap();
 
+  // ResizeObserver: Secara instan mendeteksi perubahan ukuran kontainer DOM Leaflet
+  // (misal saat tab beralih dari display:none menjadi block di layar ponsel atau orientasi berubah)
   useEffect(() => {
-    // Pastikan ukuran viewport Leaflet ter-kalkulasi sempurna saat mount atau container ditampilkan
+    const container = map.getContainer();
+    if (!container || typeof ResizeObserver === "undefined") return;
+
+    let rafId: number;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(() => {
+            map.invalidateSize({ animate: false });
+          });
+        }
+      }
+    });
+
+    observer.observe(container);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
+  }, [map]);
+
+  // Ketika tab ponsel "Spatial Map" diaktifkan oleh pengguna
+  useEffect(() => {
+    if (isMobileActive) {
+      map.invalidateSize({ animate: false });
+      const timer = setTimeout(() => {
+        map.invalidateSize({ animate: false });
+        if (allRouteCoords.length > 1 && !focusCoords) {
+          const bounds = L.latLngBounds(allRouteCoords);
+          map.fitBounds(bounds, { padding: [36, 36], maxZoom: 11 });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobileActive, map, allRouteCoords, focusCoords]);
+
+  useEffect(() => {
+    // Pastikan ukuran viewport Leaflet ter-kalkulasi sempurna saat mount
     const timer = setTimeout(() => {
-      map.invalidateSize();
+      map.invalidateSize({ animate: false });
     }, 120);
     return () => clearTimeout(timer);
   }, [map]);
@@ -177,6 +220,7 @@ interface LeafletMapProps {
   arrivalLabel?: string;
   locale: Locale;
   isDark?: boolean;
+  isMobileActive?: boolean;
 }
 
 export default function LeafletMap({
@@ -190,6 +234,7 @@ export default function LeafletMap({
   arrivalLabel = "Bandara I Gusti Ngurah Rai",
   locale,
   isDark = false,
+  isMobileActive = true,
 }: LeafletMapProps) {
   const t = UI_TEXT[locale];
   const [showAllCuratedVillages, setShowAllCuratedVillages] = useState(true);
@@ -353,7 +398,7 @@ export default function LeafletMap({
   const dayPrefix = locale === "en" ? "D" : "H";
 
   return (
-    <div className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-slate-200/90 dark:border-emerald-800/60 bg-slate-200 dark:bg-[#090E0B] shadow-sm">
+    <div className="relative w-full h-[calc(100dvh-8.75rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden border border-slate-200/90 dark:border-emerald-800/60 bg-slate-100 dark:bg-[#090E0B] shadow-sm">
       {/* Top Floating Glassmorphic HUD (Mobile Swipeable) */}
       <div className="absolute top-2.5 sm:top-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
         {/* Filter Hari - Horizontal Scrollable on Mobile */}
@@ -512,6 +557,7 @@ export default function LeafletMap({
         <MapViewportController
           focusCoords={focusCoords}
           allRouteCoords={allRouteCoords}
+          isMobileActive={isMobileActive}
         />
 
         {/* Visualisasi Zona Konsentrasi Bali Selatan */}

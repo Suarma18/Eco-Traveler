@@ -167,9 +167,9 @@ export default function ItineraryTimeline({
               : null;
 
           return (
-            <section key={day.dayNumber} className="space-y-3.5">
+            <section key={day.dayNumber} className="space-y-3.5 print-avoid-break">
               {/* Header Hari */}
-              <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-xl px-4 py-3 shadow-2xs transition-colors">
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-xl px-4 py-3 shadow-2xs transition-colors print-day-header">
                 <div className="flex items-center gap-3 min-w-0">
                   <span
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold text-white shrink-0 shadow-2xs"
@@ -224,7 +224,7 @@ export default function ItineraryTimeline({
                       locale
                     );
                     return (
-                      <div className="relative py-1">
+                      <div className="relative py-1 print-avoid-break">
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
                           <Navigation
                             className="w-3 h-3 text-[#0D4732] dark:text-emerald-400 shrink-0"
@@ -282,7 +282,7 @@ export default function ItineraryTimeline({
                     >
                       {/* Transit Connector Antar-Titik Aktivitas */}
                       {transitFromPrev && prevAct && (
-                        <div className="relative py-1">
+                        <div className="relative py-1 print-avoid-break">
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-[#142019] border border-slate-200/70 dark:border-emerald-900/50 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
                             <Car
                               className="w-3 h-3 text-[#EA580C] dark:text-[#FB923C] shrink-0"
@@ -312,7 +312,7 @@ export default function ItineraryTimeline({
                           onSelectActivity(activity);
                         }
                       }}
-                      className={`group relative bg-white dark:bg-[#111914] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
+                      className={`group relative bg-white dark:bg-[#111914] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer print-avoid-break focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                         isSelected
                           ? "border-[#0D4732] dark:border-emerald-400 ring-2 ring-[#0D4732]/10 dark:ring-emerald-400/20 shadow-sm"
                           : "border-slate-200/80 dark:border-emerald-900/40 hover:border-slate-300 dark:hover:border-emerald-700/60 shadow-2xs"
@@ -427,7 +427,7 @@ export default function ItineraryTimeline({
                                       e.stopPropagation();
                                       onJumpToMap(activity);
                                     }}
-                                    className="lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
+                                    className="no-print lg:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold text-[11px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
                                   >
                                     <MapPin
                                       className="w-3 h-3"
@@ -730,7 +730,7 @@ export default function ItineraryTimeline({
                     );
 
                     return (
-                      <div className="relative py-1">
+                      <div className="relative py-1 print-avoid-break">
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 dark:bg-[#142019] border border-slate-200/70 dark:border-emerald-900/50 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
                           <Car
                             className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0"
@@ -750,7 +750,7 @@ export default function ItineraryTimeline({
 
                 {/* Rekomendasi Homestay / Eco-Lodge Warga di Akhir Hari */}
                 {day.recommendedStay && (
-                  <div className="relative bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 text-white rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shadow-xs">
+                  <div className="relative bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 text-white rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shadow-xs print-avoid-break">
                     <span
                       aria-hidden="true"
                       className="absolute -left-[23px] sm:-left-[27px] top-4 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#F8F9FA] dark:border-[#090E0B]"

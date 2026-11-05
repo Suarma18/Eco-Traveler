@@ -32,15 +32,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Eco Traveler | Perencana Rute Wisata Berkeadilan Bali",
+  title: "Eco Traveler | Equitable Bali Travel Route Planner",
   description:
-    "Susun rute perjalanan ke 28 desa wisata di Bali Utara, Timur, dan Barat dengan perhitungan belanja langsung ke homestay warga dan panduan adat Awig-Awig.",
+    "Design community-first itineraries to 28 verified tourist villages across North, East, and West Bali. Direct tourist spend to local homestays and adhere to customary Awig-Awig rules.",
   keywords: [
     "Eco Traveler Bali",
     "Bali DigiFest 2026",
     "Bali Smart Society",
     "Desa Wisata Bali",
-    "Perencana Rute Wisata Berkeadilan Bali",
+    "Bali Sustainable Tourism",
+    "Equitable Bali Travel Route Planner",
   ],
 };
 
@@ -53,10 +54,8 @@ const THEME_INIT_SCRIPT = `
     } else {
       document.documentElement.classList.remove("dark");
     }
-    var l = localStorage.getItem("eco-traveler-locale");
-    if (l === "en" || l === "id") {
-      document.documentElement.lang = l;
-    }
+    var l = localStorage.getItem("eco-traveler-locale") || "en";
+    document.documentElement.lang = l;
   } catch (e) {}
 })();
 `;
@@ -68,7 +67,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="id"
+      lang="en"
       suppressHydrationWarning
       className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} scroll-smooth`}
     >
@@ -81,7 +80,7 @@ export default function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[2000] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[#0D261C] dark:focus:bg-emerald-600 focus:text-white focus:text-xs focus:font-semibold"
         >
-          Lewati ke konten utama
+          Skip to main content
         </a>
         {children}
       </body>

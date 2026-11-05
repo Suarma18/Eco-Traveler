@@ -81,6 +81,15 @@ html.dark ::-webkit-scrollbar-thumb {
 }
 
 /* Custom Leaflet Styling - Subak Atelier Light & Dark */
+.leaflet-container {
+  background-color: #f1f5f9 !important;
+  outline: none;
+}
+
+html.dark .leaflet-container {
+  background-color: #090e0b !important;
+}
+
 .leaflet-top.leaflet-left {
   margin-top: 52px !important;
 }
@@ -179,14 +188,74 @@ html.dark .leaflet-popup-close-button {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 15mm 10mm;
+  }
+
   html,
   body,
   html.dark,
   html.dark body {
     background-color: #ffffff !important;
-    color: #171717 !important;
+    background-image: none !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
   }
+
+  /* Sembunyikan bilah navigasi, peta interaktif, kontrol formulir, dan elemen interaktif */
+  header,
+  nav,
+  aside,
   .no-print {
     display: none !important;
+  }
+
+  /* Lebarkan konten rute ke 100% halaman cetak A4 */
+  main,
+  .print-full-width,
+  div[class*="lg:w-[46%]"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    display: block !important;
+  }
+
+  /* Proteksi pemotongan halaman (page-break clipping prevention) */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-day-header {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Sederhanakan border dan hilangkan shadow tebal agar hemat tinta */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .border,
+  [class*="border-"] {
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Jangan cetak URL tautan otomatis dari browser */
+  a[href]::after {
+    content: none !important;
+  }
+
+  /* Hilangkan efek scroll overflow saat cetak */
+  body,
+  main,
+  div {
+    overflow: visible !important;
   }
 }

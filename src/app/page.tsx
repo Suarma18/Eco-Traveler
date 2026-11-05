@@ -9,7 +9,7 @@ import {
   TripDayActivity,
 } from "@/types/trip";
 import { DESA_DATASET, computeItineraryTelemetry } from "@/lib/scoring";
-import { Locale } from "@/lib/utils";
+import { Locale, formatCurrency } from "@/lib/utils";
 import { UI_TEXT, localizeItinerary } from "@/lib/i18n";
 import TripPlannerForm from "@/components/TripPlannerForm";
 import TelemetryCards from "@/components/TelemetryCards";
@@ -120,7 +120,10 @@ function getInitialItinerary(locale: Locale = "id"): ItineraryResponse {
       source: "deterministic-fallback",
       modelUsed: "Subak Spatial Engine v2.0",
       latencyMs: 14,
-      arrivalGateLabel: "Bandara I Gusti Ngurah Rai",
+      arrivalGateLabel:
+        locale === "en"
+          ? "I Gusti Ngurah Rai Airport"
+          : "Bandara I Gusti Ngurah Rai",
       arrivalCoords: [-8.7467, 115.1668],
     },
   };
@@ -129,7 +132,7 @@ function getInitialItinerary(locale: Locale = "id"): ItineraryResponse {
 }
 
 export default function HomePage() {
-  const [locale, setLocale] = useState<Locale>("id");
+  const [locale, setLocale] = useState<Locale>("en");
   const [isDark, setIsDark] = useState<boolean>(false);
 
   const [request, setRequest] = useState<TripRequest>({
@@ -138,11 +141,11 @@ export default function HomePage() {
     budgetCategory: "Moderate",
     arrivalGate: "NgurahRaiAirport",
     simulateCapacityAlert: true,
-    locale: "id",
+    locale: "en",
   });
 
   const [itinerary, setItinerary] = useState<ItineraryResponse>(() =>
-    getInitialItinerary("id")
+    getInitialItinerary("en")
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedDayFilter, setSelectedDayFilter] = useState<number | null>(
@@ -165,9 +168,12 @@ export default function HomePage() {
         document.documentElement.classList.add("dark");
       }
       const savedLocale = localStorage.getItem("eco-traveler-locale");
-      if (savedLocale === "en") {
-        setLocale("en");
-        setItinerary((prev) => localizeItinerary(prev, "en"));
+      if (savedLocale === "id") {
+        setLocale("id");
+        setRequest((prev) => ({ ...prev, locale: "id" }));
+        setItinerary((prev) => localizeItinerary(prev, "id"));
+        document.documentElement.lang = "id";
+      } else {
         document.documentElement.lang = "en";
       }
     } catch {
@@ -247,7 +253,7 @@ export default function HomePage() {
     setSelectedActivity(activity);
     setMobileTab("map");
     if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
   };
 
@@ -406,20 +412,6 @@ export default function HomePage() {
                 <span className="hidden sm:inline">{t.themeDark}</span>
               </button>
             </div>
-
-            {/* Export PDF Action */}
-            <button
-              type="button"
-              onClick={handleDownloadPdf}
-              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#0D4732] dark:hover:bg-emerald-500 text-white font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
-            >
-              <FileDown
-                className="w-3.5 h-3.5 text-emerald-300 dark:text-white"
-                aria-hidden="true"
-              />
-              <span className="hidden xl:inline">{t.downloadPdfFull}</span>
-              <span className="xl:hidden">{t.downloadPdfShort}</span>
-            </button>
           </div>
         </div>
       </header>
@@ -427,7 +419,7 @@ export default function HomePage() {
       {/* Main Workspace Container */}
       <main
         id="main-content"
-        className="max-w-[1520px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5"
+        className="max-w-[1520px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 pb-20 lg:pb-5"
       >
         {/* DESKTOP SIMULATION VIEW OR MOBILE SIMULATION TAB */}
         <div
@@ -465,12 +457,85 @@ export default function HomePage() {
         >
             {/* PANEL KIRI: 46% Lebar Layar Desktop, atau Tab "plan" di Mobile */}
             <div
-              className={`w-full lg:w-[46%] space-y-4 sm:space-y-5 ${
+              className={`w-full lg:w-[46%] print-full-width space-y-4 sm:space-y-5 ${
                 mobileTab === "map" ? "hidden lg:block" : "block"
               }`}
             >
+              {/* PRINT-ONLY OFFICIAL HEADER BANNER */}
+              <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 text-slate-900">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded bg-[#0D261C] text-emerald-300 flex items-center justify-center font-bold text-xs">
+                        ET
+                      </div>
+                      <h1 className="font-display text-lg font-bold tracking-tight text-slate-900 uppercase">
+                        {t.printHeaderTitle}
+                      </h1>
+                    </div>
+                    <p className="text-xs text-slate-600 mt-1 font-medium">
+                      {t.printHeaderSub}
+                    </p>
+                  </div>
+                  <div className="text-right text-xs space-y-0.5 shrink-0">
+                    <div className="text-slate-500 font-mono text-[10px]">
+                      {t.printGeneratedOn}{" "}
+                      {new Date().toLocaleDateString(
+                        locale === "en" ? "en-US" : "id-ID",
+                        { dateStyle: "medium" }
+                      )}
+                    </div>
+                    <div className="font-bold text-slate-900 font-mono text-xs">
+                      {itinerary.engineMeta?.modelUsed ||
+                        "Subak Spatial Engine v2.0"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-300 text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-500 block">
+                      {t.durationLabel}
+                    </span>
+                    <span className="font-bold text-slate-900">
+                      {t.routeSummaryDays(itinerary.days.length)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-500 block">
+                      {t.printArrivalGate}
+                    </span>
+                    <span className="font-bold text-slate-900 truncate block">
+                      {itinerary.engineMeta?.arrivalGateLabel ||
+                        (locale === "en"
+                          ? "I Gusti Ngurah Rai Airport"
+                          : "Bandara I Gusti Ngurah Rai")}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-500 block">
+                      {t.printDirectSpend}
+                    </span>
+                    <span className="font-bold font-mono text-[#0D4732]">
+                      {formatCurrency(
+                        itinerary.metrics.totalLocalRetainedRp,
+                        locale
+                      )}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-500 block">
+                      {t.printLbiRetention}
+                    </span>
+                    <span className="font-bold font-mono text-emerald-700">
+                      {itinerary.metrics.localBenefitIndex.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Editorial Hero Banner */}
-              <section className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 text-white p-5 sm:p-6 shadow-sm">
+              <section className="no-print relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 text-white p-5 sm:p-6 shadow-sm">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
@@ -528,24 +593,42 @@ export default function HomePage() {
               {/* Ringkasan Narasi Rute Aktif */}
               <section
                 aria-live="polite"
-                className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-2.5 transition-colors"
+                className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3 transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-[#0D4732] dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
-                    <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-                    {t.routeSummaryDays(itinerary.days.length)}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
-                    <PlaneLanding
-                      className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 font-semibold text-[#0D4732] dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-1 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
+                      <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t.routeSummaryDays(itinerary.days.length)}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
+                      <PlaneLanding
+                        className="w-3.5 h-3.5 text-[#EA580C] dark:text-[#FB923C]"
+                        aria-hidden="true"
+                      />
+                      {t.arrivalGatePrefix}{" "}
+                      <strong className="text-slate-900 dark:text-slate-100">
+                        {itinerary.engineMeta?.arrivalGateLabel ||
+                          (locale === "en"
+                            ? "I Gusti Ngurah Rai Airport"
+                            : "Bandara I Gusti Ngurah Rai")}
+                      </strong>
+                    </span>
+                  </div>
+
+                  {/* Primary PDF Download Action */}
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0D261C] dark:bg-emerald-600 hover:bg-[#0D4732] dark:hover:bg-emerald-500 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
+                    title={t.downloadPdfFull}
+                  >
+                    <FileDown
+                      className="w-3.5 h-3.5 text-emerald-300 dark:text-white"
                       aria-hidden="true"
                     />
-                    {t.arrivalGatePrefix}{" "}
-                    <strong className="text-slate-900 dark:text-slate-100">
-                      {itinerary.engineMeta?.arrivalGateLabel ||
-                        "Bandara I Gusti Ngurah Rai"}
-                    </strong>
-                  </span>
+                    <span>{t.downloadPdfFull}</span>
+                  </button>
                 </div>
 
                 <h2 className="font-display text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 pt-0.5 text-balance">
@@ -569,6 +652,33 @@ export default function HomePage() {
                 arrivalCoords={itinerary.engineMeta?.arrivalCoords}
                 arrivalLabel={itinerary.engineMeta?.arrivalGateLabel}
               />
+
+              {/* Closing Action Card: Export Itinerary to PDF */}
+              <section className="no-print bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1 max-w-md">
+                  <div className="flex items-center gap-1.5 text-emerald-300 text-[11px] font-semibold uppercase tracking-wider">
+                    <FileDown
+                      className="w-3.5 h-3.5 text-emerald-300"
+                      aria-hidden="true"
+                    />
+                    <span>{t.pdfExportTitle}</span>
+                  </div>
+                  <h3 className="font-display font-bold text-sm sm:text-base text-white tracking-tight">
+                    {t.readyForJourney}
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {t.readyForJourneyDesc}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  className="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
+                >
+                  <FileDown className="w-4 h-4 text-slate-950" aria-hidden="true" />
+                  <span>{t.downloadPdfFull}</span>
+                </button>
+              </section>
 
               {/* Panduan Etika Adat Desa (Awig-Awig) */}
               <CulturalBriefing
@@ -601,6 +711,7 @@ export default function HomePage() {
                 arrivalLabel={itinerary.engineMeta?.arrivalGateLabel}
                 locale={locale}
                 isDark={isDark}
+                isMobileActive={mobileTab === "map"}
               />
             </aside>
           </div>
@@ -635,6 +746,9 @@ export default function HomePage() {
             onClick={() => {
               setActiveView("atlas");
               setMobileTab("map");
+              if (typeof window !== "undefined") {
+                window.scrollTo({ top: 0, behavior: "instant" });
+              }
             }}
             className={`py-2 px-2 rounded-xl flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
               mobileTab === "map"
