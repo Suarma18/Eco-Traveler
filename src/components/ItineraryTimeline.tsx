@@ -230,7 +230,7 @@ export default function ItineraryTimeline({
     <div className="space-y-6 sm:space-y-7">
       {/* Banner Total Perjalanan Seluruh Rute */}
       {tripTransitTotals.minutes > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-xs text-slate-700 dark:text-slate-300 print-avoid-break">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 shadow-sm text-xs text-stone-600 dark:text-stone-300 print-avoid-break">
           <div className="flex items-center gap-2">
             <Car
               className="w-4 h-4 text-[#EA580C] dark:text-[#FB923C] shrink-0"
@@ -402,7 +402,7 @@ export default function ItineraryTimeline({
           return (
             <section key={day.dayNumber} className="space-y-3.5 print-avoid-break">
               {/* Header Hari */}
-              <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-xl px-4 py-3 shadow-2xs transition-colors print-day-header">
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl p-4 shadow-sm transition-colors print-day-header">
                 <div className="flex items-center gap-3 min-w-0">
                   <span
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold text-white shrink-0 shadow-2xs"
@@ -640,10 +640,10 @@ export default function ItineraryTimeline({
                           onSelectActivity(activity);
                         }
                       }}
-                      className={`group relative bg-white dark:bg-[#111914] rounded-2xl p-3.5 sm:p-4 border transition-[border-color,box-shadow] cursor-pointer print-avoid-break focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
+                      className={`group relative bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl shadow-sm p-4 transition-[border-color,box-shadow] cursor-pointer print-avoid-break focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
                         isSelected
-                          ? "border-[#0D4732] dark:border-emerald-400 ring-2 ring-[#0D4732]/10 dark:ring-emerald-400/20 shadow-sm"
-                          : "border-slate-200/80 dark:border-emerald-900/40 hover:border-slate-300 dark:hover:border-emerald-700/60 shadow-2xs"
+                          ? "border-[#0D4732] dark:border-emerald-400 ring-1 ring-[#0D4732]/20 shadow-sm"
+                          : "hover:border-stone-300 dark:hover:border-emerald-700/60"
                       }`}
                     >
                       {/* Node Dot on Vertical Timeline */}
@@ -731,12 +731,12 @@ export default function ItineraryTimeline({
                                   />
                                   {t.aiStopBadge}
                                 </span>
-                                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
+                                <p className="text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
                                   {aiStopNarratives[activity.villageId]}
                                 </p>
                               </div>
                             ) : (
-                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                              <p className="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
                                 {activity.description}
                               </p>
                             )}

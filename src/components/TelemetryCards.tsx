@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   ArrowUpRight,
   HelpCircle,
+  Info,
 } from "lucide-react";
 
 interface TelemetryCardsProps {
@@ -78,10 +79,7 @@ export default function TelemetryCards({
   return (
     <div className="space-y-3 print-avoid-break">
       {/* Top Header / Formulas Link */}
-      <div className="flex items-center justify-between gap-2 px-1 text-xs">
-        <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-          * {t.assumptionBadge}
-        </span>
+      <div className="flex items-center justify-end gap-2 px-1 text-xs">
         <button
           type="button"
           onClick={() => setIsFormulaModalOpen(true)}
@@ -95,7 +93,7 @@ export default function TelemetryCards({
       {/* 3-Cell Bento Impact Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Cell 1: Anchor Dark Forest Card - Spread Score */}
-        <div className="bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 dark:ring-1 dark:ring-emerald-400/10 text-white rounded-2xl p-4 flex flex-col justify-between shadow-xs">
+        <div className="bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 text-white rounded-xl shadow-sm p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-emerald-200/90 flex items-center gap-1.5 flex-wrap">
               <span>{t.spreadScoreTitle}</span>
@@ -111,9 +109,6 @@ export default function TelemetryCards({
               {metrics.spreadScore.toFixed(1)}
             </span>
             <span className="text-xs font-mono text-emerald-300">/ 100</span>
-            <span className="text-[10px] font-mono text-emerald-300/70 ml-auto">
-              {t.assumptionBadge}
-            </span>
           </div>
 
           <div className="space-y-1.5">
@@ -133,7 +128,7 @@ export default function TelemetryCards({
         </div>
 
         {/* Cell 2: Local Benefit Index (LBI) */}
-        <div className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 flex flex-col justify-between shadow-xs transition-colors">
+        <div className="bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl shadow-sm p-4 flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 flex-wrap">
               <span>{t.lbiTitle}</span>
@@ -154,9 +149,6 @@ export default function TelemetryCards({
             >
               {t.lbiTarget}
             </span>
-            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 ml-auto">
-              {t.assumptionBadge}
-            </span>
           </div>
 
           <div className="space-y-1.5">
@@ -175,7 +167,7 @@ export default function TelemetryCards({
         </div>
 
         {/* Cell 3: Total Belanja Warga & Capacity Guard */}
-        <div className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 flex flex-col justify-between shadow-xs transition-colors">
+        <div className="bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl shadow-sm p-4 flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
               {t.directSpendTitle}
@@ -191,9 +183,6 @@ export default function TelemetryCards({
               <div className="text-2xl font-display font-extrabold text-[#0D4732] dark:text-emerald-400 font-mono tabular-nums truncate">
                 {formatCompactCurrency(metrics.totalLocalRetainedRp, locale)}
               </div>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 shrink-0">
-                {t.assumptionBadge}
-              </span>
             </div>
             <div className="text-xs text-slate-600 dark:text-slate-300 font-mono tabular-nums">
               {t.totalEstPrefix}{" "}
@@ -223,7 +212,7 @@ export default function TelemetryCards({
       </div>
 
       {/* Regional Distribution Bar */}
-      <div className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs transition-colors">
+      <div className="bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl shadow-sm px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs transition-colors">
         <div className="flex items-center gap-2.5 min-w-0">
           <BarChart3
             className="w-4 h-4 text-[#0D4732] dark:text-emerald-400 shrink-0"
@@ -275,6 +264,16 @@ export default function TelemetryCards({
             <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         )}
+      </div>
+
+      {/* Single Clean Disclaimer (De-slop) */}
+      <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500 border-t border-stone-100 dark:border-emerald-900/30 pt-2 mt-4">
+        <Info className="w-3.5 h-3.5 shrink-0 text-stone-400 dark:text-stone-500" aria-hidden="true" />
+        <span title={t.formulaNotice}>
+          {locale === "en"
+            ? "Assumption-based estimate: scores and spend are model projections, not real-time field measurements."
+            : "Estimasi berbasis asumsi: skor dan belanja merupakan hasil pemodelan, bukan sensor lapangan waktu-nyata."}
+        </span>
       </div>
 
       {!hideSimulationTriggers && (

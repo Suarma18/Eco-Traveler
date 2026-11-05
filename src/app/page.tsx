@@ -695,7 +695,7 @@ export default function HomePage() {
               {/* Ringkasan Narasi Rute Aktif */}
               <section
                 aria-live="polite"
-                className="bg-white dark:bg-[#111914] border border-slate-200/80 dark:border-emerald-900/40 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3 transition-colors"
+                className="bg-white dark:bg-[#111914] border border-stone-200/80 dark:border-emerald-900/40 rounded-xl p-4 sm:p-5 shadow-sm space-y-3 transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <div className="flex flex-wrap items-center gap-2">
@@ -745,7 +745,7 @@ export default function HomePage() {
                 <h2 className="font-display text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 pt-0.5 text-balance">
                   {itinerary.tripTitle}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
                   {isAiActive && aiNarrative?.summary
                     ? aiNarrative.summary
                     : itinerary.summaryNarrative}

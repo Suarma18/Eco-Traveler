@@ -78,6 +78,17 @@ export default function GovernmentBar({
     "Denpasar",
   ];
 
+  // Filter hanya kabupaten yang memiliki alokasi belanja > 0 pada rute aktif (mengurangi beban kognitif)
+  const activeRegencies = orderedRegencies.filter((regency) => {
+    const activeInfo = regencySpendLookup.get(regency);
+    return activeInfo && (activeInfo.spendRp > 0 || activeInfo.sharePct > 0);
+  });
+
+  // Identifikasi kabupaten yang tidak masuk dalam rute redistribusi ini
+  const excludedRegencies = orderedRegencies.filter(
+    (regency) => !activeRegencies.includes(regency)
+  );
+
   const activeRegencyNames = breakdown
     .filter((b) => b.estimatedSpendRp > 0)
     .map((b) => (locale === "en" ? b.regency : `Kab. ${b.regency}`));
@@ -144,14 +155,9 @@ export default function GovernmentBar({
         </div>
 
         <div className="p-4 rounded-xl bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 text-white space-y-1">
-          <div className="text-xs font-medium text-emerald-300 flex items-center justify-between gap-1.5">
-            <span className="flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{t.ecoRouteAllocTitle}</span>
-            </span>
-            <span className="text-[10px] font-mono text-emerald-300/70">
-              {t.assumptionBadge}
-            </span>
+          <div className="text-xs font-medium text-emerald-300 flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{t.ecoRouteAllocTitle}</span>
           </div>
           <div className="text-2xl font-display font-extrabold text-white font-mono tabular-nums">
             {prioritySharePct}%
@@ -162,14 +168,9 @@ export default function GovernmentBar({
         </div>
 
         <div className="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-900/15 dark:border-emerald-800/40 space-y-1">
-          <div className="text-xs font-medium text-[#0D4732] dark:text-emerald-300 flex items-center justify-between gap-1.5">
-            <span className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{t.econInjectionTitle(cohortFormatted)}</span>
-            </span>
-            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-              {t.assumptionBadge}
-            </span>
+          <div className="text-xs font-medium text-[#0D4732] dark:text-emerald-300 flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>{t.econInjectionTitle(cohortFormatted)}</span>
           </div>
           <div className="text-2xl font-display font-extrabold text-[#0D4732] dark:text-emerald-400 font-mono tabular-nums">
             {formatCompactCurrency(projectedTotalRetained, locale)}
@@ -228,19 +229,15 @@ export default function GovernmentBar({
         <p className="leading-relaxed">{t.methodologyNote}</p>
       </div>
 
-      {/* Regency Comparison Grid (9 Kabupaten/Kota) */}
+      {/* Regency Comparison Grid (Hanya render kabupaten yang memiliki alokasi belanja > 0) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {orderedRegencies.map((regency) => {
+        {activeRegencies.map((regency) => {
           const baseInfo = BALI_BASELINE_SHARE[regency] || {
             baselinePct: 5,
             zone: "Bali",
             isPriority: true,
           };
-          const activeInfo = regencySpendLookup.get(regency) || {
-            spendRp: 0,
-            sharePct: 0,
-            visits: 0,
-          };
+          const activeInfo = regencySpendLookup.get(regency)!;
           const projectedRegencyRp = activeInfo.spendRp * touristCohort;
           const zoneLabel =
             locale === "en"
@@ -252,11 +249,7 @@ export default function GovernmentBar({
           return (
             <div
               key={regency}
-              className={`p-3.5 rounded-xl border transition-colors ${
-                activeInfo.sharePct > 0
-                  ? "bg-white dark:bg-[#14231b] border-emerald-800/30 dark:border-emerald-600/40 shadow-2xs"
-                  : "bg-slate-50/70 dark:bg-[#101913]/60 border-slate-200/70 dark:border-emerald-900/30 opacity-75"
-              }`}
+              className="bg-white dark:bg-[#14231b] border border-stone-200/80 dark:border-emerald-600/40 rounded-xl shadow-sm p-4 transition-colors"
             >
               <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -267,7 +260,7 @@ export default function GovernmentBar({
                     className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                       baseInfo.isPriority
                         ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300"
-                        : "bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                        : "bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-400"
                     }`}
                   >
                     {zoneLabel}
@@ -279,22 +272,18 @@ export default function GovernmentBar({
                   )}
                 </div>
                 <span className="font-mono text-xs font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
-                  {activeInfo.sharePct > 0
-                    ? formatCompactCurrency(projectedRegencyRp, locale)
-                    : locale === "en"
-                    ? "$0"
-                    : "Rp 0"}
+                  {formatCompactCurrency(projectedRegencyRp, locale)}
                 </span>
               </div>
 
               <div className="space-y-1.5 text-[11px] font-mono tabular-nums">
                 <div className="flex items-center gap-2">
-                  <span className="w-44 text-slate-500 dark:text-slate-400 text-[10px] shrink-0 truncate">
+                  <span className="w-44 text-stone-500 dark:text-stone-400 text-[10px] shrink-0 truncate">
                     {t.statusQuoBar} {baseInfo.baselinePct}%
                   </span>
-                  <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-stone-200 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-slate-400 dark:bg-slate-600 rounded-full"
+                      className="h-full bg-stone-400 dark:bg-slate-600 rounded-full"
                       style={{
                         width: `${Math.min(100, baseInfo.baselinePct * 1.5)}%`,
                       }}
@@ -306,7 +295,7 @@ export default function GovernmentBar({
                   <span className="w-44 text-[#0D4732] dark:text-emerald-400 font-semibold text-[10px] shrink-0 truncate">
                     {t.thisRouteBar} {activeInfo.sharePct}%
                   </span>
-                  <div className="flex-1 h-2 bg-slate-100 dark:bg-[#16231c] rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-stone-100 dark:bg-[#16231c] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#0D4732] dark:bg-emerald-500 rounded-full transition-[width] duration-500"
                       style={{
@@ -320,6 +309,15 @@ export default function GovernmentBar({
           );
         })}
       </div>
+
+      {/* Catatan elegan untuk kabupaten yang tidak masuk dalam rute redistribusi */}
+      {excludedRegencies.length > 0 && (
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-4 italic">
+          {locale === "en"
+            ? `Other regencies (${excludedRegencies.slice(0, 3).join(", ")}, etc.) are not included in this redistribution route.`
+            : `Kabupaten lainnya (${excludedRegencies.slice(0, 3).join(", ")}, dll) tidak masuk dalam rute redistribusi ini.`}
+        </p>
+      )}
 
       {/* Footer Sumber Data PDRB */}
       <div className="border-t border-slate-200/80 dark:border-emerald-900/30 pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
