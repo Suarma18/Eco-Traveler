@@ -68,11 +68,19 @@ export default function ItineraryTimeline({
   const [expandedSubSection, setExpandedSubSection] = useState<
     Record<string, "stays" | "attractions" | null>
   >({});
+  const [expandedAdat, setExpandedAdat] = useState<Record<string, boolean>>({});
 
   const toggleSubSection = (key: string, section: "stays" | "attractions") => {
     setExpandedSubSection((prev) => ({
       ...prev,
       [key]: prev[key] === section ? null : section,
+    }));
+  };
+
+  const toggleAdat = (key: string) => {
+    setExpandedAdat((prev) => ({
+      ...prev,
+      [key]: !prev[key],
     }));
   };
 
@@ -426,7 +434,7 @@ export default function ItineraryTimeline({
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                     {t.activityAllocLabel}
                   </span>
                   <span className="text-xs font-mono font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
@@ -778,25 +786,98 @@ export default function ItineraryTimeline({
                               </div>
                             </div>
 
-                            {vText?.customsNote && (
-                              <div className="flex items-start gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                                <ScrollText
-                                  className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5"
-                                  aria-hidden="true"
-                                />
-                                <span>
-                                  <strong className="text-slate-700 dark:text-slate-200">
-                                    {t.customsNotePrefix}{" "}
-                                  </strong>
-                                  {vText.customsNote}
-                                </span>
-                              </div>
-                            )}
+                            {vText?.customsNote && (() => {
+                              const isAdatExpanded = Boolean(expandedAdat[cardKey]);
+                              return (
+                                <div className="space-y-1.5 pt-0.5">
+                                  {/* Single-line summary by default, full when expanded or in print */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300 min-w-0">
+                                      <ScrollText
+                                        className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5"
+                                        aria-hidden="true"
+                                      />
+                                      <div className="leading-relaxed">
+                                        <strong className="text-slate-900 dark:text-slate-100 font-semibold">
+                                          {t.customsNotePrefix}{" "}
+                                        </strong>
+                                        <span className={isAdatExpanded ? "" : "line-clamp-1"}>
+                                          {vText.customsNote}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleAdat(cardKey);
+                                      }}
+                                      className="no-print shrink-0 text-[11px] font-semibold text-[#0D4732] dark:text-emerald-400 hover:underline cursor-pointer flex items-center gap-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#0D4732]"
+                                    >
+                                      <span>{isAdatExpanded ? t.adatQuotaLess : t.adatQuotaMore}</span>
+                                      <ChevronDown
+                                        className={`w-3 h-3 transition-transform ${isAdatExpanded ? "rotate-180" : ""}`}
+                                        aria-hidden="true"
+                                      />
+                                    </button>
+                                  </div>
+
+                                  {/* Expanded Adat Rules, Dress Code, Sacred Days, Quota Details & Verification */}
+                                  {isAdatExpanded && (
+                                    <div className="space-y-1.5 pl-5 pt-1 text-xs text-slate-600 dark:text-slate-300 bg-slate-50/70 dark:bg-[#142019] p-2.5 rounded-xl border border-slate-200/60 dark:border-emerald-900/30">
+                                      {vText.dressCode && (
+                                        <p className="leading-relaxed">
+                                          <strong className="text-slate-800 dark:text-slate-200 font-medium">
+                                            {t.dressAndEtiquetteLabel}:{" "}
+                                          </strong>
+                                          {vText.dressCode}
+                                        </p>
+                                      )}
+                                      {vText.sacredDaysNote && (
+                                        <p className="leading-relaxed text-[#EA580C] dark:text-[#FB923C] font-medium">
+                                          <strong className="font-semibold">{t.sacredDaysLabel}: </strong>
+                                          {vText.sacredDaysNote}
+                                        </p>
+                                      )}
+                                      {villageEntity && (
+                                        <p className="leading-relaxed text-[11px] font-mono text-slate-600 dark:text-slate-400">
+                                          {t.quotaDetailLabel(
+                                            villageEntity.dailyQuota || 90,
+                                            villageEntity.currentSimulatedLoad || 25,
+                                            visualMeta.quotaPercentage
+                                          )}
+                                        </p>
+                                      )}
+                                      <div className="text-[10px] text-slate-500 dark:text-slate-400 italic pt-0.5">
+                                        {villageEntity?.adatVerifiedBy
+                                          ? t.adatVerifiedLabel(
+                                              villageEntity.adatVerifiedBy,
+                                              villageEntity.adatVerifiedAt
+                                            )
+                                          : t.adatPendingVerification}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Print-only complete verification note if not manually expanded */}
+                                  {!isAdatExpanded && (
+                                    <div className="hidden print:block text-[10px] text-slate-500 italic pl-5">
+                                      {villageEntity?.adatVerifiedBy
+                                        ? t.adatVerifiedLabel(
+                                            villageEntity.adatVerifiedBy,
+                                            villageEntity.adatVerifiedAt
+                                          )
+                                        : t.adatPendingVerification}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
 
                             {/* Sub-Section Toggle Buttons: Penginapan Warga & Wisata Terdekat */}
                             {(accommodations.length > 0 ||
                               nearbyAttractions.length > 0) && (
-                              <div className="pt-2 border-t border-slate-100 dark:border-emerald-900/30 flex flex-wrap items-center gap-2">
+                              <div className="no-print pt-2 border-t border-slate-100 dark:border-emerald-900/30 flex flex-wrap items-center gap-2">
                                 {accommodations.length > 0 && (
                                   <button
                                     type="button"

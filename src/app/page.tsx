@@ -39,9 +39,19 @@ if (typeof window !== "undefined") {
   import("@/components/LeafletMap");
 }
 
-const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
-  ssr: false,
-  loading: () => (
+function MapLoadingPlaceholder() {
+  const [isEn, setIsEn] = useState(false);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("eco-traveler-locale");
+      const htmlLang = typeof document !== "undefined" ? document.documentElement.lang : "en";
+      setIsEn(stored === "en" || (!stored && htmlLang !== "id"));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  return (
     <div
       className="relative w-full h-[calc(100dvh-8.25rem)] sm:h-[560px] lg:h-[calc(100dvh-5.5rem)] rounded-2xl overflow-hidden bg-stone-100 dark:bg-[#08120E] border border-stone-200/90 dark:border-emerald-800/60 shadow-lg flex flex-col items-center justify-center p-6 text-center select-none"
       aria-live="polite"
@@ -56,7 +66,7 @@ const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
       {/* Top Floating Badge Mockup */}
       <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
         <div className="px-2.5 py-1 rounded-xl bg-white/90 dark:bg-[#101E18]/90 backdrop-blur-xs border border-stone-200 dark:border-emerald-800/40 text-[11px] font-mono font-medium text-stone-600 dark:text-stone-300 shadow-xs">
-          OpenStreetMap · Basemap Siaga
+          {isEn ? "OpenStreetMap · Standby Basemap" : "OpenStreetMap · Basemap Siaga"}
         </div>
         <div className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-[10px] font-mono text-[#0D4732] dark:text-emerald-300 font-semibold">
           8°20&apos;S 115°13&apos;E
@@ -98,15 +108,22 @@ const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
 
         <div className="space-y-1">
           <p className="font-display text-sm font-bold text-stone-900 dark:text-stone-100 tracking-tight">
-            Menyiapkan Atlas Spasial Bali
+            {isEn ? "Preparing Bali Spatial Atlas…" : "Menyiapkan Atlas Spasial Bali…"}
           </p>
           <p className="text-xs font-mono text-stone-500 dark:text-stone-400">
-            Sinkronisasi layer OpenStreetMap & 28 titik desa...
+            {isEn
+              ? "Synchronizing OpenStreetMap layer & 28 village coordinates…"
+              : "Sinkronisasi layer OpenStreetMap & 28 titik desa…"}
           </p>
         </div>
       </div>
     </div>
-  ),
+  );
+}
+
+const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
+  ssr: false,
+  loading: () => <MapLoadingPlaceholder />,
 });
 
 function getInitialItinerary(locale: Locale = "id"): ItineraryResponse {
@@ -349,7 +366,12 @@ export default function HomePage() {
                 </span>
                 <span
                   translate="no"
-                  className="hidden md:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40"
+                  title={
+                    locale === "en"
+                      ? "Subak Atelier: Design aesthetic inspired by Balinese subak landscape geometry"
+                      : "Subak Atelier: Tema desain terinspirasi oleh geometri bentang alam subak Bali"
+                  }
+                  className="hidden md:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 cursor-help"
                 >
                   Subak Atelier
                 </span>

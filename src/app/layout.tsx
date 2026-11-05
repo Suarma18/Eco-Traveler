@@ -34,16 +34,29 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Eco Traveler | Equitable Bali Travel Route Planner",
   description:
-    "Design community-first itineraries to 28 curated tourist villages across North, East, and West Bali. Direct tourist spend to local homestays and adhere to customary Awig-Awig rules.",
+    "AI-assisted community-first travel route planner for 28 curated tourist villages across North, East, and West Bali. Combines Anthropic Claude AI narrative with the Subak Spatial Engine to direct tourist spend to local homestays and prevent overtourism under customary Awig-Awig carrying capacities.",
   keywords: [
     "Eco Traveler Bali",
-    "Baligivation 2026",
+    "Baligivation 2026", // TODO-HUMAN: Konfirmasi nama resmi di poster lomba (Baligivation / Bali Digital Innovation Festival 2026)
+    "Bali Digital Innovation Festival 2026",
     "AI Web Innovation Challenge",
+    "Build with AI",
+    "Solver for Bali",
     "Bali Smart Society",
     "Desa Wisata Bali",
+    "Subak Spatial Engine",
+    "Claude AI Travel",
     "Bali Sustainable Tourism",
     "Equitable Bali Travel Route Planner",
   ],
+  openGraph: {
+    title: "Eco Traveler | Equitable Bali Travel Route Planner",
+    description:
+      "AI-assisted community-first travel route planner for 28 curated tourist villages across North, East, and West Bali. Powered by real Claude AI narration & deterministic spatial optimization.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Eco Traveler",
+  },
 };
 
 const THEME_INIT_SCRIPT = `

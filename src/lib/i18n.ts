@@ -167,6 +167,14 @@ export const UI_TEXT = {
       `Total durasi perjalanan: ~${duration} (${distance})`,
     roadConditionNotice:
       "Waktu tempuh dihitung dengan estimasi jalur darat realistis menghindari koridor padat Bali Selatan. Waktu aktual bergantung pada cuaca dan kondisi jalan lokal.",
+    adatVerifiedLabel: (by: string, at?: string) =>
+      `Diverifikasi oleh: ${by}${at ? ` (${at})` : ""}`,
+    adatPendingVerification:
+      "Konten adat dikurasi dari publikasi desa dan sedang dalam proses verifikasi bersama pengelola desa/prajuru adat terkait (TODO-HUMAN).",
+    adatQuotaMore: "Rincian Adat & Kuota",
+    adatQuotaLess: "Tutup Rincian",
+    quotaDetailLabel: (quota: number, load: number, pct: number) =>
+      `Kapasitas rencana: ${quota}/hari (simulasi beban: ${load}/hari · ${pct}% aman dari overtourism)`,
     // Penginapan & Wisata Terdekat
     tabOverview: "Ringkasan",
     tabStays: (count: number) => `Penginapan (${count})`,
@@ -377,6 +385,14 @@ export const UI_TEXT = {
       `Total trip transit: ~${duration} (${distance})`,
     roadConditionNotice:
       "Travel times reflect scenic road transit avoiding congested South Bali corridors. Actual duration may vary based on weather and local topography.",
+    adatVerifiedLabel: (by: string, at?: string) =>
+      `Customary verification by: ${by}${at ? ` (${at})` : ""}`,
+    adatPendingVerification:
+      "Customary rules curated from village records; official verification with village customary council in progress (TODO-HUMAN).",
+    adatQuotaMore: "Adat & Quota Details",
+    adatQuotaLess: "Hide Details",
+    quotaDetailLabel: (quota: number, load: number, pct: number) =>
+      `Planned capacity: ${quota}/day (simulated load: ${load}/day · ${pct}% safe from overtourism)`,
     // Accommodations & Nearby Attractions
     tabOverview: "Overview",
     tabStays: (count: number) => `Local Stays (${count})`,

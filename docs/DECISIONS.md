@@ -96,3 +96,43 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
 
 
 
+
+
+---
+
+## [2026-11-05] T9: Ekspor PDF Berbasis Vektor A4 Bersih
+- **Konteks:** Ekspor PDF sebelumnya rentan menghasilkan file raksasa berbasis tangkapan layar raster (html2canvas) yang berat, teks tidak dapat diseleksi/dicari, dan boros tinta jika dicetak.
+- **Keputusan:**
+  1. **Styling Cetak @media print Native:** Menggunakan lembar gaya `@media print` native berstandar A4 portrait (`size: A4 portrait`) dengan margin yang presisi (`12mm 10mm 15mm 10mm`), teks vektor tajam yang dapat diseleksi, dan pencegahan pemotongan kartu (`break-inside: avoid`).
+  2. **Auto-Light Print Guard:** Mengalihkan tema sementara ke Light Mode saat `window.print()` dipanggil agar hasil cetak ramah tinta (latar belakang putih bersih, border minimalis, tanpa shadow tebal).
+  3. **Penyembunyian Kontrol Interaktif:** Memberikan kelas `.no-print` pada seluruh bilah navigasi, filter pill, tab drawer, formulir, dan tombol aksi peta sehingga dokumen cetak bersih dan rapi.
+  4. **Kelengkapan Dokumen:** Mencantumkan ringkasan perjalanan, hari dan destinasi lengkap, estimasi biaya dan waktu tempuh, panduan etika adat, serta catatan kaki penafian dan sumber data resmi.
+
+---
+
+## [2026-11-05] T10: Keterbacaan, Kontras WCAG AA, dan Kepadatan UI
+- **Konteks:** Audit menemukan beberapa teks sekunder berukuran terlalu kecil (<11px) atau terpotong elipsis (`truncate`/`line-clamp`) pada informasi penting ("Hari Sakral", "Etika & Busana", "Desa Penyangga", "Homestay warga & koperasi"). Kartu destinasi di timeline juga dirasa terlalu padat.
+- **Keputusan:**
+  1. **Penghapusan Pemotongan Teks Kritis:** Menghapus `truncate` dan `line-clamp` pada seluruh aturan adat, hari sakral, dan label proteksi desa penyangga di `CulturalBriefing.tsx` dan `TelemetryCards.tsx`.
+  2. **Peningkatan Ukuran Font & Kontras Warna (WCAG AA):** Menaikkan ukuran font label sekunder ("ALOKASI AKTIVITAS", "Total estimasi", subteks LBI) ke minimal 12px (`text-xs`) dan memastikan rasio kontras warna terhadap latar belakang gelap maupun terang memenuhi target WCAG AA (≥ 4.5:1).
+  3. **Bar Bertumpuk Mini Sebaran Wilayah:** Menambahkan representasi visual *mini stacked bar* di samping teks sebaran wilayah pada `TelemetryCards.tsx` agar distribusi rute terlihat intuitif sekilas.
+  4. **Kartu Stop Rapi & Collapsible:** Mengubah rincian etika adat dan batas kuota harian pada kartu stop menjadi collapsible (default tertutup dengan ringkasan 1 baris terbuka) dilengkapi tombol "Rincian Adat & Kuota" / "Adat & Quota Details". Saat dicetak (`@media print`), seluruh rincian tetap dicetak utuh tanpa memerlukan interaksi klik.
+  5. **Tooltip Informatif:** Menambahkan tooltip penjelas untuk "Subak Atelier", "Zona Padat", dan "OSM".
+
+---
+
+## [2026-11-05] T11: Catatan Verifikasi Konten Adat (Awig-Awig)
+- **Konteks:** Aturan adat (seperti larangan di Sema Wayah Trunyan atau etika di desa-desa Bali Aga) belum diverifikasi langsung oleh prajuru adat/pengelola desa setempat. Klaim sepihak bahwa data telah "terverifikasi" berisiko menurunkan kredibilitas.
+- **Keputusan:**
+  1. Menambahkan field `adatVerifiedBy` dan `adatVerifiedAt` (default string kosong) pada setiap entri desa di `data/desa-wisata.json`.
+  2. Menampilkan catatan penafian kecil pada panel etika adat di timeline dan dock peta Leaflet selama status verifikasi masih kosong: `"Konten adat dikurasi dan sedang diverifikasi bersama pengelola desa (TODO-HUMAN)"` (ID) / `"Customary rules curated from village records; official verification with village customary council in progress (TODO-HUMAN)"` (EN).
+  3. Mendokumentasikan seluruh aturan adat spesifik dalam `docs/DATA-SOURCES.md` dengan status memerlukan verifikasi manusia.
+
+---
+
+## [2026-11-05] T12: Detail i18n dan Metadata Kompetisi
+- **Konteks:** Layar loading peta masih menggunakan bahasa Indonesia kaku saat pengguna memilih bahasa Inggris. Selain itu, metadata kompetisi masih mencantumkan nama umum ("Bali DigiFest") alih-alih identitas resmi lomba "Baligivation" / "AI Web Innovation Challenge".
+- **Keputusan:**
+  1. **Layar Loading Peta Bilingual:** Mengekstrak `MapLoadingPlaceholder` di `src/app/page.tsx` yang membaca preferensi bahasa aktif (`localStorage` atau `document.documentElement.lang`) dan menampilkan teks bilingual yang selaras ("Preparing Bali Spatial Atlas…" vs "Menyiapkan Atlas Spasial Bali…").
+  2. **Pembaruan Metadata Resmi Kompetisi:** Memperbarui `metadata.keywords` di `src/app/layout.tsx` dengan kata kunci resmi: "Baligivation 2026", "AI Web Innovation Challenge", "Build with AI", "Solver for Bali", dan "Bali Smart Society", disertai penanda `TODO-HUMAN` untuk konfirmasi final nama resmi di poster.
+  3. **Metadata Berbasis AI:** Menyelaraskan `meta description` dan OpenGraph tags untuk menegaskan integrasi AI nyata (Claude AI narration) bersama mesin deterministik Subak Spatial Engine.

@@ -481,6 +481,11 @@ export default function LeafletMap({
             type="button"
             aria-pressed={showSouthHotspotZone}
             onClick={() => setShowSouthHotspotZone((v) => !v)}
+            title={
+              locale === "en"
+                ? "South Bali Congested Hub (Kuta, Canggu, Seminyak - absorbs 65.88% of Bali tourism GDP)"
+                : "Zona Padat Pariwisata Bali Selatan (Kuta, Canggu, Seminyak - menyerap 65,88% PDRB pariwisata)"
+            }
             className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
               showSouthHotspotZone
                 ? "bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] font-semibold"
@@ -536,7 +541,7 @@ export default function LeafletMap({
               );
             }}
             className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-medium text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white bg-slate-100 dark:bg-[#16231c] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400"
-            title={t.switchBasemapLabel}
+            title={`${t.switchBasemapLabel}: OpenStreetMap (OSM) / Carto`}
           >
             {tileTheme === "osm-clean"
               ? "OSM"
@@ -1213,18 +1218,28 @@ export default function LeafletMap({
 
                   {/* Tab Content 1: Awig-Awig & Etika Adat Kontekstual */}
                   {inspectorTab === "overview" && (
-                    <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
-                      <ScrollText
-                        className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
-                        aria-hidden="true"
-                      />
-                      <div className="line-clamp-2 sm:line-clamp-none">
-                        <strong className="text-amber-300">
-                          {t.awigAwigPrefix}{" "}
-                        </strong>
-                        {activeVillageText?.customsNote ||
-                          "Respect sacred temple areas and preserve local subak irrigation channels."}
+                    <div className="p-2.5 rounded-lg bg-white/10 border border-white/10 text-xs text-emerald-50 leading-relaxed space-y-1.5">
+                      <div className="flex items-start gap-2">
+                        <ScrollText
+                          className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <strong className="text-amber-300 font-semibold">
+                            {t.awigAwigPrefix}{" "}
+                          </strong>
+                          {activeVillageText?.customsNote ||
+                            "Respect sacred temple areas and preserve local subak irrigation channels."}
+                        </div>
                       </div>
+                      <p className="text-[10px] text-emerald-200/70 italic pl-5">
+                        {activeVillageEntity?.adatVerifiedBy
+                          ? t.adatVerifiedLabel(
+                              activeVillageEntity.adatVerifiedBy,
+                              activeVillageEntity.adatVerifiedAt
+                            )
+                          : t.adatPendingVerification}
+                      </p>
                     </div>
                   )}
 

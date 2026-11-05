@@ -107,26 +107,26 @@ export default function CulturalBriefing({
                 className="rounded-xl bg-slate-50/70 dark:bg-[#15221b] border border-slate-200/70 dark:border-emerald-900/40 p-3 space-y-1.5"
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
                     {village.name}
                   </span>
                   <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
                     {village.regency}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug line-clamp-2">
-                  <span className="font-semibold text-slate-800 dark:text-slate-100">
+                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {t.dressAndEtiquetteLabel}
                   </span>{" "}
                   {vText.dressCode}
                 </p>
                 {vText.sacredDaysNote && (
-                  <div className="flex items-center gap-1 text-[10px] text-[#EA580C] dark:text-[#FB923C] font-medium pt-0.5">
+                  <div className="flex items-start gap-1.5 text-xs text-[#EA580C] dark:text-[#FB923C] font-medium pt-1">
                     <ShieldAlert
-                      className="w-3 h-3 shrink-0"
+                      className="w-3.5 h-3.5 shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
-                    <span className="truncate">
+                    <span className="leading-relaxed">
                       {t.sacredDaysLabel} {vText.sacredDaysNote}
                     </span>
                   </div>
