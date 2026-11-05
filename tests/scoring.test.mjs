@@ -171,3 +171,32 @@ test("All 28 villages have curated accommodations and nearby attractions with va
     }
   }
 });
+
+test("GDP baseline shares cover all 9 regencies/cities in Bali and sum to 100%", () => {
+  const gdpData = JSON.parse(
+    fs.readFileSync(path.resolve("data/gdp-share.json"), "utf8")
+  );
+
+  const regencies = Object.keys(gdpData.regencies);
+  assert.equal(regencies.length, 9, "Bali must have 9 regencies and cities");
+  assert.ok(regencies.includes("Klungkung"), "Klungkung must be included");
+
+  let totalPct = 0;
+  for (const [name, info] of Object.entries(gdpData.regencies)) {
+    assert.ok(info.value > 0, `GDP value for ${name} must be > 0`);
+    assert.ok(info.year, `GDP year for ${name} must be defined`);
+    assert.ok(info.source, `GDP source for ${name} must be defined`);
+    totalPct += info.value;
+  }
+
+  // Floating point precision check: 100.0%
+  assert.equal(Math.round(totalPct * 10) / 10, 100);
+
+  // Sarbagita sum verification: Badung + Denpasar + Gianyar + Tabanan = 65.88%
+  const sarbagitaSum =
+    gdpData.regencies.Badung.value +
+    gdpData.regencies.Denpasar.value +
+    gdpData.regencies.Gianyar.value +
+    gdpData.regencies.Tabanan.value;
+  assert.equal(Math.round(sarbagitaSum * 100) / 100, 65.88);
+});

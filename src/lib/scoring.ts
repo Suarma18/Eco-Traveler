@@ -1,4 +1,5 @@
 import desaWisataData from "../../data/desa-wisata.json";
+import gdpShareData from "../../data/gdp-share.json";
 import { DayItinerary, RegencySpendBreakdown, BudgetCategory } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
 
@@ -38,22 +39,33 @@ export const PRIORITY_REGENCIES = new Set([
 
 /**
  * Baseline distribusi PDRB Akomodasi & Makan Minum Bali (BPS Provinsi Bali):
- * Kawasan Sarbagita (Badung, Denpasar, Gianyar, Tabanan) menguasai ~65.88% PDRB Bali.
+ * Dimuat secara terpusat dari data/gdp-share.json
  */
+export const GDP_SHARE_DATA = gdpShareData;
+
 export const BALI_BASELINE_SHARE: Record<
   string,
-  { baselinePct: number; zone: string; isPriority: boolean }
-> = {
-  Badung: { baselinePct: 38.4, zone: "Bali Selatan (Pusat)", isPriority: false },
-  Denpasar: { baselinePct: 14.2, zone: "Bali Selatan (Pusat)", isPriority: false },
-  Gianyar: { baselinePct: 8.58, zone: "Zona Transisi", isPriority: false },
-  Tabanan: { baselinePct: 4.7, zone: "Zona Transisi", isPriority: false },
-  Buleleng: { baselinePct: 11.4, zone: "Bali Utara (Prioritas)", isPriority: true },
-  Karangasem: { baselinePct: 7.8, zone: "Bali Timur (Prioritas)", isPriority: true },
-  Bangli: { baselinePct: 6.1, zone: "Bali Tengah-Utara (Prioritas)", isPriority: true },
-  Jembrana: { baselinePct: 5.32, zone: "Bali Barat (Prioritas)", isPriority: true },
-  Klungkung: { baselinePct: 3.5, zone: "Kepulauan & Timur", isPriority: true },
-};
+  {
+    baselinePct: number;
+    zone: string;
+    isPriority: boolean;
+    source?: string;
+    year?: number;
+    isDerived?: boolean;
+  }
+> = Object.fromEntries(
+  Object.entries(gdpShareData.regencies).map(([reg, item]) => [
+    reg,
+    {
+      baselinePct: item.value,
+      zone: item.zone,
+      isPriority: item.isPriority,
+      source: item.source,
+      year: item.year,
+      isDerived: "isDerived" in item ? Boolean((item as Record<string, unknown>).isDerived) : false,
+    },
+  ])
+);
 
 export function getRegencyWeight(regency: string): number {
   const normalized = regency.trim();

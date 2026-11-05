@@ -1,0 +1,85 @@
+{
+  "sarbagitaCombined": {
+    "value": 65.88,
+    "year": 2022,
+    "source": "BPS Provinsi Bali (dikutip dari Jurnal UIN Alauddin)",
+    "sourceUrl": "https://journal.uin-alauddin.ac.id/",
+    "needsUpdate": true
+  },
+  "regencies": {
+    "Badung": {
+      "value": 38.4,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Selatan (Pusat)",
+      "isPriority": false
+    },
+    "Denpasar": {
+      "value": 14.2,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Selatan (Pusat)",
+      "isPriority": false
+    },
+    "Gianyar": {
+      "value": 8.58,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Zona Transisi",
+      "isPriority": false
+    },
+    "Tabanan": {
+      "value": 4.7,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Zona Transisi",
+      "isPriority": false
+    },
+    "Buleleng": {
+      "value": 11.4,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Utara (Prioritas)",
+      "isPriority": true
+    },
+    "Karangasem": {
+      "value": 7.8,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Timur (Prioritas)",
+      "isPriority": true
+    },
+    "Bangli": {
+      "value": 6.1,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Tengah-Utara (Prioritas)",
+      "isPriority": true
+    },
+    "Jembrana": {
+      "value": 5.32,
+      "year": 2022,
+      "source": "TODO-HUMAN",
+      "sourceUrl": "",
+      "zone": "Bali Barat (Prioritas)",
+      "isPriority": true
+    },
+    "Klungkung": {
+      "value": 3.5,
+      "year": 2022,
+      "source": "Turunan (100 - 8 kabupaten lain), perlu verifikasi manusia (TODO-HUMAN)",
+      "sourceUrl": "",
+      "zone": "Kepulauan & Timur",
+      "isPriority": true,
+      "isDerived": true
+    }
+  }
+}
+

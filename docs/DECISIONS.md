@@ -12,3 +12,26 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
 - **Keamanan:** Kunci API sama sekali tidak diekspos ke klien (tidak ada prefix `NEXT_PUBLIC_`).
 - **Prinsip Fallback & Zero-Crash:** Jika `ANTHROPIC_API_KEY` tidak disetel atau terjadi timeout/kegagalan jaringan, sistem secara otomatis dan mulus kembali ke narasi deterministik tanpa menampilkan badge "AI" palsu.
 - **Pemisahan Peran:** AI tidak pernah menghitung skor pemerataan (Spread Score), retensi lokal (LBI), jarak, waktu tempuh, atau alokasi belanja. Seluruh perhitungan numerik tetap dihitung secara deterministik oleh `src/lib/scoring.ts`.
+
+---
+
+## [2026-11-05] T2: Foto, Duplikasi, dan Placeholder Jujur
+- **Konteks:** Ditemukan 14 foto Unsplash yang terduplikasi di beberapa desa dan foto stok yang tidak mencerminkan lanskap desa wisata riil di Bali Utara/Timur/Barat.
+- **Keputusan:** Menghapus seluruh duplikasi foto stok. Disediakan struktur folder `public/img/villages/{id}.webp` dengan metadata `image` dan `imageCredit` di `data/desa-wisata.json` untuk verifikasi manusia mendatang.
+- **Visual Jujur:** Menggunakan ilustrasi SVG berbasis landscape kearifan lokal (teras sawah, kerajinan tenun, terumbu karang, tambak garam, warisan budaya, kaldera, agro perkebunan, dan hutan lindung) dengan alt text jujur (`Ilustrasi Desa Wisata...`) sehingga tidak menyesatkan juri atau wisatawan.
+- **Pemisahan Elemen UI:** Lencana ketinggian (`mdpl`) dipisahkan dari overlay foto ke baris metadata untuk estetika dan hierarki informasi yang bersih.
+
+---
+
+## [2026-11-05] T3: Dashboard Simulasi Dampak & 9 Kabupaten/Kota
+- **Konteks:** Dashboard simulasi ekonomi sebelumnya hanya menampilkan 8 kabupaten/kota (Klungkung hilang) dan teks deskripsi mengklaim persentase hanya untuk Buleleng, Karangasem, dan Bangli meskipun rute bisa melewati kabupaten lain.
+- **Keputusan:**
+  1. Menambahkan seluruh 9 kabupaten/kota Provinsi Bali ke dalam konfigurasi `data/gdp-share.json` dan `BALI_BASELINE_SHARE` di `src/lib/scoring.ts`.
+  2. Klungkung dimasukkan dengan nilai PDRB turunan (3.5% dengan penanda `isDerived: true` dan label "(turunan, perlu verifikasi)" serta ditandai `TODO-HUMAN`).
+  3. Total porsi PDRB 9 kabupaten/kota adalah tepat 100% (Sarbagita 65.88%, 5 kabupaten lainnya 34.12%).
+  4. Deskripsi alokasi belanja rute dibuat dinamis melalui `ecoRouteAllocDesc(activeRegencyNames)` sehingga hanya menyebut kabupaten yang benar-benar dikunjungi dan menerima alokasi belanja pada rute aktif.
+  5. Ditambahkan kotak peringatan metodologi (*Methodology Note*) dan catatan kaki sumber data PDRB (BPS Bali 2022 via kajian ilmiah UIN Alauddin Makassar).
+  6. Label perbandingan diperjelas menjadi "Porsi PDRB (Status Quo)" vs "Porsi Belanja Rute (Ilustrasi)".
+  7. Ditambahkan disclaimer eksplisit untuk pengali kohort wisatawan: pengali 1.000, 10.000, 50.000 mengasumsikan pola belanja identik tanpa memperhitungkan kendala kapasitas fisik desa.
+
+

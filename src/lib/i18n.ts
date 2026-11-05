@@ -146,24 +146,33 @@ export const UI_TEXT = {
     sacredDaysLabel: "Hari Sakral:",
     // Government Bar
     govBadge: "Simulasi Kebijakan Pemerataan Ekonomi Bali",
-    govTitle: "Proyeksi Redistribusi Belanja Wisatawan Antar-Kabupaten",
+    govTitle: "Simulasi Dampak per Kabupaten/Kota",
     govSubtitle:
-      "Membandingkan porsi PDRB Status Quo (65,88% terpusat di Bali Selatan) dengan distribusi belanja langsung dari rute Eco Traveler.",
+      "Perbandingan ilustratif porsi PDRB wilayah (status quo) dengan distribusi belanja langsung dari rute Eco Traveler saat ini.",
     closeModalLabel: "Tutup rincian sebaran",
-    statusQuoTitle: "Status Quo PDRB Bali",
+    statusQuoTitle: "Porsi PDRB Wilayah (Status Quo)",
     statusQuoDesc:
-      "Terkonsentrasi di Bali Selatan (Badung, Denpasar, Gianyar, Tabanan).",
-    ecoRouteAllocTitle: "Alokasi Rute Eco Traveler",
-    ecoRouteAllocDesc:
-      "Mengalir langsung ke Buleleng, Karangasem, Bangli, dan Jembrana.",
+      "Terkonsentrasi di Bali Selatan (Badung, Denpasar, Gianyar, Tabanan: 65,88%).",
+    ecoRouteAllocTitle: "Porsi Belanja Rute Ini (Ilustrasi)",
+    ecoRouteAllocDesc: (regencies: string[]) =>
+      regencies.length > 0
+        ? `Mengalir langsung ke desa wisata di ${regencies.join(", ")}.`
+        : "Belum ada alokasi belanja langsung ke kabupaten prioritas.",
     econInjectionTitle: (cohortStr: string) =>
       `Injeksi Ekonomi (${cohortStr} Turis)`,
     econInjectionDesc: (perTouristStr: string) =>
       `Setara ${perTouristStr}/wisatawan ke usaha desa & homestay warga.`,
     cohortScaleLabel: "Skala Simulasi Jumlah Wisatawan:",
+    cohortDisclaimer:
+      "Perkalian linear dari satu rute contoh, bukan prakiraan ekonomi makro.",
     touristUnit: "Wisatawan",
-    statusQuoBar: "Status Quo:",
-    thisRouteBar: "Rute Ini:",
+    statusQuoBar: "Porsi PDRB (Status Quo):",
+    thisRouteBar: "Porsi Belanja Rute (Ilustrasi):",
+    methodologyNote:
+      "Catatan Metodologi: Porsi PDRB wilayah (status quo) dan porsi belanja rute ini bukan padanan langsung. Simulasi bersifat ilustratif untuk menunjukkan pengalihan belanja wisata.",
+    gdpDataSource:
+      "Sumber: BPS Provinsi Bali (2022, dikutip dari Jurnal UIN Alauddin). Data tahun 2022, perlu pembaruan.",
+    derivedLabel: "turunan, perlu verifikasi",
   },
   en: {
     brandSubtitle: "Spatial Atlas & Fair-Trade Route Planner for Bali",
@@ -246,7 +255,7 @@ export const UI_TEXT = {
     quotaSafe: "Within Daily Quota",
     simPdrbBtn: "GDP Simulation",
     regionalShareLabel: "Regional Share:",
-    openSimDashboard: "Open 8-Regency Impact Dashboard",
+    openSimDashboard: "Open Regency Impact Dashboard",
     // Timeline
     showingDayFocus: (d: number) => `Showing focused route for Day ${d}`,
     showAllDays: (total: number) => `Show All Days (${total}D)`,
@@ -307,24 +316,33 @@ export const UI_TEXT = {
     sacredDaysLabel: "Sacred Days:",
     // Government Bar
     govBadge: "Bali Regional Economic Redistribution Simulation",
-    govTitle: "Projected Inter-Regency Tourist Spend Redistribution",
+    govTitle: "Regency & City Impact Simulation",
     govSubtitle:
-      "Comparing the Status Quo GDP concentration (65.88% locked in South Bali) against direct village spending from this Eco Traveler route.",
+      "Illustrative comparison of baseline regional GDP share (status quo) against direct community spending from this Eco Traveler route.",
     closeModalLabel: "Close simulation modal",
-    statusQuoTitle: "Bali Status Quo GDP",
+    statusQuoTitle: "Regional GDP Share (Status Quo)",
     statusQuoDesc:
-      "Concentrated in South Bali (Badung, Denpasar, Gianyar, Tabanan).",
-    ecoRouteAllocTitle: "Eco Traveler Route Share",
-    ecoRouteAllocDesc:
-      "Flows directly to Buleleng, Karangasem, Bangli, and Jembrana.",
+      "Concentrated in South Bali (Badung, Denpasar, Gianyar, Tabanan: 65.88%).",
+    ecoRouteAllocTitle: "This Route Spend Share (Illustration)",
+    ecoRouteAllocDesc: (regencies: string[]) =>
+      regencies.length > 0
+        ? `Flows directly to community villages in ${regencies.join(", ")}.`
+        : "No direct spend allocated to priority regencies yet.",
     econInjectionTitle: (cohortStr: string) =>
       `Community Injection (${cohortStr} Visitors)`,
     econInjectionDesc: (perTouristStr: string) =>
       `Equals ${perTouristStr}/visitor retained by village businesses & homestays.`,
     cohortScaleLabel: "Simulated Visitor Cohort Scale:",
+    cohortDisclaimer:
+      "Linear extrapolation from a single sample route, not an econometric forecast.",
     touristUnit: "Visitors",
-    statusQuoBar: "Status Quo:",
-    thisRouteBar: "This Route:",
+    statusQuoBar: "GDP Share (Status Quo):",
+    thisRouteBar: "Route Spend Share (Illustration):",
+    methodologyNote:
+      "Methodology Note: Regional GDP share (status quo) and route spending share are not direct equivalents. This comparison is illustrative to show tourism spend redirection.",
+    gdpDataSource:
+      "Source: BPS Bali Province (2022, via UIN Alauddin Journal). Data from 2022, needs update.",
+    derivedLabel: "derived, needs verification",
   },
 } as const;
 

@@ -5,7 +5,7 @@ import { ItineraryResponse } from "@/types/trip";
 import { BALI_BASELINE_SHARE, PRIORITY_REGENCIES } from "@/lib/scoring";
 import { Locale, formatCompactCurrency, formatCurrency } from "@/lib/utils";
 import { UI_TEXT } from "@/lib/i18n";
-import { X, Users, BarChart3, TrendingUp, Scale } from "lucide-react";
+import { X, Users, BarChart3, TrendingUp, Scale, Info } from "lucide-react";
 
 interface GovernmentBarProps {
   itinerary: ItineraryResponse;
@@ -71,11 +71,16 @@ export default function GovernmentBar({
     "Karangasem",
     "Bangli",
     "Jembrana",
+    "Klungkung",
     "Tabanan",
     "Gianyar",
     "Badung",
     "Denpasar",
   ];
+
+  const activeRegencyNames = breakdown
+    .filter((b) => b.estimatedSpendRp > 0)
+    .map((b) => (locale === "en" ? b.regency : `Kab. ${b.regency}`));
 
   const priorityTotalSpend = breakdown
     .filter((b) => PRIORITY_REGENCIES.has(b.regency))
@@ -147,7 +152,7 @@ export default function GovernmentBar({
             {prioritySharePct}%
           </div>
           <p className="text-[11px] text-emerald-100/80">
-            {t.ecoRouteAllocDesc}
+            {t.ecoRouteAllocDesc(activeRegencyNames)}
           </p>
         </div>
 
@@ -166,40 +171,54 @@ export default function GovernmentBar({
       </div>
 
       {/* Cohort Multiplier Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-100/80 dark:bg-[#16231c] p-3 rounded-xl">
-        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-          {t.cohortScaleLabel}
-        </span>
-        <div
-          role="group"
-          aria-label={t.cohortScaleLabel}
-          className="flex flex-wrap items-center gap-1.5"
-        >
-          {COHORT_COUNTS.map((count) => {
-            const active = touristCohort === count;
-            const formatted = count.toLocaleString(
-              locale === "en" ? "en-US" : "id-ID"
-            );
-            return (
-              <button
-                key={count}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setTouristCohort(count)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
-                  active
-                    ? "bg-[#0D261C] dark:bg-emerald-600 text-white font-semibold shadow-xs"
-                    : "bg-white dark:bg-[#111914] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1c3025] border border-slate-200/80 dark:border-emerald-900/40"
-                }`}
-              >
-                {formatted} {t.touristUnit}
-              </button>
-            );
-          })}
+      <div className="bg-slate-100/80 dark:bg-[#16231c] p-3 rounded-xl space-y-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+            {t.cohortScaleLabel}
+          </span>
+          <div
+            role="group"
+            aria-label={t.cohortScaleLabel}
+            className="flex flex-wrap items-center gap-1.5"
+          >
+            {COHORT_COUNTS.map((count) => {
+              const active = touristCohort === count;
+              const formatted = count.toLocaleString(
+                locale === "en" ? "en-US" : "id-ID"
+              );
+              return (
+                <button
+                  key={count}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setTouristCohort(count)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono tabular-nums transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D4732] dark:focus-visible:ring-emerald-400 ${
+                    active
+                      ? "bg-[#0D261C] dark:bg-emerald-600 text-white font-semibold shadow-xs"
+                      : "bg-white dark:bg-[#111914] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1c3025] border border-slate-200/80 dark:border-emerald-900/40"
+                  }`}
+                >
+                  {formatted} {t.touristUnit}
+                </button>
+              );
+            })}
+          </div>
         </div>
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 italic">
+          {t.cohortDisclaimer}
+        </p>
       </div>
 
-      {/* Regency Comparison Grid */}
+      {/* Methodology Note Alert */}
+      <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/70 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-300">
+        <Info
+          className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+          aria-hidden="true"
+        />
+        <p className="leading-relaxed">{t.methodologyNote}</p>
+      </div>
+
+      {/* Regency Comparison Grid (9 Kabupaten/Kota) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {orderedRegencies.map((regency) => {
           const baseInfo = BALI_BASELINE_SHARE[regency] || {
@@ -230,7 +249,7 @@ export default function GovernmentBar({
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
                     {locale === "en" ? regency : `Kab. ${regency}`}
                   </span>
@@ -243,6 +262,11 @@ export default function GovernmentBar({
                   >
                     {zoneLabel}
                   </span>
+                  {baseInfo.isDerived && (
+                    <span className="text-[10px] text-amber-700 dark:text-amber-400 italic">
+                      ({t.derivedLabel})
+                    </span>
+                  )}
                 </div>
                 <span className="font-mono text-xs font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
                   {activeInfo.sharePct > 0
@@ -255,7 +279,7 @@ export default function GovernmentBar({
 
               <div className="space-y-1.5 text-[11px] font-mono tabular-nums">
                 <div className="flex items-center gap-2">
-                  <span className="w-28 text-slate-500 dark:text-slate-400 text-[10px] shrink-0">
+                  <span className="w-44 text-slate-500 dark:text-slate-400 text-[10px] shrink-0 truncate">
                     {t.statusQuoBar} {baseInfo.baselinePct}%
                   </span>
                   <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -269,7 +293,7 @@ export default function GovernmentBar({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="w-28 text-[#0D4732] dark:text-emerald-400 font-semibold text-[10px] shrink-0">
+                  <span className="w-44 text-[#0D4732] dark:text-emerald-400 font-semibold text-[10px] shrink-0 truncate">
                     {t.thisRouteBar} {activeInfo.sharePct}%
                   </span>
                   <div className="flex-1 h-2 bg-slate-100 dark:bg-[#16231c] rounded-full overflow-hidden">
@@ -285,6 +309,14 @@ export default function GovernmentBar({
             </div>
           );
         })}
+      </div>
+
+      {/* Footer Sumber Data PDRB */}
+      <div className="border-t border-slate-200/80 dark:border-emerald-900/30 pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+        <span>{t.gdpDataSource}</span>
+        <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
+          9 Kabupaten/Kota Provinsi Bali
+        </span>
       </div>
     </div>
   );
