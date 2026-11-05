@@ -1005,16 +1005,12 @@ export default function LeafletMap({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={activeVisualMeta.imageUrl}
-                    alt={activeStep.activity.villageName}
+                    alt={activeVisualMeta.altText}
                     width={112}
                     height={96}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
-                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono text-emerald-300 flex items-center gap-1">
-                    <Mountain className="w-2.5 h-2.5" aria-hidden="true" />
-                    {activeVisualMeta.elevationLabel}
-                  </span>
                 </div>
 
                 {/* Detail & Awig-Awig Desa Aktif */}
@@ -1028,6 +1024,10 @@ export default function LeafletMap({
                         </span>
                         <span className="text-[11px] text-emerald-200/80 font-mono">
                           {activeStep.activity.regency}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-300 bg-black/50 border border-white/10 px-1.5 py-0.5 rounded">
+                          <Mountain className="w-2.5 h-2.5" aria-hidden="true" />
+                          {activeVisualMeta.elevationLabel}
                         </span>
                         <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
                           {t.quotaFilled(activeVisualMeta.quotaPercentage)}

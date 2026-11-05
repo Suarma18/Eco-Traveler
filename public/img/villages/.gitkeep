@@ -1,0 +1,3 @@
+# Folder untuk menampung foto asli 28 desa wisata: {villageId}.webp
+# Bila file lokal tersedia (misal public/img/villages/desa-sidemen.webp), aplikasi akan menggunakannya.
+# Bila belum tersedia, aplikasi menggunakan ilustrasi SVG placeholder bergradien yang jujur dan konsisten.

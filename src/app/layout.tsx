@@ -72,7 +72,6 @@ export default function RootLayout({
       className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} scroll-smooth`}
     >
       <head>
-        <link rel="preconnect" href="https://images.unsplash.com" />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="font-sans antialiased bg-[#F8F9FA] dark:bg-[#090E0B] text-slate-900 dark:text-slate-100 selection:bg-[#0D261C] selection:text-emerald-200 min-h-[100dvh]">

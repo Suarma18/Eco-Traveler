@@ -603,15 +603,26 @@ export default function HomePage() {
 
               {/* Editorial Hero Banner */}
               <section className="no-print relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#0D261C] via-[#103426] to-[#0A1F17] dark:from-[#0E1F18] dark:to-[#07130E] border border-emerald-900/40 dark:border-emerald-500/30 text-white p-5 sm:p-6 shadow-sm">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80"
-                  alt=""
+                <svg
                   aria-hidden="true"
-                  width={1200}
-                  height={400}
-                  className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-luminosity pointer-events-none"
-                />
+                  className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1200 400"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M 0,200 Q 300,120 600,200 T 1200,180 L 1200,400 L 0,400 Z"
+                    fill="#34D399"
+                  />
+                  <path
+                    d="M 0,260 Q 400,180 800,270 T 1200,240 L 1200,400 L 0,400 Z"
+                    fill="#10B981"
+                  />
+                  <path
+                    d="M 0,320 Q 350,250 700,330 T 1200,300 L 1200,400 L 0,400 Z"
+                    fill="#059669"
+                  />
+                </svg>
                 <div className="relative z-10 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-emerald-200 border border-white/15">

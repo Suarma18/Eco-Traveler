@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { TripRequest, BudgetCategory, ArrivalGate } from "@/types/trip";
 import { Locale } from "@/lib/utils";
 import { UI_TEXT } from "@/lib/i18n";
+import { PRESET_1_SVG, PRESET_2_SVG } from "@/lib/village-media";
 import {
   Loader2,
   Compass,
@@ -269,7 +270,7 @@ export default function TripPlannerForm({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=240&q=80"
+              src={PRESET_1_SVG}
               alt={t.scenario1Title}
               width={48}
               height={48}
@@ -301,7 +302,7 @@ export default function TripPlannerForm({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=240&q=80"
+              src={PRESET_2_SVG}
               alt={t.scenario2Title}
               width={48}
               height={48}

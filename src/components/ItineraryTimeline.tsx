@@ -336,7 +336,7 @@ export default function ItineraryTimeline({
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={visualMeta.imageUrl}
-                            alt={activity.villageName}
+                            alt={visualMeta.altText}
                             width={144}
                             height={144}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -350,19 +350,12 @@ export default function ItineraryTimeline({
                             {day.dayNumber}.{idx + 1} ·{" "}
                             {formatTimeSlot(activity.timeSlot, locale)}
                           </span>
-                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-[10px] font-mono text-white flex items-center gap-1">
-                            <Mountain
-                              className="w-2.5 h-2.5 text-emerald-300"
-                              aria-hidden="true"
-                            />
-                            {visualMeta.elevationLabel}
-                          </span>
                         </div>
 
                         {/* Content Body */}
                         <div className="flex-1 min-w-0 flex flex-col justify-between space-y-2.5">
                           <div>
-                            {/* Top Meta Row */}
+                            {/* Top Meta Row: Nama Desa, Kabupaten, Badge Ketinggian (mdpl) & Buffer */}
                             <div className="flex items-start justify-between gap-2 mb-1">
                               <div className="flex flex-wrap items-center gap-1.5">
                                 <span className="text-xs font-bold text-[#0D4732] dark:text-emerald-400">
@@ -372,6 +365,14 @@ export default function ItineraryTimeline({
                                   {locale === "en"
                                     ? `${activity.regency}`
                                     : `Kab. ${activity.regency}`}
+                                </span>
+                                {/* Badge Ketinggian dipindah ke baris info agar tidak hilang saat foto diganti */}
+                                <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#16231c] text-slate-600 dark:text-slate-300">
+                                  <Mountain
+                                    className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400"
+                                    aria-hidden="true"
+                                  />
+                                  {visualMeta.elevationLabel}
                                 </span>
                                 {isRedirected && (
                                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-[#FB923C] border border-orange-200/70 dark:border-orange-800/50">

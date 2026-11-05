@@ -86,5 +86,9 @@ export interface DesaWisata {
   elevationMeters?: number;
   accommodations?: LocalAccommodation[];
   nearbyAttractions?: NearbyAttraction[];
+  image?: string;
+  imageCredit?: string;
+  adatVerifiedBy?: string;
+  adatVerifiedAt?: string;
 }
 
