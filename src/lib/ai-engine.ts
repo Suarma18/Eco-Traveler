@@ -14,7 +14,11 @@ import {
   computeItineraryTelemetry,
   PRIORITY_REGENCIES,
 } from "@/lib/scoring";
-import { formatRupiah } from "@/lib/utils";
+import {
+  formatRupiah,
+  generateDeterministicStopDescription,
+  cleanHighlightPhrase,
+} from "@/lib/utils";
 import { localizeItinerary } from "@/lib/i18n";
 
 const GEMINI_TIMEOUT_MS = 6000;
@@ -179,8 +183,15 @@ export function buildDeterministicItinerary(
           villageId: village.id,
           villageName: village.name,
           regency: village.regency,
-          activityTitle: `${slotActionPrefix} ${village.highlights.split(",")[0]}`,
-          description: `Berkunjung ke ${village.name} di Kabupaten ${village.regency} untuk mengenal ${village.highlights.toLowerCase()} dan berbelanja langsung di ${village.localUmkm}.`,
+          activityTitle: `${slotActionPrefix} ${cleanHighlightPhrase(village.highlights)}`,
+          description: generateDeterministicStopDescription(
+            village.name,
+            village.regency,
+            village.highlights,
+            village.localUmkm,
+            slot,
+            "id"
+          ),
           lat: village.lat,
           lng: village.lng,
           estimatedLocalSpendRp: estimatedSpend,

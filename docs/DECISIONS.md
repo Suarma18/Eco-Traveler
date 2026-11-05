@@ -61,6 +61,16 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
   4. **Peringatan Perjalanan Panjang (≥ 3 Jam):** Menambahkan penanda `isLongLeg` (`durationMinutes >= 180`) dan chip peringatan lembut "Kaki perjalanan panjang (~X jam), disarankan istirahat di perjalanan" dengan ikon peringatan amber.
   5. **Bahasa Netral & Penghapusan Klaim Berlebihan:** Menghapus seluruh klaim "bebas macet", "jalur pintas tanpa hambatan", dan "traffic-free" dari prompt, UI, dan narasi. Diganti dengan bahasa realistis bahwa rute dirancang menghindari koridor padat Bali Selatan, dengan disclaimer bahwa durasi aktual tetap bergantung pada kondisi jalan lokal dan cuaca.
 
+---
+
+## [2026-11-05] T6: Teks, Huruf Kapital, dan Keragaman Template Deterministik
+- **Konteks:** Pemanggilan `.toLowerCase()` pada string deskripsi dan highlights menyebabkan nama diri dan istilah adat ("UNESCO", "Danau Batur", "Gunung Agung", "Bali Aga", "Sungai Unda") tercetak berhuruf kecil. Selain itu, kalimat deskripsi stop deterministik mengulang pola kaku ("Berkunjung ke [Nama]... untuk mengenal... dan berbelanja...") sehingga terasa artifisial saat AI tidak aktif.
+- **Keputusan:**
+  1. **Preservasi Huruf Kapital Proper Nouns:** Mengimplementasikan fungsi `preserveProperNouns(text)` dan `cleanHighlightPhrase(highlights)` di `src/lib/utils.ts` dengan daftar kamus proper nouns dan istilah adat Bali. Menghapus semua pemanggilan `.toLowerCase()` pada highlights.
+  2. **Tiga Pola Template Berbeda:** Menyediakan `generateDeterministicStopDescription` dengan 3 variasi pembuka kalimat berbeda sesuai slot waktu aktivitas (Pagi/Morning, Siang/Afternoon, Sore/Sunset, serta variasi mitigasi overtourism untuk pengalihan desa penyangga).
+  3. **Pengujian Otomatis:** Menambahkan rangkaian tes unit di `tests/text-capitalization.test.mjs` untuk memverifikasi preservasi kapitalisasi dan keragaman kalimat.
+
+
 
 
 

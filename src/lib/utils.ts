@@ -264,3 +264,156 @@ export function formatDailyTransitSummary(
     ? `Transit: ~${timeStr} (${distStr})`
     : `Perjalanan: ~${timeStr} (${distStr})`;
 }
+
+/**
+ * Daftar istilah adat, nama geografis, dan proper nouns Bali
+ * yang wajib mempertahankan huruf kapital benar (tidak boleh berhuruf kecil).
+ */
+export const BALI_PROPER_NOUNS = [
+  "UNESCO",
+  "Danau Batur",
+  "Lake Batur",
+  "Gunung Agung",
+  "Mount Agung",
+  "Gunung Batur",
+  "Mount Batur",
+  "Danau Tamblingan",
+  "Lake Tamblingan",
+  "Danau Buyan",
+  "Lake Buyan",
+  "Danau Beratan",
+  "Lake Beratan",
+  "Bali Aga",
+  "Bali Mula",
+  "Sungai Unda",
+  "Unda River",
+  "Pura Pancering Jagat",
+  "Pura Besakih",
+  "Pura Ulun Danu",
+  "Taman Nasional Bali Barat",
+  "West Bali National Park",
+  "Taman Ujung",
+  "Tirta Gangga",
+  "Jatiluwih",
+  "Penglipuran",
+  "Trunyan",
+  "Tenganan",
+  "Sidemen",
+  "Munduk",
+  "Pemuteran",
+  "Buleleng",
+  "Karangasem",
+  "Bangli",
+  "Jembrana",
+  "Klungkung",
+  "Tabanan",
+  "Gianyar",
+  "Badung",
+  "Denpasar",
+  "Pokdarwis",
+  "BUMDes",
+  "Subak",
+  "Awig-Awig",
+  "Gringsing",
+  "Kintamani",
+  "Amed",
+  "Tulamben",
+  "Menjangan",
+  "Black Lava",
+];
+
+/**
+ * Memastikan setiap istilah geografis dan adat dalam teks ditulis dengan huruf kapital yang benar.
+ */
+export function preserveProperNouns(text: string): string {
+  if (!text) return "";
+  let result = text;
+  for (const noun of BALI_PROPER_NOUNS) {
+    const regex = new RegExp(
+      `\\b${noun.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`,
+      "gi"
+    );
+    result = result.replace(regex, noun);
+  }
+  return result;
+}
+
+/**
+ * Membersihkan frasa highlights dan menjaga nama geografis/istilah adat tetap kapital.
+ */
+export function cleanHighlightPhrase(highlights: string): string {
+  if (!highlights) return "";
+  const firstClause = highlights.split(",")[0].trim();
+  return preserveProperNouns(firstClause);
+}
+
+/**
+ * Menghasilkan deskripsi stop deterministik dengan minimal 3 pola kalimat berbeda
+ * (Morning / Afternoon / Sunset) untuk mencegah teks berulang kaku saat AI tidak aktif.
+ */
+export function generateDeterministicStopDescription(
+  villageName: string,
+  regency: string,
+  highlights: string,
+  umkm: string,
+  timeSlot: string,
+  locale: Locale = "id",
+  isRedirected = false,
+  originalSaturatedVillage?: string
+): string {
+  const cleanHighlight = cleanHighlightPhrase(highlights);
+  const cleanUmkm = preserveProperNouns(
+    umkm || (locale === "en" ? "local village artisans" : "UMKM warga")
+  );
+  const regencyLabel = locale === "en" ? regency : `Kabupaten ${regency}`;
+
+  if (isRedirected) {
+    if (locale === "en") {
+      return preserveProperNouns(
+        `To mitigate overtourism pressures at ${
+          originalSaturatedVillage || "nearby saturated hotspots"
+        }, the journey shifts smoothly to ${villageName} in ${regencyLabel}. Experience authentic ${cleanHighlight} while investing directly with ${cleanUmkm}.`
+      );
+    }
+    return preserveProperNouns(
+      `Untuk mencegah beban overtourism di ${
+        originalSaturatedVillage || "kawasan padat"
+      }, rute dialihkan ke ${villageName} (${regencyLabel}). Nikmati kearifan lokal ${cleanHighlight} sembari mendukung perputaran ekonomi langsung di ${cleanUmkm}.`
+    );
+  }
+
+  // Tiga pola pembuka berbeda untuk Pagi, Siang, dan Sore/Sunset
+  const normalizedSlot = timeSlot.toUpperCase();
+
+  if (normalizedSlot.includes("MORNING") || normalizedSlot.includes("PAGI")) {
+    if (locale === "en") {
+      return preserveProperNouns(
+        `Begin the morning expedition exploring ${cleanHighlight} at ${villageName} (${regencyLabel}), directly benefiting village families and ${cleanUmkm}.`
+      );
+    }
+    return preserveProperNouns(
+      `Awali perjalanan pagi dengan mengeksplorasi ${cleanHighlight} di ${villageName} (${regencyLabel}), yang memberikan manfaat ekonomi langsung bagi ${cleanUmkm}.`
+    );
+  }
+
+  if (normalizedSlot.includes("WORKSHOP") || normalizedSlot.includes("SIANG") || normalizedSlot.includes("AFTERNOON")) {
+    if (locale === "en") {
+      return preserveProperNouns(
+        `Immerse in local living heritage and ${cleanHighlight} at ${villageName} (${regencyLabel}), with community spending channeled to ${cleanUmkm}.`
+      );
+    }
+    return preserveProperNouns(
+      `Selami tradisi kehidupan dan kearifan ${cleanHighlight} di ${villageName} (${regencyLabel}), sembari berbelanja langsung di ${cleanUmkm}.`
+    );
+  }
+
+  // Default: Sore / Sunset
+  if (locale === "en") {
+    return preserveProperNouns(
+      `Wind down the day taking in ${cleanHighlight} around ${villageName} (${regencyLabel}), accompanied by warm local hospitality at ${cleanUmkm}.`
+    );
+  }
+  return preserveProperNouns(
+    `Nikmati suasana sore dengan mengamati ${cleanHighlight} di ${villageName} (${regencyLabel}), disertai keramahan warga di ${cleanUmkm}.`
+  );
+}

@@ -1,7 +1,13 @@
 import { DesaWisata } from "@/types/desa";
 import { ItineraryResponse, TimeSlot } from "@/types/trip";
 import { DESA_BY_ID, PRIORITY_REGENCIES } from "@/lib/scoring";
-import { Locale, formatStayPriceRange } from "@/lib/utils";
+import {
+  Locale,
+  formatStayPriceRange,
+  generateDeterministicStopDescription,
+  cleanHighlightPhrase,
+  preserveProperNouns,
+} from "@/lib/utils";
 
 export const UI_TEXT = {
   id: {
@@ -797,24 +803,24 @@ export function localizeItinerary(
 
       const isRedirected = act.capacityStatus === "REDIRECTED_BUFFER";
 
+      const rawHighlight = vText?.highlights || act.activityTitle;
+      const cleanHighlight = cleanHighlightPhrase(rawHighlight);
+
       const activityTitle =
         locale === "en"
-          ? `${slotPrefixEn} ${firstHighlight.charAt(0).toUpperCase()}${firstHighlight.slice(1)}`
-          : act.activityTitle.startsWith("Morning") ||
-            act.activityTitle.startsWith("Workshop") ||
-            act.activityTitle.startsWith("Afternoon")
-          ? `${slotPrefixId} ${firstHighlight}`
-          : act.activityTitle;
+          ? `${slotPrefixEn} ${cleanHighlight}`
+          : `${slotPrefixId} ${cleanHighlight}`;
 
-      const description =
-        locale === "en"
-          ? isRedirected
-            ? `When visitor numbers at ${act.originalSaturatedVillage || "nearby hotspots"} approach the daily limit, the route shifts to the neighboring buffer village of ${act.villageName} in ${act.regency} Regency. Experience ${vText?.highlights.toLowerCase() || "local village life"} and support ${act.localUmkmSpot || "village artisans"}.`
-            : `Visit ${act.villageName} in ${act.regency} Regency to experience ${vText?.highlights.toLowerCase() || "authentic village traditions"} and spend directly with ${act.localUmkmSpot || "local community hosts"}.`
-          : act.description.startsWith("Visit ") ||
-            act.description.startsWith("When visitor")
-          ? `Berkunjung ke ${act.villageName} di Kabupaten ${act.regency} untuk mengenal ${vText?.highlights.toLowerCase() || "kehidupan desa"} dan berbelanja langsung di ${act.localUmkmSpot || "UMKM warga"}.`
-          : act.description;
+      const description = generateDeterministicStopDescription(
+        act.villageName,
+        act.regency,
+        rawHighlight,
+        act.localUmkmSpot || "",
+        act.timeSlot,
+        locale,
+        isRedirected,
+        act.originalSaturatedVillage
+      );
 
       const antiOvertourismNote =
         locale === "en"
