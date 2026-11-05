@@ -46,3 +46,4 @@ for (const village of dataset) {
 
 fs.writeFileSync(filePath, JSON.stringify(dataset, null, 2) + '\n', 'utf8');
 console.log(`Updated ${dataset.length} villages in ${filePath}`);
+
