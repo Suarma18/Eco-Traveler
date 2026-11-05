@@ -460,8 +460,8 @@ export function getVillageVisualMeta(
     quotaPercentage,
     quotaLabel:
       locale === "en"
-        ? `${load}/${quota} visitors/day (${quotaPercentage}%)`
-        : `${load}/${quota} wisatawan/hari (${quotaPercentage}%)`,
+        ? `Capacity: ${quota}/day (simulated: ${load}/day · ${quotaPercentage}%)`
+        : `Kapasitas rencana: ${quota}/hari (simulasi beban: ${load}/hari · ${quotaPercentage}%)`,
     imageCredit: village?.imageCredit || undefined,
     isIllustration,
   };

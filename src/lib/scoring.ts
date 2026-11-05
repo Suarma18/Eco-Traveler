@@ -182,8 +182,8 @@ export function computeItineraryTelemetry(
       (budgetCategory === "Backpacker"
         ? 210000
         : budgetCategory === "Comfort"
-          ? 360000
-          : 270000);
+        ? 360000
+        : 270000);
 
     const retentionFactor =
       day.recommendedStay?.type === "Community Homestay" ? 0.94 : 0.86;
@@ -294,11 +294,11 @@ export function applyAntiOvertourismCapacityGuard(
             localUmkmSpot: bufferVillage.localUmkm,
             capacityStatus: "REDIRECTED_BUFFER" as const,
             originalSaturatedVillage: village.name,
-            antiOvertourismNote: `Kuota harian ${village.name} mencapai ${pct}% (${load}/${quota} wisatawan). Rute digeser ke Desa Penyangga ${bufferVillage.name} (${Math.round(
+            antiOvertourismNote: `Beban simulasi ${village.name} mencapai ${pct}% (${load}/${quota}/hari). Rute digeser ke Desa Penyangga ${bufferVillage.name} (${Math.round(
               ((bufferVillage.currentSimulatedLoad || 25) /
                 (bufferVillage.dailyQuota || 90)) *
-              100
-            )}% kapasitas) untuk menjaga kenyamanan kunjungan.`,
+                100
+            )}% kapasitas simulasi) untuk mencegah overtourism.`,
           };
         }
       }
