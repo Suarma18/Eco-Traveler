@@ -186,7 +186,7 @@ export function buildDeterministicItinerary(
           estimatedLocalSpendRp: estimatedSpend,
           antiOvertourismNote: PRIORITY_REGENCIES.has(village.regency)
             ? `Kabupaten prioritas pemerataan ${village.regency} (Bobot Spasial 1.0).`
-            : `Jalur penghubung bebas macet di ${village.regency} menuju Bali Utara dan Timur.`,
+            : `Koridor jalur penghubung di ${village.regency} yang menghindari koridor padat Bali Selatan menuju Bali Utara dan Timur.`,
           localUmkmSpot: village.localUmkm,
           capacityStatus: "OPTIMAL",
         };

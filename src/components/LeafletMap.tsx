@@ -337,13 +337,16 @@ export default function LeafletMap({
 
   const allRouteCoords = useMemo(() => {
     const coords: [number, number][] = [];
+    if (arrivalCoords) {
+      coords.push(arrivalCoords);
+    }
     for (const day of visibleDays) {
       for (const act of day.activities) {
         coords.push([act.lat, act.lng]);
       }
     }
     return coords;
-  }, [visibleDays]);
+  }, [visibleDays, arrivalCoords]);
 
   const focusCoords: [number, number] | null = selectedActivity
     ? [selectedActivity.lat, selectedActivity.lng]
@@ -944,6 +947,47 @@ export default function LeafletMap({
             </React.Fragment>
           );
         })}
+
+        {/* Polyline Kaki Transit Pulang ke Pintu Keberangkatan */}
+        {visibleDays.length > 0 &&
+          visibleDays[visibleDays.length - 1].dayNumber === days.length &&
+          arrivalCoords && (() => {
+            const lastDay = visibleDays[visibleDays.length - 1];
+            if (lastDay.activities.length === 0) return null;
+            const lastAct = lastDay.activities[lastDay.activities.length - 1];
+            const returnTransit = estimateBaliTransit(
+              lastAct.lat,
+              lastAct.lng,
+              arrivalCoords[0],
+              arrivalCoords[1],
+              locale
+            );
+            return (
+              <Polyline
+                positions={[
+                  [lastAct.lat, lastAct.lng],
+                  arrivalCoords,
+                ]}
+                pathOptions={{
+                  color: useDarkMapColors ? "#FB923C" : "#EA580C",
+                  weight: 2.5,
+                  dashArray: "6 8",
+                  opacity: 0.85,
+                }}
+              >
+                <Tooltip sticky>
+                  <div className="font-sans text-xs space-y-0.5">
+                    <div className="font-semibold text-slate-800 dark:text-slate-100">
+                      {lastAct.villageName} ➔ {arrivalLabel || "Ngurah Rai"}
+                    </div>
+                    <div className="font-mono text-[11px] text-[#EA580C] dark:text-[#FB923C] font-bold tabular-nums">
+                      {returnTransit.formattedSummary}
+                    </div>
+                  </div>
+                </Tooltip>
+              </Polyline>
+            );
+          })()}
       </MapContainer>
 
       {/* Bottom Floating Village & Awig-Awig Inspector Dock */}

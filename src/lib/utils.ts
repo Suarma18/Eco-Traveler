@@ -180,6 +180,7 @@ export interface TransitEstimate {
   formattedDuration: string;
   formattedDistance: string;
   formattedSummary: string;
+  isLongLeg: boolean;
 }
 
 /**
@@ -198,6 +199,7 @@ export function estimateBaliTransit(
   const roadKm = Math.max(0.5, Math.round(straight * 1.38 * 10) / 10);
   // Rata-rata 35 km/jam + buffer transisi/parkir 5 menit
   const durationMinutes = Math.max(10, Math.round((roadKm / 35) * 60) + 5);
+  const isLongLeg = durationMinutes >= 180;
 
   let formattedDuration: string;
   if (durationMinutes < 60) {
@@ -228,6 +230,7 @@ export function estimateBaliTransit(
     formattedDuration,
     formattedDistance,
     formattedSummary,
+    isLongLeg,
   };
 }
 

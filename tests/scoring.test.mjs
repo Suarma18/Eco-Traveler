@@ -240,3 +240,59 @@ test("T4: Estimation labels, formulas transparency, and honest capacity terminol
     "village-media must clearly label capacity as simulated load"
   );
 });
+
+test("T5: Complete transit legs, long leg warnings, and absence of misleading traffic-free claims", () => {
+  const i18nContent = fs.readFileSync(
+    path.resolve("src/lib/i18n.ts"),
+    "utf8"
+  );
+
+  // Check required transit i18n functions
+  assert.ok(
+    i18nContent.includes("morningTransitFromStay:"),
+    "i18n must include morningTransitFromStay"
+  );
+  assert.ok(
+    i18nContent.includes("returnTransitToGate:"),
+    "i18n must include returnTransitToGate"
+  );
+  assert.ok(
+    i18nContent.includes("longLegWarning:"),
+    "i18n must include longLegWarning"
+  );
+  assert.ok(
+    i18nContent.includes("totalTripTransit:"),
+    "i18n must include totalTripTransit"
+  );
+  assert.ok(
+    i18nContent.includes("roadConditionNotice:"),
+    "i18n must include roadConditionNotice"
+  );
+
+  // Verify utils transit computation flags long legs >= 180 min
+  const utilsContent = fs.readFileSync(
+    path.resolve("src/lib/utils.ts"),
+    "utf8"
+  );
+  assert.ok(
+    utilsContent.includes("isLongLeg: boolean") &&
+      utilsContent.includes("durationMinutes >= 180"),
+    "utils must define isLongLeg when transit is >= 180 minutes"
+  );
+
+  // Verify zero unsubstantiated "bebas macet" / "traffic-free" claims in app code
+  assert.ok(
+    !i18nContent.includes("traffic-free") &&
+      !i18nContent.includes("bebas macet"),
+    "i18n must not contain misleading 'traffic-free' or 'bebas macet' claims"
+  );
+
+  const aiEngineContent = fs.readFileSync(
+    path.resolve("src/lib/ai-engine.ts"),
+    "utf8"
+  );
+  assert.ok(
+    !aiEngineContent.includes("bebas macet"),
+    "ai-engine must not contain misleading 'bebas macet' claims"
+  );
+});

@@ -50,5 +50,17 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
      - "26/85 wisatawan/hari" diubah menjadi format simulasi jujur: "Kapasitas rencana: 85/hari (simulasi beban: 26/hari · 31%)" dan "Kapasitas terpakai: 31% (simulasi)".
      - Menambahkan tooltip penjelasan definisi ambang daya dukung harian desa pada elemen kapasitas.
 
+---
+
+## [2026-11-05] T5: Waktu Tempuh: Kaki Pagi dan Pulang Lengkap
+- **Konteks:** Perhitungan waktu tempuh sebelumnya tidak memperhitungkan kaki perjalanan pagi dari homestay malam sebelumnya ke destinasi pertama hari berikutnya, serta kaki perjalanan pulang dari destinasi terakhir hari terakhir ke pintu kepulangan (Bandara Ngurah Rai/Pelabuhan). Selain itu terdapat klaim berlebihan seperti "bebas macet" dan belum ada penanda jika transit melampaui durasi 3 jam.
+- **Keputusan:**
+  1. **Kaki Pagi (Hari 2+):** Menghitung transit dari koordinat homestay rekomendasi malam sebelumnya ke stop pertama hari berjalan dan menampilkannya sebagai konektor resmi di timeline rute.
+  2. **Kaki Pulang (Hari Terakhir):** Menghitung transit dari destinasi terakhir rute kembali ke pintu kedatangan/keberangkatan awal (default: Bandara Ngurah Rai atau pelabuhan asal) serta menggambarkannya pada peta spasial Leaflet (`LeafletMap`).
+  3. **Akumulasi Waktu Tempuh Total:** Menghitung total durasi dan jarak tempuh keseluruhan rute dan menampilkannya dalam banner ringkasan di atas timeline.
+  4. **Peringatan Perjalanan Panjang (≥ 3 Jam):** Menambahkan penanda `isLongLeg` (`durationMinutes >= 180`) dan chip peringatan lembut "Kaki perjalanan panjang (~X jam), disarankan istirahat di perjalanan" dengan ikon peringatan amber.
+  5. **Bahasa Netral & Penghapusan Klaim Berlebihan:** Menghapus seluruh klaim "bebas macet", "jalur pintas tanpa hambatan", dan "traffic-free" dari prompt, UI, dan narasi. Diganti dengan bahasa realistis bahwa rute dirancang menghindari koridor padat Bali Selatan, dengan disclaimer bahwa durasi aktual tetap bergantung pada kondisi jalan lokal dan cuaca.
+
+
 
 

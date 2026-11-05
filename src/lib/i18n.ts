@@ -146,6 +146,16 @@ export const UI_TEXT = {
     transitToStay: "Menuju Homestay Warga",
     transitFromPrev: (summary: string) => `${summary} dari titik sebelumnya`,
     transitRoadEstimate: "Estimasi Jalur Darat",
+    morningTransitFromStay: (stayName: string) =>
+      `Dari ${stayName} (Malam sebelumnya)`,
+    returnTransitToGate: (gate: string) =>
+      `Kembali ke ${gate} (Pintu Keberangkatan)`,
+    longLegWarning: (duration: string) =>
+      `Kaki perjalanan panjang (~${duration}), disarankan istirahat di perjalanan.`,
+    totalTripTransit: (duration: string, distance: string) =>
+      `Total durasi perjalanan: ~${duration} (${distance})`,
+    roadConditionNotice:
+      "Waktu tempuh dihitung dengan estimasi jalur darat realistis menghindari koridor padat Bali Selatan. Waktu aktual bergantung pada cuaca dan kondisi jalan lokal.",
     // Penginapan & Wisata Terdekat
     tabOverview: "Ringkasan",
     tabStays: (count: number) => `Penginapan (${count})`,
@@ -243,7 +253,7 @@ export const UI_TEXT = {
       "No parameters needed adjustment from your prompt.",
     heroTitle: "Equitable Bali Village Route Planner",
     heroDesc:
-      "Plan traffic-free journeys across North, East, and West Bali. Your homestay, lunch, and local guide spending goes directly to village families and subak cooperatives.",
+      "Plan sustainable journeys across North, East, and West Bali, avoiding congested South Bali corridors. Your homestay, lunch, and local guide spending goes directly to village families and subak cooperatives.",
     routeSummaryDays: (days: number) => `${days}-Day Travel Itinerary`,
     arrivalGatePrefix: "Arrival Gate:",
     footerLeft: "Eco Traveler · Bali Smart Society",
@@ -341,6 +351,16 @@ export const UI_TEXT = {
     transitToStay: "To Community Homestay",
     transitFromPrev: (summary: string) => `${summary} from previous stop`,
     transitRoadEstimate: "Scenic Road Estimate",
+    morningTransitFromStay: (stayName: string) =>
+      `From ${stayName} (Previous night stay)`,
+    returnTransitToGate: (gate: string) =>
+      `Return to ${gate} (Departure Gate)`,
+    longLegWarning: (duration: string) =>
+      `Long travel leg (~${duration}), scenic roadside rest recommended.`,
+    totalTripTransit: (duration: string, distance: string) =>
+      `Total trip transit: ~${duration} (${distance})`,
+    roadConditionNotice:
+      "Travel times reflect scenic road transit avoiding congested South Bali corridors. Actual duration may vary based on weather and local topography.",
     // Accommodations & Nearby Attractions
     tabOverview: "Overview",
     tabStays: (count: number) => `Local Stays (${count})`,
@@ -802,12 +822,12 @@ export function localizeItinerary(
             ? `Redirects visitors from ${act.originalSaturatedVillage || "crowded villages"} (98% capacity) to ${act.villageName} Buffer Village (30% capacity).`
             : PRIORITY_REGENCIES.has(act.regency)
             ? `Priority economic redistribution regency (${act.regency}, Spatial Weight 1.0).`
-            : `Traffic-free transition corridor through ${act.regency} toward North and East Bali.`
+            : `Scenic transition corridor through ${act.regency} outside congested South Bali toward North and East Bali.`
           : isRedirected
           ? `Mengalihkan kunjungan dari ${act.originalSaturatedVillage || "desa padat"} (98% kapasitas) ke Desa Penyangga ${act.villageName} (30% kapasitas).`
           : PRIORITY_REGENCIES.has(act.regency)
           ? `Kabupaten prioritas pemerataan ${act.regency} (Bobot Spasial 1.0).`
-          : `Jalur penghubung bebas macet di ${act.regency} menuju Bali Utara dan Timur.`;
+          : `Koridor jalur penghubung di ${act.regency} yang menghindari koridor padat Bali Selatan menuju Bali Utara dan Timur.`;
 
       return {
         ...act,
@@ -926,13 +946,13 @@ export function localizeItinerary(
 
   const summaryNarrative =
     locale === "en"
-      ? `This ${duration}-day route travels directly from ${arrivalGateLabel} into ${regenciesList}, bypassing congested South Bali. It achieves a ${itinerary.metrics.spreadScore.toFixed(
+      ? `This ${duration}-day route travels directly from ${arrivalGateLabel} into ${regenciesList}, avoiding congested South Bali corridors. It achieves a ${itinerary.metrics.spreadScore.toFixed(
           1
         )}/100 Regional Spread Score and retains ${itinerary.metrics.localBenefitIndex.toFixed(
           1
         )}% of total spending with community homestays, subak farmers, and village cooperatives.`
       : itinerary.summaryNarrative.startsWith("This ")
-      ? `Perjalanan ${duration} hari dari ${arrivalGateLabel} menuju Kabupaten ${regenciesList} tanpa singgah di kawasan padat Bali Selatan. Rute ini mencatat Indeks Pemerataan ${itinerary.metrics.spreadScore.toFixed(
+      ? `Perjalanan ${duration} hari dari ${arrivalGateLabel} menuju Kabupaten ${regenciesList} yang menghindari koridor padat Bali Selatan. Rute ini mencatat Indeks Pemerataan ${itinerary.metrics.spreadScore.toFixed(
           1
         )}/100 dengan ${itinerary.metrics.localBenefitIndex.toFixed(
           1

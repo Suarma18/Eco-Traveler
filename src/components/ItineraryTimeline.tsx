@@ -32,6 +32,7 @@ import {
   Compass,
   ChevronDown,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ItineraryTimelineProps {
@@ -75,8 +76,171 @@ export default function ItineraryTimeline({
     }));
   };
 
+  // Hitung total akumulasi waktu tempuh dan jarak seluruh rute (seluruh hari + pintu kedatangan + kepulangan)
+  const tripTransitTotals = React.useMemo(() => {
+    let minutes = 0;
+    let km = 0;
+
+    for (let d = 0; d < days.length; d++) {
+      const day = days[d];
+      if (day.activities.length === 0) continue;
+
+      // Hari 1: pintu kedatangan ke titik pertama
+      if (day.dayNumber === 1 && arrivalCoords) {
+        const gateEst = estimateBaliTransit(
+          arrivalCoords[0],
+          arrivalCoords[1],
+          day.activities[0].lat,
+          day.activities[0].lng,
+          locale
+        );
+        minutes += gateEst.durationMinutes;
+        km += gateEst.roadDistanceKm;
+      }
+
+      // Hari 2+: kaki pagi dari tempat menginap malam sebelumnya ke titik pertama
+      if (day.dayNumber > 1) {
+        const prevDay = days[d - 1];
+        if (prevDay && prevDay.activities.length > 0) {
+          const prevLastAct = prevDay.activities[prevDay.activities.length - 1];
+          const stayVillage = prevDay.recommendedStay
+            ? allVillages.find((v) =>
+                prevDay.recommendedStay.name
+                  .toLowerCase()
+                  .includes(v.name.toLowerCase())
+              ) ||
+              allVillages.find(
+                (v) =>
+                  prevDay.recommendedStay.villageName &&
+                  v.name
+                    .toLowerCase()
+                    .includes(
+                      prevDay.recommendedStay.villageName.toLowerCase()
+                    )
+              ) ||
+              DESA_BY_ID.get(prevLastAct.villageId)
+            : DESA_BY_ID.get(prevLastAct.villageId);
+
+          const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
+          const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
+          const mornEst = estimateBaliTransit(
+            startLat,
+            startLng,
+            day.activities[0].lat,
+            day.activities[0].lng,
+            locale
+          );
+          minutes += mornEst.durationMinutes;
+          km += mornEst.roadDistanceKm;
+        }
+      }
+
+      // Kaki antar-titik hari berjalan
+      for (let i = 1; i < day.activities.length; i++) {
+        const segEst = estimateBaliTransit(
+          day.activities[i - 1].lat,
+          day.activities[i - 1].lng,
+          day.activities[i].lat,
+          day.activities[i].lng,
+          locale
+        );
+        minutes += segEst.durationMinutes;
+        km += segEst.roadDistanceKm;
+      }
+
+      // Kaki menuju homestay
+      if (day.recommendedStay && day.activities.length > 0) {
+        const lastAct = day.activities[day.activities.length - 1];
+        const stayVillage =
+          allVillages.find((v) =>
+            day.recommendedStay.name
+              .toLowerCase()
+              .includes(v.name.toLowerCase())
+          ) ||
+          allVillages.find(
+            (v) =>
+              day.recommendedStay.villageName &&
+              v.name
+                .toLowerCase()
+                .includes(day.recommendedStay.villageName.toLowerCase())
+          ) ||
+          DESA_BY_ID.get(lastAct.villageId);
+
+        const stayTargetLat = stayVillage ? stayVillage.lat : lastAct.lat;
+        const stayTargetLng = stayVillage ? stayVillage.lng : lastAct.lng;
+        const stayEst = estimateBaliTransit(
+          lastAct.lat,
+          lastAct.lng,
+          stayTargetLat,
+          stayTargetLng,
+          locale
+        );
+        minutes += stayEst.durationMinutes;
+        km += stayEst.roadDistanceKm;
+      }
+
+      // Hari terakhir: kaki kembali ke pintu kedatangan/keberangkatan
+      if (day.dayNumber === days.length && arrivalCoords) {
+        const lastAct = day.activities[day.activities.length - 1];
+        const retEst = estimateBaliTransit(
+          lastAct.lat,
+          lastAct.lng,
+          arrivalCoords[0],
+          arrivalCoords[1],
+          locale
+        );
+        minutes += retEst.durationMinutes;
+        km += retEst.roadDistanceKm;
+      }
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const durationFormatted =
+      hours > 0
+        ? locale === "en"
+          ? `${hours}h ${mins}m`
+          : `${hours}j ${mins}m`
+        : locale === "en"
+        ? `${mins} mins`
+        : `${mins} mnt`;
+
+    const distanceFormatted =
+      locale === "en"
+        ? `${km.toFixed(1)} km`
+        : `${km.toFixed(1).replace(".", ",")} km`;
+
+    return {
+      minutes,
+      km,
+      durationFormatted,
+      distanceFormatted,
+    };
+  }, [days, arrivalCoords, allVillages, locale]);
+
   return (
     <div className="space-y-6 sm:space-y-7">
+      {/* Banner Total Perjalanan Seluruh Rute */}
+      {tripTransitTotals.minutes > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-xs text-slate-700 dark:text-slate-300 print-avoid-break">
+          <div className="flex items-center gap-2">
+            <Car
+              className="w-4 h-4 text-[#EA580C] dark:text-[#FB923C] shrink-0"
+              aria-hidden="true"
+            />
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              {t.totalTripTransit(
+                tripTransitTotals.durationFormatted,
+                tripTransitTotals.distanceFormatted
+              )}
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+            {t.roadConditionNotice}
+          </span>
+        </div>
+      )}
+
       {selectedDayFilter !== null && (
         <div className="flex items-center justify-between bg-emerald-50/90 dark:bg-emerald-950/60 border border-emerald-900/15 dark:border-emerald-700/40 px-4 py-2.5 rounded-xl text-xs">
           <span className="text-slate-800 dark:text-slate-200 font-medium">
@@ -120,6 +284,44 @@ export default function ItineraryTimeline({
             totalDayTransitKm += gateEst.roadDistanceKm;
           }
 
+          // Hari 2+: Kaki transit pagi
+          if (day.dayNumber > 1 && day.activities.length > 0) {
+            const prevDay = days.find((d) => d.dayNumber === day.dayNumber - 1);
+            if (prevDay && prevDay.activities.length > 0) {
+              const prevLastAct =
+                prevDay.activities[prevDay.activities.length - 1];
+              const stayVillage = prevDay.recommendedStay
+                ? allVillages.find((v) =>
+                    prevDay.recommendedStay.name
+                      .toLowerCase()
+                      .includes(v.name.toLowerCase())
+                  ) ||
+                  allVillages.find(
+                    (v) =>
+                      prevDay.recommendedStay.villageName &&
+                      v.name
+                        .toLowerCase()
+                        .includes(
+                          prevDay.recommendedStay.villageName.toLowerCase()
+                        )
+                  ) ||
+                  DESA_BY_ID.get(prevLastAct.villageId)
+                : DESA_BY_ID.get(prevLastAct.villageId);
+
+              const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
+              const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
+              const mornEst = estimateBaliTransit(
+                startLat,
+                startLng,
+                day.activities[0].lat,
+                day.activities[0].lng,
+                locale
+              );
+              totalDayTransitMinutes += mornEst.durationMinutes;
+              totalDayTransitKm += mornEst.roadDistanceKm;
+            }
+          }
+
           for (let i = 1; i < day.activities.length; i++) {
             const segEst = estimateBaliTransit(
               day.activities[i - 1].lat,
@@ -160,6 +362,24 @@ export default function ItineraryTimeline({
             );
             totalDayTransitMinutes += stayEst.durationMinutes;
             totalDayTransitKm += stayEst.roadDistanceKm;
+          }
+
+          // Hari terakhir: kaki kembali ke pintu keberangkatan
+          if (
+            day.dayNumber === days.length &&
+            arrivalCoords &&
+            day.activities.length > 0
+          ) {
+            const lastAct = day.activities[day.activities.length - 1];
+            const retEst = estimateBaliTransit(
+              lastAct.lat,
+              lastAct.lng,
+              arrivalCoords[0],
+              arrivalCoords[1],
+              locale
+            );
+            totalDayTransitMinutes += retEst.durationMinutes;
+            totalDayTransitKm += retEst.roadDistanceKm;
           }
 
           const dailyTransitSummary =
@@ -243,6 +463,88 @@ export default function ItineraryTimeline({
                             ({gateTransit.formattedDistance})
                           </span>
                         </div>
+                        {gateTransit.isLongLeg && (
+                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
+                            <AlertTriangle
+                              className="w-3 h-3 text-amber-600 shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              {t.longLegWarning(gateTransit.formattedDuration)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                {/* Hari 2+: Kaki Transit Pagi dari Homestay Malam Sebelumnya */}
+                {day.dayNumber > 1 &&
+                  day.activities.length > 0 && (() => {
+                    const prevDay = days.find(
+                      (d) => d.dayNumber === day.dayNumber - 1
+                    );
+                    if (!prevDay || prevDay.activities.length === 0) return null;
+                    const prevLastAct =
+                      prevDay.activities[prevDay.activities.length - 1];
+                    const stayVillage = prevDay.recommendedStay
+                      ? allVillages.find((v) =>
+                          prevDay.recommendedStay.name
+                            .toLowerCase()
+                            .includes(v.name.toLowerCase())
+                        ) ||
+                        allVillages.find(
+                          (v) =>
+                            prevDay.recommendedStay.villageName &&
+                            v.name
+                              .toLowerCase()
+                              .includes(
+                                prevDay.recommendedStay.villageName.toLowerCase()
+                              )
+                        ) ||
+                        DESA_BY_ID.get(prevLastAct.villageId)
+                      : DESA_BY_ID.get(prevLastAct.villageId);
+
+                    const startLat = stayVillage ? stayVillage.lat : prevLastAct.lat;
+                    const startLng = stayVillage ? stayVillage.lng : prevLastAct.lng;
+                    const stayName =
+                      prevDay.recommendedStay?.name ||
+                      (stayVillage ? stayVillage.name : prevLastAct.villageName);
+
+                    const mornTransit = estimateBaliTransit(
+                      startLat,
+                      startLng,
+                      day.activities[0].lat,
+                      day.activities[0].lng,
+                      locale
+                    );
+
+                    return (
+                      <div className="relative py-1 print-avoid-break">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
+                          <Navigation
+                            className="w-3 h-3 text-[#0D4732] dark:text-emerald-400 shrink-0"
+                            aria-hidden="true"
+                          />
+                          <span>
+                            {t.morningTransitFromStay(stayName)}:{" "}
+                            <strong className="text-slate-800 dark:text-slate-100 font-semibold">
+                              {mornTransit.formattedDuration}
+                            </strong>{" "}
+                            ({mornTransit.formattedDistance})
+                          </span>
+                        </div>
+                        {mornTransit.isLongLeg && (
+                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
+                            <AlertTriangle
+                              className="w-3 h-3 text-amber-600 shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              {t.longLegWarning(mornTransit.formattedDuration)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
@@ -304,6 +606,19 @@ export default function ItineraryTimeline({
                               · {t.transitRoadEstimate}
                             </span>
                           </div>
+                          {transitFromPrev.isLongLeg && (
+                            <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
+                              <AlertTriangle
+                                className="w-3 h-3 text-amber-600 shrink-0"
+                                aria-hidden="true"
+                              />
+                              <span>
+                                {t.longLegWarning(
+                                  transitFromPrev.formattedDuration
+                                )}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -768,6 +1083,17 @@ export default function ItineraryTimeline({
                             ({stayTransit.formattedDistance})
                           </span>
                         </div>
+                        {stayTransit.isLongLeg && (
+                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
+                            <AlertTriangle
+                              className="w-3 h-3 text-amber-600 shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              {t.longLegWarning(stayTransit.formattedDuration)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
@@ -799,6 +1125,50 @@ export default function ItineraryTimeline({
                     </span>
                   </div>
                 )}
+
+                {/* Hari Terakhir: Kaki Transit Pulang Kembali ke Pintu Kedatangan/Keberangkatan */}
+                {day.dayNumber === days.length &&
+                  arrivalCoords &&
+                  day.activities.length > 0 && (() => {
+                    const lastAct = day.activities[day.activities.length - 1];
+                    const returnTransit = estimateBaliTransit(
+                      lastAct.lat,
+                      lastAct.lng,
+                      arrivalCoords[0],
+                      arrivalCoords[1],
+                      locale
+                    );
+                    return (
+                      <div className="relative py-2 print-avoid-break">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/90 dark:bg-[#16231c] border border-slate-200/80 dark:border-emerald-800/40 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-2xs">
+                          <Navigation
+                            className="w-3 h-3 text-[#EA580C] dark:text-[#FB923C] shrink-0 rotate-180"
+                            aria-hidden="true"
+                          />
+                          <span>
+                            {t.returnTransitToGate(arrivalLabel || "Ngurah Rai")}:{" "}
+                            <strong className="text-slate-800 dark:text-slate-100 font-semibold">
+                              {returnTransit.formattedDuration}
+                            </strong>{" "}
+                            ({returnTransit.formattedDistance})
+                          </span>
+                        </div>
+                        {returnTransit.isLongLeg && (
+                          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/40">
+                            <AlertTriangle
+                              className="w-3 h-3 text-amber-600 shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              {t.longLegWarning(
+                                returnTransit.formattedDuration
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
               </div>
             </section>
           );
