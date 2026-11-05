@@ -76,16 +76,42 @@ export const UI_TEXT = {
     spreadScoreTitle: "Indeks Pemerataan Wilayah",
     outsideSouthBali: "Luar Bali Selatan:",
     routeSuffix: "Rute",
-    lbiTitle: "Retensi Ekonomi Desa (LBI)",
+    lbiTitle: "Retensi Ekonomi Desa (Local Economic Retention, LBI)",
     lbiTarget: "Target ≥75%",
     lbiSub: "Homestay warga, koperasi & warung lokal",
     directSpendTitle: "Belanja Langsung ke Warga",
     totalEstPrefix: "Total estimasi:",
     bufferActive: (n: number) => `${n} Desa Penyangga Aktif`,
-    quotaSafe: "Kuota Kunjungan Aman",
+    quotaSafe: "Kapasitas Rencana Aman",
     simPdrbBtn: "Simulasi PDRB",
     regionalShareLabel: "Sebaran Wilayah:",
     openSimDashboard: "Buka Dashboard Simulasi Kabupaten",
+    assumptionBadge: "Estimasi berbasis asumsi",
+    howCalculatedBtn: "Bagaimana dihitung?",
+    formulaModalTitle: "Metodologi & Rumus Perhitungan",
+    formulaModalSubtitle:
+      "Transparansi model matematis deterministik Subak Spatial Engine",
+    formulaNotice:
+      "Semua skor, rasio retensi, dan estimasi belanja merupakan hasil pemodelan matematis berbasis bobot wilayah dan asumsi standar komponen wisata, bukan data sensor okupansi lapangan waktu-nyata.",
+    spreadScoreFormulaTitle: "1. Indeks Pemerataan Wilayah (Spread Score)",
+    spreadScoreFormulaMath:
+      "Spread Score = ( (1 / N) * Σ W(Kabupaten_i) ) * 100",
+    spreadScoreFormulaDesc:
+      "Mengukur sejauh mana rute mendistribusikan kunjungan ke luar kawasan wisata padat Bali Selatan (Sarbagita). Bobot kabupaten: W = 1.0 untuk Wilayah Prioritas (Buleleng, Karangasem, Bangli, Jembrana, Klungkung); W = 0.5 untuk Zona Transisi (Tabanan, Gianyar); W = 0.2 untuk Pusat Keramaian (Badung, Denpasar).",
+    lbiFormulaTitle: "2. Retensi Ekonomi Desa (Local Economic Retention, LBI)",
+    lbiFormulaMath:
+      "LBI = (Belanja Warga Lokal / Total Estimasi Belanja) * 100%",
+    lbiFormulaDesc:
+      "Mengukur persentase pengeluaran wisatawan yang langsung tinggal di desa wisata (akomodasi homestay warga, kuliner warung lokal/KWT, pemandu Pokdarwis, donasi/tiket koperasi desa). Target ≥75% bertujuan meminimalkan kebocoran ekonomi (economic leakage) ke luar desa (TODO-HUMAN: ambang 75% perlu diverifikasi dengan standar akademis pariwisata berkelanjutan atau Disparda Bali).",
+    directSpendFormulaTitle: "3. Belanja Langsung ke Warga (Direct Community Spend)",
+    directSpendFormulaDesc:
+      "Dihitung dari akumulasi tarif wajar komponen wisata desa di data desa wisata (akomodasi homestay Rp 150rb–350rb, kuliner lokal Rp 35rb–75rb, pemandu lokal Rp 100rb–250rb, donasi/tiket koperasi Rp 15rb–30rb per orang per hari). Total untuk rute dikalikan jumlah hari perjalanan.",
+    quotaFormulaTitle:
+      "4. Ambang Daya Dukung & Proteksi Kuota (Capacity Quota Guard)",
+    quotaFormulaDesc:
+      "Batas daya dukung harian desa untuk mencegah overtourism, ditentukan oleh kesiapan pengelola dan kapasitas fisik desa. Angka kuota (contoh: 85/hari) dan beban (contoh: 26/hari) dalam aplikasi adalah beban contoh dalam simulasi perencana, bukan sensor okupansi real-time lapangan. Jika beban simulasi mencapai ≥92%, rute secara otomatis dialihkan ke Desa Penyangga (Buffer Village) terdekat.",
+    quotaTooltip:
+      "Batas daya dukung harian desa untuk mencegah overtourism, ditentukan oleh kesiapan pengelola dan kapasitas fisik desa. Estimasi berbasis asumsi simulasi.",
     // Timeline
     showingDayFocus: (d: number) => `Menampilkan fokus rute Hari ${d}`,
     showAllDays: (total: number) => `Tampilkan Semua Hari (${total}H)`,
@@ -108,7 +134,7 @@ export const UI_TEXT = {
     nightSuffix: "/malam",
     arrivalPopupLabel: "Pintu Kedatangan",
     spendToLocals: "Belanja ke Warga:",
-    quotaFilled: (pct: number) => `Kuota: ${pct}% Terisi`,
+    quotaFilled: (pct: number) => `Kapasitas terpakai: ${pct}% (simulasi)`,
     awigAwigPrefix: "Awig-Awig Desa:",
     prevStopLabel: "Destinasi sebelumnya",
     nextStopLabel: "Destinasi berikutnya",
@@ -252,10 +278,35 @@ export const UI_TEXT = {
     directSpendTitle: "Direct Community Spend",
     totalEstPrefix: "Total est. trip:",
     bufferActive: (n: number) => `${n} Buffer Village Redirects`,
-    quotaSafe: "Within Daily Quota",
+    quotaSafe: "Within Planned Capacity",
     simPdrbBtn: "GDP Simulation",
     regionalShareLabel: "Regional Share:",
     openSimDashboard: "Open Regency Impact Dashboard",
+    assumptionBadge: "Assumption-based estimate",
+    howCalculatedBtn: "How is this calculated?",
+    formulaModalTitle: "Calculation Formulas & Methodology",
+    formulaModalSubtitle:
+      "Mathematical transparency for the Subak Spatial Engine deterministic model",
+    formulaNotice:
+      "All scores, retention ratios, and spend estimates are mathematical model outputs based on regional weights and standard tourism component assumptions, not real-time live field sensor data.",
+    spreadScoreFormulaTitle: "1. Regional Spread Score",
+    spreadScoreFormulaMath:
+      "Spread Score = ( (1 / N) * Σ W(Regency_i) ) * 100",
+    spreadScoreFormulaDesc:
+      "Measures how effectively the route distributes tourism outside congested South Bali (Sarbagita). Regency weights: W = 1.0 for Priority Regencies (Buleleng, Karangasem, Bangli, Jembrana, Klungkung); W = 0.5 for Transition Zones (Tabanan, Gianyar); W = 0.2 for Core Hubs (Badung, Denpasar).",
+    lbiFormulaTitle: "2. Local Economic Retention (LBI)",
+    lbiFormulaMath:
+      "LBI = (Direct Local Community Spend / Total Estimated Trip Spend) * 100%",
+    lbiFormulaDesc:
+      "Measures the percentage of tourist spending directly retained by village residents (village homestays, local warung dining, Pokdarwis guides, cooperative/BUMDes entry tickets). The ≥75% target aims to minimize economic leakage outside rural villages (TODO-HUMAN: verify 75% target benchmark against sustainable tourism literature or Bali Tourism Board standards).",
+    directSpendFormulaTitle: "3. Direct Community Spend",
+    directSpendFormulaDesc:
+      "Calculated from the cumulative fair-rate components in the village dataset (homestay Rp 150k–350k, local warung meals Rp 35k–75k, local guides Rp 100k–250k, cooperative entry Rp 15k–30k per person per day), multiplied across trip days.",
+    quotaFormulaTitle: "4. Carrying Capacity Limit & Quota Guard",
+    quotaFormulaDesc:
+      "Daily carrying capacity limit to prevent overtourism, determined by management readiness and physical village capacity. Quota figures (e.g. 85/day) and load figures (e.g. 26/day) are illustrative simulation loads in the planner, not real-time live sensor data. When simulated load reaches ≥92%, the itinerary automatically redirects to the nearest Buffer Village.",
+    quotaTooltip:
+      "Daily carrying capacity limit to prevent overtourism, determined by management readiness and physical village capacity. Assumption-based simulation estimate.",
     // Timeline
     showingDayFocus: (d: number) => `Showing focused route for Day ${d}`,
     showAllDays: (total: number) => `Show All Days (${total}D)`,
@@ -278,7 +329,7 @@ export const UI_TEXT = {
     nightSuffix: "/night",
     arrivalPopupLabel: "Arrival Gate",
     spendToLocals: "Community Spend:",
-    quotaFilled: (pct: number) => `Quota: ${pct}% Filled`,
+    quotaFilled: (pct: number) => `Capacity used: ${pct}% (simulated)`,
     awigAwigPrefix: "Village Awig-Awig:",
     prevStopLabel: "Previous village stop",
     nextStopLabel: "Next village stop",

@@ -144,9 +144,14 @@ export default function GovernmentBar({
         </div>
 
         <div className="p-4 rounded-xl bg-[#0D261C] dark:bg-[#12281e] dark:border dark:border-emerald-500/30 text-white space-y-1">
-          <div className="text-xs font-medium text-emerald-300 flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t.ecoRouteAllocTitle}</span>
+          <div className="text-xs font-medium text-emerald-300 flex items-center justify-between gap-1.5">
+            <span className="flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{t.ecoRouteAllocTitle}</span>
+            </span>
+            <span className="text-[10px] font-mono text-emerald-300/70">
+              {t.assumptionBadge}
+            </span>
           </div>
           <div className="text-2xl font-display font-extrabold text-white font-mono tabular-nums">
             {prioritySharePct}%
@@ -157,9 +162,14 @@ export default function GovernmentBar({
         </div>
 
         <div className="p-4 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-900/15 dark:border-emerald-800/40 space-y-1">
-          <div className="text-xs font-medium text-[#0D4732] dark:text-emerald-300 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t.econInjectionTitle(cohortFormatted)}</span>
+          <div className="text-xs font-medium text-[#0D4732] dark:text-emerald-300 flex items-center justify-between gap-1.5">
+            <span className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{t.econInjectionTitle(cohortFormatted)}</span>
+            </span>
+            <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+              {t.assumptionBadge}
+            </span>
           </div>
           <div className="text-2xl font-display font-extrabold text-[#0D4732] dark:text-emerald-400 font-mono tabular-nums">
             {formatCompactCurrency(projectedTotalRetained, locale)}

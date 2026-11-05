@@ -34,4 +34,21 @@ Dokumen ini mencatat setiap keputusan arsitektural dan teknis yang diambil selam
   6. Label perbandingan diperjelas menjadi "Porsi PDRB (Status Quo)" vs "Porsi Belanja Rute (Ilustrasi)".
   7. Ditambahkan disclaimer eksplisit untuk pengali kohort wisatawan: pengali 1.000, 10.000, 50.000 mengasumsikan pola belanja identik tanpa memperhitungkan kendala kapasitas fisik desa.
 
+---
+
+## [2026-11-05] T4: Label Estimasi, Penjelasan Rumus, dan Istilah Transparan
+- **Konteks:** Angka metrik (Spread Score, Local Retention, Direct Spend) berpotensi disalahpahami sebagai hasil pengukuran real-time di lapangan. Format lama "26/85 wisatawan/hari" tampak seperti data sensor/okupansi live. Istilah LBI dan target ≥75% belum dijelaskan secara transparan.
+- **Keputusan:**
+  1. **Badge Estimasi Asumsi:** Menambahkan label tegas "Estimasi berbasis asumsi" / "Assumption-based estimate" pada kartu ringkasan skor rute (`TelemetryCards`), dashboard simulasi (`GovernmentBar`), dan bar kapasitas desa.
+  2. **Modal Transparansi Rumus (`CalculationFormulasModal`):** Menyediakan tombol "Bagaimana dihitung?" / "How is this calculated?" yang membuka modal penjelasan matematis lengkap untuk:
+     - Spread Score: bobot wilayah (Prioritas = 1.0, Transisi = 0.5, Inti Sarbagita = 0.2).
+     - Local Economic Retention (LBI): rasio pengeluaran homestay, warung, pemandu lokal, tiket koperasi terhadap total estimasi belanja. Target ≥75% dijelaskan sebagai acuan meminimalkan kebocoran ekonomi (*economic leakage*) dengan penanda `TODO-HUMAN` untuk verifikasi akademis/Disparda.
+     - Direct Community Spend: dasar perhitungan akumulasi tarif wajar komponen wisata desa per hari per orang.
+     - Ambang Daya Dukung & Proteksi Kuota: definisi daya dukung desa untuk mencegah overtourism, penegasan bahwa beban adalah beban simulasi contoh tanpa sensor IoT live.
+  3. **Penyesuaian Istilah Kuota & LBI:**
+     - LBI diperluas menjadi: "Retensi Ekonomi Desa (Local Economic Retention, LBI)".
+     - "26/85 wisatawan/hari" diubah menjadi format simulasi jujur: "Kapasitas rencana: 85/hari (simulasi beban: 26/hari · 31%)" dan "Kapasitas terpakai: 31% (simulasi)".
+     - Menambahkan tooltip penjelasan definisi ambang daya dukung harian desa pada elemen kapasitas.
+
+
 

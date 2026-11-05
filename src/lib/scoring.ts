@@ -294,11 +294,11 @@ export function applyAntiOvertourismCapacityGuard(
             localUmkmSpot: bufferVillage.localUmkm,
             capacityStatus: "REDIRECTED_BUFFER" as const,
             originalSaturatedVillage: village.name,
-            antiOvertourismNote: `Kuota harian ${village.name} mencapai ${pct}% (${load}/${quota} wisatawan). Rute digeser ke Desa Penyangga ${bufferVillage.name} (${Math.round(
+            antiOvertourismNote: `Beban simulasi ${village.name} mencapai ${pct}% (${load}/${quota}/hari). Rute digeser ke Desa Penyangga ${bufferVillage.name} (${Math.round(
               ((bufferVillage.currentSimulatedLoad || 25) /
                 (bufferVillage.dailyQuota || 90)) *
                 100
-            )}% kapasitas) untuk menjaga kenyamanan kunjungan.`,
+            )}% kapasitas simulasi) untuk mencegah overtourism.`,
           };
         }
       }

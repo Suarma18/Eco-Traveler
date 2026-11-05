@@ -200,3 +200,43 @@ test("GDP baseline shares cover all 9 regencies/cities in Bali and sum to 100%",
     gdpData.regencies.Tabanan.value;
   assert.equal(Math.round(sarbagitaSum * 100) / 100, 65.88);
 });
+
+test("T4: Estimation labels, formulas transparency, and honest capacity terminology are present", () => {
+  const i18nContent = fs.readFileSync(
+    path.resolve("src/lib/i18n.ts"),
+    "utf8"
+  );
+
+  // Verify assumption badges and formula transparency keys in i18n
+  assert.ok(
+    i18nContent.includes("assumptionBadge:"),
+    "i18n must include assumptionBadge"
+  );
+  assert.ok(
+    i18nContent.includes("howCalculatedBtn:"),
+    "i18n must include howCalculatedBtn"
+  );
+  assert.ok(
+    i18nContent.includes("formulaModalTitle:"),
+    "i18n must include formulaModalTitle"
+  );
+  assert.ok(
+    i18nContent.includes("Retensi Ekonomi Desa (Local Economic Retention, LBI)"),
+    "i18n must include expanded LBI terminology"
+  );
+  assert.ok(
+    i18nContent.includes("Kapasitas terpakai:"),
+    "i18n quota text must indicate simulation rather than live occupancy"
+  );
+
+  // Verify village-media.ts does not use raw live visitor counts without simulation label
+  const villageMediaContent = fs.readFileSync(
+    path.resolve("src/lib/village-media.ts"),
+    "utf8"
+  );
+  assert.ok(
+    villageMediaContent.includes("simulasi beban:") ||
+      villageMediaContent.includes("simulated:"),
+    "village-media must clearly label capacity as simulated load"
+  );
+});

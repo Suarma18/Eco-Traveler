@@ -433,7 +433,10 @@ export default function ItineraryTimeline({
                               )}
 
                               <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-slate-400 tabular-nums">
+                                <div
+                                  className="flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-slate-400 tabular-nums"
+                                  title={t.quotaTooltip}
+                                >
                                   <Users
                                     className="w-3 h-3 text-[#0D4732] dark:text-emerald-400"
                                     aria-hidden="true"

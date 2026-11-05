@@ -1029,7 +1029,10 @@ export default function LeafletMap({
                           <Mountain className="w-2.5 h-2.5" aria-hidden="true" />
                           {activeVisualMeta.elevationLabel}
                         </span>
-                        <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
+                        <span
+                          className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums"
+                          title={t.quotaTooltip}
+                        >
                           {t.quotaFilled(activeVisualMeta.quotaPercentage)}
                         </span>
                         {activeTransitEstimate && (
