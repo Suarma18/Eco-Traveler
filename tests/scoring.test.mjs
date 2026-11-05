@@ -65,3 +65,109 @@ test("Currency conversion converts IDR to USD accurately for English mode", () =
   const spendUsd = Math.round(spendRp / USD_EXCHANGE_RATE);
   assert.equal(spendUsd, 20);
 });
+
+function calculateHaversineDistanceKm(lat1, lon1, lat2, lon2) {
+  if (lat1 === lat2 && lon1 === lon2) return 0;
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function estimateBaliTransit(fromLat, fromLng, toLat, toLng, locale = "id") {
+  const straight = calculateHaversineDistanceKm(fromLat, fromLng, toLat, toLng);
+  const roadKm = Math.max(0.5, Math.round(straight * 1.38 * 10) / 10);
+  const durationMinutes = Math.max(10, Math.round((roadKm / 35) * 60) + 5);
+  let formattedDuration =
+    durationMinutes < 60
+      ? locale === "en"
+        ? `${durationMinutes} mins`
+        : `${durationMinutes} mnt`
+      : locale === "en"
+      ? `${Math.floor(durationMinutes / 60)}h ${durationMinutes % 60}m`
+      : `${Math.floor(durationMinutes / 60)}j ${durationMinutes % 60}m`;
+  const formattedDistance =
+    locale === "en"
+      ? `${roadKm.toFixed(1)} km`
+      : `${roadKm.toFixed(1).replace(".", ",")} km`;
+  return { roadKm, durationMinutes, formattedDuration, formattedDistance };
+}
+
+test("Transit calculation estimates realistic travel duration and distance in Bali", () => {
+  // Bandara Ngurah Rai (-8.7467, 115.1668) ke Desa Sedang (-8.5321, 115.2289)
+  const transitId = estimateBaliTransit(
+    -8.7467,
+    115.1668,
+    -8.5321,
+    115.2289,
+    "id"
+  );
+  assert.ok(
+    transitId.roadKm > 20 && transitId.roadKm < 45,
+    "Road km should be between 20 and 45 km"
+  );
+  assert.ok(
+    transitId.durationMinutes > 35 && transitId.durationMinutes < 80,
+    "Duration should be between 35 and 80 mins"
+  );
+  assert.match(transitId.formattedDistance, /km$/);
+  assert.match(transitId.formattedDuration, /(mnt|j)/);
+
+  const transitEn = estimateBaliTransit(
+    -8.7467,
+    115.1668,
+    -8.5321,
+    115.2289,
+    "en"
+  );
+  assert.match(transitEn.formattedDuration, /(mins|h)/);
+});
+
+test("All 28 villages have curated accommodations and nearby attractions with valid coordinates and properties", () => {
+  for (const v of desaDataset) {
+    assert.ok(
+      Array.isArray(v.accommodations) && v.accommodations.length > 0,
+      `Village ${v.id} must have accommodations`
+    );
+    for (const stay of v.accommodations) {
+      assert.ok(stay.id, `Stay in ${v.id} missing id`);
+      assert.ok(stay.name, `Stay in ${v.id} missing name`);
+      assert.ok(stay.pricePerNightRp > 0, `Stay in ${v.id} price must be > 0`);
+      assert.ok(
+        stay.lat < -8.0 && stay.lat > -8.9,
+        `Invalid stay lat for ${stay.id}`
+      );
+      assert.ok(
+        stay.lng > 114.4 && stay.lng < 115.8,
+        `Invalid stay lng for ${stay.id}`
+      );
+    }
+
+    assert.ok(
+      Array.isArray(v.nearbyAttractions) && v.nearbyAttractions.length > 0,
+      `Village ${v.id} must have nearby attractions`
+    );
+    for (const poi of v.nearbyAttractions) {
+      assert.ok(poi.id, `POI in ${v.id} missing id`);
+      assert.ok(poi.name, `POI in ${v.id} missing name`);
+      assert.ok(poi.category, `POI in ${v.id} missing category`);
+      assert.ok(poi.distanceKm > 0, `POI in ${v.id} distance must be > 0`);
+      assert.ok(poi.durationMinutes > 0, `POI in ${v.id} duration must be > 0`);
+      assert.ok(
+        poi.lat < -8.0 && poi.lat > -8.9,
+        `Invalid POI lat for ${poi.id}`
+      );
+      assert.ok(
+        poi.lng > 114.4 && poi.lng < 115.8,
+        `Invalid POI lng for ${poi.id}`
+      );
+    }
+  }
+});

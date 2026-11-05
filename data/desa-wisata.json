@@ -6,7 +6,10 @@
     "zone": "North",
     "lat": -8.1456,
     "lng": 114.6542,
-    "focus": ["Nature", "Wellness"],
+    "focus": [
+      "Nature",
+      "Wellness"
+    ],
     "highlights": "Konservasi Terumbu Karang Biorock, Snorkeling Ramah Lingkungan",
     "avgHomestayPrice": 250000,
     "localUmkm": "Warung Pesisir Organik, Kelompok Tani Garam Pemuteran",
@@ -16,7 +19,130 @@
     "dailyQuota": 120,
     "currentSimulatedLoad": 68,
     "bufferVillageId": "desa-pejarakan",
-    "elevationMeters": 12
+    "elevationMeters": 12,
+    "accommodations": [
+      {
+        "id": "stay-pemuteran-1",
+        "name": "Pondok Sari Beach Homestay",
+        "nameEn": "Pondok Sari Beach Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 250000,
+        "lat": -8.1448,
+        "lng": 114.656,
+        "features": [
+          "Pesisir Pantai Biorock",
+          "Sarapan Ikan Bakar Organik",
+          "Dikelola Keluarga Nelayan"
+        ],
+        "featuresEn": [
+          "Biorock Beachfront",
+          "Organic Grilled Fish Breakfast",
+          "Family Run"
+        ],
+        "bookingNote": "Termasuk peminjaman alat snorkeling dari pokdarwis setempat.",
+        "bookingNoteEn": "Includes snorkeling gear rental from local tourism board."
+      },
+      {
+        "id": "stay-pemuteran-2",
+        "name": "Taman Sari Eco-Lodge",
+        "nameEn": "Taman Sari Eco-Lodge",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 420000,
+        "lat": -8.1465,
+        "lng": 114.6515,
+        "features": [
+          "Arsitektur Bambu & Batu Alam",
+          "Kolam Air Asin Alami",
+          "Kebun Sayur Permakultur"
+        ],
+        "featuresEn": [
+          "Bamboo & Natural Stone Architecture",
+          "Natural Saltwater Pool",
+          "Permaculture Garden"
+        ],
+        "bookingNote": "100% limbah air disaring dengan rawa buatan ekologis.",
+        "bookingNoteEn": "100% greywater filtered via eco constructed wetlands."
+      },
+      {
+        "id": "stay-pemuteran-3",
+        "name": "Biorock Bamboo Retreat",
+        "nameEn": "Biorock Bamboo Retreat",
+        "type": "Bamboo Villa",
+        "pricePerNightRp": 350000,
+        "lat": -8.148,
+        "lng": 114.653,
+        "features": [
+          "View Perbukitan & Teluk",
+          "Bambu Petung Ramah Lingkungan",
+          "Tenang & Privat"
+        ],
+        "featuresEn": [
+          "Bay & Hill Views",
+          "Eco Bamboo Construction",
+          "Quiet & Private"
+        ],
+        "bookingNote": "Dapur komunitas bersama menggunakan bumbu kebun desa.",
+        "bookingNoteEn": "Shared community kitchen using garden ingredients."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-pemuteran-1",
+        "name": "Konservasi Terumbu Karang Biorock",
+        "nameEn": "Biorock Coral Reef Sanctuary",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.3,
+        "durationMinutes": 4,
+        "lat": -8.1435,
+        "lng": 114.655,
+        "description": "Pusat restorasi karang buatan bertenaga listrik mikro terluas di dunia yang memulihkan habitat penyu dan ikan karang.",
+        "descriptionEn": "World's largest micro-current coral reef restoration sanctuary reviving sea turtle and reef fish habitats.",
+        "highlights": "Snorkeling Karang Elektris & Edukasi Kelautan",
+        "highlightsEn": "Electric Reef Snorkeling & Marine Education"
+      },
+      {
+        "id": "poi-pemuteran-2",
+        "name": "Bukit Batu Kursi Viewpoint",
+        "nameEn": "Batu Kursi Hill Viewpoint",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.8,
+        "durationMinutes": 8,
+        "lat": -8.152,
+        "lng": 114.662,
+        "description": "Bukit savana hijau dengan tangga batu menuju puncak kuil kuno dengan panorama Teluk Pemuteran dan Laut Bali utara.",
+        "descriptionEn": "Green savannah ridge with stone stairs leading to a sacred hilltop shrine with panoramic bay views.",
+        "highlights": "Golden Hour Trekking & Panorama Teluk",
+        "highlightsEn": "Golden Hour Trekking & Bay Panorama"
+      },
+      {
+        "id": "poi-pemuteran-3",
+        "name": "Pura Pulaki & Pura Melanting Pesisir",
+        "nameEn": "Pulaki & Melanting Coastal Temples",
+        "category": "Pura & Budaya",
+        "distanceKm": 3.2,
+        "durationMinutes": 7,
+        "lat": -8.1472,
+        "lng": 114.6795,
+        "description": "Kompleks pura tebing laut bersejarah dengan komunitas kera suci dan pemandangan selat yang dramatis.",
+        "descriptionEn": "Historic sea-cliff temple complex home to sacred monkeys and dramatic coastal vistas.",
+        "highlights": "Cagar Pura Laut & Arsitektur Batu Hitam",
+        "highlightsEn": "Sacred Marine Shrine & Black Stone Architecture"
+      },
+      {
+        "id": "poi-pemuteran-4",
+        "name": "Pemandian Air Panas Banyuwedang",
+        "nameEn": "Banyuwedang Natural Hot Springs",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 6.8,
+        "durationMinutes": 14,
+        "lat": -8.136,
+        "lng": 114.598,
+        "description": "Mata air panas belerang alami di perbatasan hutan mangrove yang diyakini warga memiliki khasiat menyegarkan tubuh.",
+        "descriptionEn": "Natural thermal sulphur springs bordering mangrove forests renowned for restorative bathing.",
+        "highlights": "Relaksasi Pemandian Belerang Alami",
+        "highlightsEn": "Natural Thermal Sulphur Bathing"
+      }
+    ]
   },
   {
     "id": "desa-sudaji",
@@ -25,7 +151,11 @@
     "zone": "North",
     "lat": -8.1925,
     "lng": 115.1481,
-    "focus": ["Culture", "Agriculture", "Culinary"],
+    "focus": [
+      "Culture",
+      "Agriculture",
+      "Culinary"
+    ],
     "highlights": "Hutan Belajar Budaya, Sistem Pertanian Alami Kuno Gandameru",
     "avgHomestayPrice": 220000,
     "localUmkm": "Kopi Sudaji Tradisional, Gula Aren Arenan, Durian Kani",
@@ -35,7 +165,95 @@
     "dailyQuota": 90,
     "currentSimulatedLoad": 42,
     "bufferVillageId": "desa-ambengan",
-    "elevationMeters": 450
+    "elevationMeters": 450,
+    "accommodations": [
+      {
+        "id": "stay-sudaji-1",
+        "name": "Sudaji Eco-Village Homestay",
+        "nameEn": "Sudaji Eco-Village Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 220000,
+        "lat": -8.1915,
+        "lng": 115.1495,
+        "features": [
+          "Pekarangan Tradisional Bali",
+          "Kelas Masak Sayur Pakis Hutan",
+          "Dikelola Tetua Subak"
+        ],
+        "featuresEn": [
+          "Traditional Balinese Compound",
+          "Jungle Fern Cooking Class",
+          "Subak Elder Run"
+        ],
+        "bookingNote": "Termasuk pemandu warga untuk tur keliling sawah subak.",
+        "bookingNoteEn": "Includes local resident guide for village rice terrace walks."
+      },
+      {
+        "id": "stay-sudaji-2",
+        "name": "Pondok Kopi Gandameru",
+        "nameEn": "Gandameru Coffee Cottage",
+        "type": "Pondok Desa",
+        "pricePerNightRp": 290000,
+        "lat": -8.194,
+        "lng": 115.146,
+        "features": [
+          "Kebun Kopi Robusta Organik",
+          "View Lembah Hijau Buleleng",
+          "Bale Baca Kopi"
+        ],
+        "featuresEn": [
+          "Organic Robusta Coffee Farm",
+          "Green Valley Vista",
+          "Coffee Reading Gazebo"
+        ],
+        "bookingNote": "Menyediakan seduh kopi petik merah segar tiap pagi.",
+        "bookingNoteEn": "Serves fresh red-cherry drip brew every morning."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-sudaji-1",
+        "name": "Hutan Lindung Belajar Budaya Gandameru",
+        "nameEn": "Gandameru Cultural Learning Forest",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.1,
+        "durationMinutes": 6,
+        "lat": -8.196,
+        "lng": 115.144,
+        "description": "Kawasan kanopi hutan adat yang menjadi laboratorium alam konservasi pohon langka dan tanaman obat usada Bali.",
+        "descriptionEn": "Sacred indigenous forest canopy serving as a living classroom for rare flora and traditional Usada healing plants.",
+        "highlights": "Jalur Edukasi Tanaman Obat & Forest Bathing",
+        "highlightsEn": "Medicinal Plant Trail & Forest Bathing"
+      },
+      {
+        "id": "poi-sudaji-2",
+        "name": "Sistem Subak Kuno & Sawah Gandameru",
+        "nameEn": "Ancient Subak & Gandameru Terraces",
+        "category": "Agrowisata",
+        "distanceKm": 0.6,
+        "durationMinutes": 4,
+        "lat": -8.1905,
+        "lng": 115.151,
+        "description": "Saluran irigasi batu kuno yang mengalirkan air dari mata air pegunungan tanpa pupuk kimia.",
+        "descriptionEn": "Stone aqueducts channeling pristine mountain springwater into heirloom chemical-free paddy fields.",
+        "highlights": "Jelajah Pematang Sawah & Air Mancur Alami",
+        "highlightsEn": "Terrace Ridge Trek & Mountain Aqueduct"
+      },
+      {
+        "id": "poi-sudaji-3",
+        "name": "Pura Dalem Gandameru Sudaji",
+        "nameEn": "Pura Dalem Gandameru Shrine",
+        "category": "Pura & Budaya",
+        "distanceKm": 1.5,
+        "durationMinutes": 7,
+        "lat": -8.188,
+        "lng": 115.145,
+        "description": "Pura kuno dengan relief ukiran batu padas bertema harmoni manusia dengan alam lebat perbukitan.",
+        "descriptionEn": "Ancient sanctuary adorned with sandstone bas-reliefs celebrating human harmony with highland ecosystems.",
+        "highlights": "Ukiran Padas Kuno & Suasana Meditatif",
+        "highlightsEn": "Ancient Sandstone Bas-Reliefs & Quiet Atmosphere"
+      }
+    ]
   },
   {
     "id": "desa-sidemen",
@@ -44,7 +262,11 @@
     "zone": "East",
     "lat": -8.4872,
     "lng": 115.4419,
-    "focus": ["Culture", "Nature", "Wellness"],
+    "focus": [
+      "Culture",
+      "Nature",
+      "Wellness"
+    ],
     "highlights": "Lembah Bukit Hijau, Tenun Tradisional Endek & Songket Alami",
     "avgHomestayPrice": 300000,
     "localUmkm": "Perajin Tenun Khas Sidemen, Arak Bali Tradisional Legal",
@@ -54,7 +276,116 @@
     "dailyQuota": 110,
     "currentSimulatedLoad": 74,
     "bufferVillageId": "desa-muncan",
-    "elevationMeters": 520
+    "elevationMeters": 520,
+    "accommodations": [
+      {
+        "id": "stay-sidemen-1",
+        "name": "Pondok Tenun Endek Homestay",
+        "nameEn": "Pondok Tenun Endek Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 300000,
+        "lat": -8.486,
+        "lng": 115.4435,
+        "features": [
+          "Workshop Tenun Tradisional",
+          "View Lembah Gunung Agung",
+          "Kopi Rempah Warga"
+        ],
+        "featuresEn": [
+          "Traditional Weaving Loom",
+          "Mt. Agung Valley View",
+          "Local Spiced Coffee"
+        ],
+        "bookingNote": "Tamu dapat mencoba alat tenun cagcag bersama ibu-ibu perajin.",
+        "bookingNoteEn": "Guests can try traditional cagcag backstrap looms with local weavers."
+      },
+      {
+        "id": "stay-sidemen-2",
+        "name": "Samanvaya Eco-Lodge Sidemen",
+        "nameEn": "Samanvaya Eco-Lodge Sidemen",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 580000,
+        "lat": -8.4895,
+        "lng": 115.439,
+        "features": [
+          "Bambu Alami Terbuka",
+          "Panorama Hamparan Subak",
+          "Bebas Plastik Sekali Pakai"
+        ],
+        "featuresEn": [
+          "Open-Air Bamboo Suites",
+          "Subak Ricefield Panorama",
+          "Zero Single-Use Plastic"
+        ],
+        "bookingNote": "Memperkerjakan 95% pemuda lokal desa Sidemen.",
+        "bookingNoteEn": "Employs 95% local youth from Sidemen village."
+      },
+      {
+        "id": "stay-sidemen-3",
+        "name": "Subak Tabola Bamboo Stay",
+        "nameEn": "Subak Tabola Bamboo Stay",
+        "type": "Bamboo Villa",
+        "pricePerNightRp": 420000,
+        "lat": -8.484,
+        "lng": 115.445,
+        "features": [
+          "Dikelilingi Aliran Sungai Alami",
+          "Balkon Menghadap Padi",
+          "Menu Vegetarian Organik"
+        ],
+        "featuresEn": [
+          "River Stream Frontage",
+          "Terrace Facing Balcony",
+          "Organic Vegetarian Dining"
+        ],
+        "bookingNote": "Air minum disaring dari mata air bukit setempat.",
+        "bookingNoteEn": "Drinking water drawn from local hill springs."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-sidemen-1",
+        "name": "Bukit Cinta Sidemen Viewpoint",
+        "nameEn": "Bukit Cinta Mt. Agung Viewpoint",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.4,
+        "durationMinutes": 8,
+        "lat": -8.472,
+        "lng": 115.448,
+        "description": "Titik pandang terbaik untuk menyaksikan siluet Gunung Agung dan hamparan sawah berselimut kabut pagi.",
+        "descriptionEn": "Premier vista spot to witness Mount Agung rising majestic over mist-shrouded morning valleys.",
+        "highlights": "Sunrise View Gunung Agung & Sawah Lembah",
+        "highlightsEn": "Sunrise Mt. Agung & Valley Panorama"
+      },
+      {
+        "id": "poi-sidemen-2",
+        "name": "Jembatan Kuning Sidemen & Aliran Sungai",
+        "nameEn": "Sidemen Yellow Bridge & River Walk",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.1,
+        "durationMinutes": 5,
+        "lat": -8.4855,
+        "lng": 115.438,
+        "description": "Jembatan gantung ikonik yang menghubungkan dusun di seberang sungai berbatu dengan suasana pedesaan yang hening.",
+        "descriptionEn": "Iconic yellow suspension footbridge connecting village hamlets across rocky streams.",
+        "highlights": "Jalan Kaki Pesisir Sungai & Suasana Asri",
+        "highlightsEn": "River Walk & Serene Countryside"
+      },
+      {
+        "id": "poi-sidemen-3",
+        "name": "Sentra Tenun Endek & Pewarna Alami Griya",
+        "nameEn": "Griya Natural Dye Weaving Workshop",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.5,
+        "durationMinutes": 3,
+        "lat": -8.487,
+        "lng": 115.441,
+        "description": "Pusat tenun ikat tradisional yang menggunakan pewarna alami dari daun tarum, kulit pohon secang, dan kunyit.",
+        "descriptionEn": "Living atelier where weavers craft delicate textiles using indigo leaves, sappanwood, and turmeric extracts.",
+        "highlights": "Proses Tenun Ikat Cagcag & Pewarna Daun Alami",
+        "highlightsEn": "Traditional Loom Weaving & Natural Botanical Dyes"
+      }
+    ]
   },
   {
     "id": "desa-penglipuran",
@@ -63,7 +394,11 @@
     "zone": "Central-North",
     "lat": -8.4522,
     "lng": 115.3567,
-    "focus": ["Culture", "Nature", "Culinary"],
+    "focus": [
+      "Culture",
+      "Nature",
+      "Culinary"
+    ],
     "highlights": "Tata Ruang Desa Terbersih di Dunia, Hutan Bambu Lindung",
     "avgHomestayPrice": 280000,
     "localUmkm": "Minuman Loloh Cemcem Tradisional, Kue Tipat Cantok Warga",
@@ -73,7 +408,95 @@
     "dailyQuota": 150,
     "currentSimulatedLoad": 148,
     "bufferVillageId": "desa-undisan",
-    "elevationMeters": 630
+    "elevationMeters": 630,
+    "accommodations": [
+      {
+        "id": "stay-penglipuran-1",
+        "name": "Penglipuran Traditional Compound Homestay",
+        "nameEn": "Penglipuran Traditional Compound Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 280000,
+        "lat": -8.4518,
+        "lng": 115.357,
+        "features": [
+          "Arsitektur Angkul-Angkul Asli",
+          "Tinggal Bersama Keluarga Adat",
+          "Sarapan Loloh Cemcem & Ubi"
+        ],
+        "featuresEn": [
+          "Authentic Angkul-Angkul Gateways",
+          "Live with Local Host Family",
+          "Herbal Loloh Drink & Sweet Potato"
+        ],
+        "bookingNote": "Akses eksklusif menikmati lorong desa yang sunyi saat pagi dan malam hari.",
+        "bookingNoteEn": "Exclusive access to experience the tranquil village lane at dawn and dusk."
+      },
+      {
+        "id": "stay-penglipuran-2",
+        "name": "Bale Bambu Warga Pokdarwis",
+        "nameEn": "Pokdarwis Bamboo Cottage",
+        "type": "Pondok Desa",
+        "pricePerNightRp": 240000,
+        "lat": -8.453,
+        "lng": 115.3555,
+        "features": [
+          "Dinding Bambu Anyam Halus",
+          "Dekat Pintu Hutan Bambu",
+          "Dukungan Koperasi Desa"
+        ],
+        "featuresEn": [
+          "Handwoven Bamboo Walls",
+          "Steps from Bamboo Forest",
+          "Village Cooperative Owned"
+        ],
+        "bookingNote": "Hasil sewa kamar 100% dialokasikan untuk pemeliharaan desa adat.",
+        "bookingNoteEn": "100% of room revenues fund customary village conservation."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-penglipuran-1",
+        "name": "Hutan Bambu Suci Adat Penglipuran",
+        "nameEn": "Penglipuran Sacred Bamboo Forest",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 0.3,
+        "durationMinutes": 3,
+        "lat": -8.4485,
+        "lng": 115.3575,
+        "description": "Hutan bambu seluas 45 hektar yang dirawat turun-temurun sebagai kawasan resapan air dan penyeimbang tata ruang desa.",
+        "descriptionEn": "Protected 45-hectare bamboo canopy conserved across generations as water catchment and ecological shield.",
+        "highlights": "Jalur Kanopi Bambu Sejuk & Sepeda Santai",
+        "highlightsEn": "Cool Bamboo Canopy Walk & Cycling Path"
+      },
+      {
+        "id": "poi-penglipuran-2",
+        "name": "Air Terjun Tukad Cepung (Tembuku)",
+        "nameEn": "Tukad Cepung Cave Waterfall",
+        "category": "Air Terjun",
+        "distanceKm": 7.2,
+        "durationMinutes": 18,
+        "lat": -8.468,
+        "lng": 115.398,
+        "description": "Air terjun tersembunyi di dalam gua tebing batu dengan sorot cahaya matahari pagi yang menembus celah ngarai.",
+        "descriptionEn": "Secluded waterfall dropping inside a sun-pierced canyon chamber with celestial morning sunbeams.",
+        "highlights": "Air Terjun Rongga Gua & Sorot Cahaya Alami",
+        "highlightsEn": "Cave Chamber Waterfall & Natural Sunbeams"
+      },
+      {
+        "id": "poi-penglipuran-3",
+        "name": "Pura Kehen Cagar Budaya Abad ke-11",
+        "nameEn": "11th-Century Pura Kehen Sanctuary",
+        "category": "Pura & Budaya",
+        "distanceKm": 4.8,
+        "durationMinutes": 12,
+        "lat": -8.441,
+        "lng": 115.362,
+        "description": "Pura bertingkat megah dengan pohon beringin raksasa berumur ratusan tahun dan gerbang tangga berukir singa batu.",
+        "descriptionEn": "Terraced state temple crowned by a centuries-old banyan tree with towering mythical guardian stairs.",
+        "highlights": "Gerbang Meru Kuno & Beringin Raksasa",
+        "highlightsEn": "Ancient Meru Gates & Giant Sacred Banyan"
+      }
+    ]
   },
   {
     "id": "desa-blimbingsari",
@@ -82,7 +505,11 @@
     "zone": "West",
     "lat": -8.2917,
     "lng": 114.5028,
-    "focus": ["Culture", "Wellness", "Culinary"],
+    "focus": [
+      "Culture",
+      "Wellness",
+      "Culinary"
+    ],
     "highlights": "Arsitektur Khas Perpaduan Budaya Bali dan Toleransi Keberagaman",
     "avgHomestayPrice": 200000,
     "localUmkm": "Kakao Fermentasi Jembrana, Kuliner Betutu Khas Gilimanuk",
@@ -92,7 +519,95 @@
     "dailyQuota": 80,
     "currentSimulatedLoad": 28,
     "bufferVillageId": "desa-ekasari",
-    "elevationMeters": 95
+    "elevationMeters": 95,
+    "accommodations": [
+      {
+        "id": "stay-blimbingsari-1",
+        "name": "Blimbingsari Heritage Homestay",
+        "nameEn": "Blimbingsari Heritage Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 200000,
+        "lat": -8.291,
+        "lng": 114.5035,
+        "features": [
+          "Pekarangan Kebun Kakao",
+          "Penganan Jembrana Khas",
+          "Suasana Pedesaan Teduh"
+        ],
+        "featuresEn": [
+          "Cocoa Farm Yard",
+          "Local Jembrana Delicacies",
+          "Shaded Village Ambience"
+        ],
+        "bookingNote": "Bisa mengikuti tur petik kakao dan fermentasi biji cokelat.",
+        "bookingNoteEn": "Guests can join cocoa harvesting and bean fermentation walks."
+      },
+      {
+        "id": "stay-blimbingsari-2",
+        "name": "Pondok Damai Pokdarwis",
+        "nameEn": "Pokdarwis Harmony Cottage",
+        "type": "Pondok Desa",
+        "pricePerNightRp": 230000,
+        "lat": -8.2925,
+        "lng": 114.5015,
+        "features": [
+          "Kamar Kayu Jati Lokal",
+          "Balkon Menghadap Perkebunan",
+          "Dikelola Warga Desa"
+        ],
+        "featuresEn": [
+          "Locally Sourced Teak Rooms",
+          "Plantation Balcony",
+          "Community Owned"
+        ],
+        "bookingNote": "Dekat dengan jalur sepeda menuju Bendungan Palasari.",
+        "bookingNoteEn": "Steps from cycling path to Palasari Dam."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-blimbingsari-1",
+        "name": "Gereja Kristen Tertua Arsitektur Bali",
+        "nameEn": "Balinese Architecture Heritage Church",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.3,
+        "durationMinutes": 3,
+        "lat": -8.292,
+        "lng": 114.503,
+        "description": "Bangunan bersejarah unik beratapkan tumpang tiga khas arsitektur Bali dengan ornamen gapura dan ukiran kayu jati.",
+        "descriptionEn": "Unique historical church built with Balinese triple-tiered roofs, relief gateways, and ornate carvings.",
+        "highlights": "Akulturasi Arsitektur Bali & Sejarah Desa",
+        "highlightsEn": "Balinese Architectural Acculturation & History"
+      },
+      {
+        "id": "poi-blimbingsari-2",
+        "name": "Bendungan & Waduk Palasari",
+        "nameEn": "Palasari Lake & Reservoir",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 3.4,
+        "durationMinutes": 8,
+        "lat": -8.275,
+        "lng": 114.53,
+        "description": "Danau buatan tenang diapit perbukitan hijau rimbun, populer untuk jalan sore dan menyaksikan kabut pegunungan barat.",
+        "descriptionEn": "Tranquil highland lake framed by lush jungle ridges, ideal for quiet walks and sunset reflections.",
+        "highlights": "Panorama Danau & Suasana Pegunungan Tenang",
+        "highlightsEn": "Lake Panorama & Peaceful Mountain Scenery"
+      },
+      {
+        "id": "poi-blimbingsari-3",
+        "name": "Hutan Lindung Taman Nasional Bali Barat (Sektor Selatan)",
+        "nameEn": "West Bali National Park (Southern Sector)",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 5.8,
+        "durationMinutes": 14,
+        "lat": -8.26,
+        "lng": 114.485,
+        "description": "Koridor rimba hutan hujan tropis barat yang menjadi habitat jalak bali, monyet hitam, dan burung endemik.",
+        "descriptionEn": "Pristine rainforest corridor habitat for Bali starlings, ebony langurs, and endemic avifauna.",
+        "highlights": "Birdwatching Jalak Bali & Trekking Hutan Hujan",
+        "highlightsEn": "Bali Starling Birdwatching & Rainforest Hike"
+      }
+    ]
   },
   {
     "id": "desa-munduk",
@@ -101,7 +616,11 @@
     "zone": "North",
     "lat": -8.2683,
     "lng": 115.0792,
-    "focus": ["Nature", "Agriculture", "Wellness"],
+    "focus": [
+      "Nature",
+      "Agriculture",
+      "Wellness"
+    ],
     "highlights": "Perkebunan Cengkeh & Kopi Pegunungan, Air Terjun Kembar Melanting",
     "avgHomestayPrice": 275000,
     "localUmkm": "Kopi Arabika & Robusta Munduk, Minyak Atsiri Cengkeh Warga",
@@ -111,7 +630,130 @@
     "dailyQuota": 100,
     "currentSimulatedLoad": 62,
     "bufferVillageId": "desa-gobleg",
-    "elevationMeters": 920
+    "elevationMeters": 920,
+    "accommodations": [
+      {
+        "id": "stay-munduk-1",
+        "name": "Pondok Warga Gunung Munduk",
+        "nameEn": "Munduk Mountain Guest Cottage",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 230000,
+        "lat": -8.258,
+        "lng": 115.0685,
+        "features": [
+          "Pemandangan Lembah & Laut Jawa",
+          "Kopi Cengkeh Seduh Tradisional",
+          "Udara Pegunungan Sejuk"
+        ],
+        "featuresEn": [
+          "Valley & Java Sea Vista",
+          "Fresh Clove Coffee Brew",
+          "Crisp Highland Breeze"
+        ],
+        "bookingNote": "Dikelola oleh keluarga petani cengkeh Munduk.",
+        "bookingNoteEn": "Hosted by local Munduk clove farming families."
+      },
+      {
+        "id": "stay-munduk-2",
+        "name": "Munduk Moding Eco-Stay",
+        "nameEn": "Munduk Moding Eco-Stay",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 620000,
+        "lat": -8.261,
+        "lng": 115.064,
+        "features": [
+          "Perkebunan Kopi Berkelanjutan",
+          "Infinity Pond Atas Awan",
+          "Panel Surya & Kompos Mandiri"
+        ],
+        "featuresEn": [
+          "Organic Working Coffee Estate",
+          "Above-the-Clouds Pool",
+          "Solar Powered & Composting"
+        ],
+        "bookingNote": "Memberikan pelatihan barista gratis bagi remaja desa.",
+        "bookingNoteEn": "Provides free barista apprenticeships for village youth."
+      },
+      {
+        "id": "stay-munduk-3",
+        "name": "Bunga Pala Bamboo Cabin",
+        "nameEn": "Bunga Pala Bamboo Cabin",
+        "type": "Bamboo Villa",
+        "pricePerNightRp": 380000,
+        "lat": -8.255,
+        "lng": 115.071,
+        "features": [
+          "Pondok Bambu Alami",
+          "Suara Aliran Air Pegunungan",
+          "Balkon Menghadap Lembah"
+        ],
+        "featuresEn": [
+          "All-Bamboo Mountain Cabin",
+          "Natural Spring Water Sound",
+          "Valley Deck View"
+        ],
+        "bookingNote": "Jalur setapak langsung menuju Air Terjun Melanting.",
+        "bookingNoteEn": "Direct footpath down to Melanting Waterfall."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-munduk-1",
+        "name": "Air Terjun Melanting & Laangan",
+        "nameEn": "Melanting & Laangan Waterfalls",
+        "category": "Air Terjun",
+        "distanceKm": 1.2,
+        "durationMinutes": 6,
+        "lat": -8.253,
+        "lng": 115.0715,
+        "description": "Air terjun setinggi 85 meter di tengah lebatnya kebun kopi dan cengkeh dengan semprotan air yang menyegarkan.",
+        "descriptionEn": "Thunderous 85-meter cascade tucked deep within coffee and clove plantations with refreshing mist.",
+        "highlights": "Air Terjun Bertingkat & Kebun Cengkeh",
+        "highlightsEn": "Cascading Falls & Clove Farm Trek"
+      },
+      {
+        "id": "poi-munduk-2",
+        "name": "Danau Tamblingan & Hutan Hujan Kuno",
+        "nameEn": "Lake Tamblingan & Ancient Rainforest",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 4.8,
+        "durationMinutes": 14,
+        "lat": -8.252,
+        "lng": 115.099,
+        "description": "Danau kawah purba tanpa perahu bermotor yang dikelilingi hutan lumut basah dan pura-pura sunyi pemujaan air.",
+        "descriptionEn": "Sacred caldera lake banned to motorboats, hugged by mossy ancient jungle and solitary water shrines.",
+        "highlights": "Kano Tradisional Pedahu & Hutan Lumut",
+        "highlightsEn": "Traditional Dugout Canoe & Mossy Forest"
+      },
+      {
+        "id": "poi-munduk-3",
+        "name": "Air Terjun Golden Valley",
+        "nameEn": "Golden Valley Waterfall",
+        "category": "Air Terjun",
+        "distanceKm": 2.1,
+        "durationMinutes": 9,
+        "lat": -8.2615,
+        "lng": 115.077,
+        "description": "Air terjun tersembunyi dengan kedai kopi ramah lingkungan yang memanggang biji kopi lokal di tepi tebing sungai.",
+        "descriptionEn": "Secluded waterfall with an eco-café roasting hyper-local beans right by riverside cliffs.",
+        "highlights": "Kedai Kopi Tepi Air Terjun & Suara Alam",
+        "highlightsEn": "Cliffside Coffee Tasting & Natural Ambience"
+      },
+      {
+        "id": "poi-munduk-4",
+        "name": "Pohon Kayu Raksasa Gesing (Bunut Purba)",
+        "nameEn": "Gesing Giant Heritage Banyan Tree",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 3.5,
+        "durationMinutes": 11,
+        "lat": -8.27,
+        "lng": 115.06,
+        "description": "Pohon raksasa berumur lebih dari 700 tahun dengan diameter perakaran mencapai puluhan meter yang disakralkan warga.",
+        "descriptionEn": "Enormous 700-year-old banyan tree with labyrinthine aerial roots revered by local guardians.",
+        "highlights": "Pohon Purba Sakral & Suasana Magis Hutan",
+        "highlightsEn": "Ancient Sacred Tree & Magical Forest Ambience"
+      }
+    ]
   },
   {
     "id": "desa-les",
@@ -120,7 +762,11 @@
     "zone": "North",
     "lat": -8.1369,
     "lng": 115.3672,
-    "focus": ["Nature", "Culinary", "Culture"],
+    "focus": [
+      "Nature",
+      "Culinary",
+      "Culture"
+    ],
     "highlights": "Garam Piramida Palung Tradisional, Konservasi Terumbu Karang & Air Terjun Yeh Mampeh",
     "avgHomestayPrice": 210000,
     "localUmkm": "Garam Palung Tejakula, Olahan Ikan Laut Segar Pesisir Timur Buleleng",
@@ -130,7 +776,95 @@
     "dailyQuota": 85,
     "currentSimulatedLoad": 31,
     "bufferVillageId": "desa-sembiran",
-    "elevationMeters": 25
+    "elevationMeters": 25,
+    "accommodations": [
+      {
+        "id": "stay-les-1",
+        "name": "Pondok Garam Segara Les",
+        "nameEn": "Les Sea Salt Fisher Cottage",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.139,
+        "lng": 115.362,
+        "features": [
+          "Pesisir Pantai Karang Hitam",
+          "Dikelola Petani Garam Tradisional",
+          "Sarapan Ikan Segar"
+        ],
+        "featuresEn": [
+          "Black Pebble Beachfront",
+          "Artisan Salt Farmer Run",
+          "Fresh Catch Breakfast"
+        ],
+        "bookingNote": "Tamu diajak mencicipi panen garam kristal murni Tejakula.",
+        "bookingNoteEn": "Guests can experience pure artisanal sun-evaporated sea salt harvesting."
+      },
+      {
+        "id": "stay-les-2",
+        "name": "Tejakula Eco-Bale Bamboo",
+        "nameEn": "Tejakula Eco-Bale Bamboo",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 360000,
+        "lat": -8.142,
+        "lng": 115.358,
+        "features": [
+          "Konstruksi Bambu Daur Ulang",
+          "Angin Laut Alami Tanpa AC",
+          "Restorasi Karang Swadaya"
+        ],
+        "featuresEn": [
+          "Upcycled Bamboo Cabins",
+          "Natural Ocean Breeze Design",
+          "Community Coral Nursery"
+        ],
+        "bookingNote": "Sebagian tarif dialokasikan untuk pemulihan terumbu karang Desa Les.",
+        "bookingNoteEn": "Portion of room rate directly funds reef restoration nets."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-les-1",
+        "name": "Air Terjun Yeh Mampeh",
+        "nameEn": "Yeh Mampeh Waterfall",
+        "category": "Air Terjun",
+        "distanceKm": 2.3,
+        "durationMinutes": 8,
+        "lat": -8.156,
+        "lng": 115.361,
+        "description": "Salah satu air terjun tertinggi di Bali utara yang jatuh bebas dari tebing batu alami yang belum terjamah komersialisasi.",
+        "descriptionEn": "One of North Bali's tallest free-falling waterfalls cascading down pristine uncommercialized cliffs.",
+        "highlights": "Kolam Alami Pegunungan & Tebing Raksasa",
+        "highlightsEn": "Pristine Plunge Basin & Sheer Rock Faces"
+      },
+      {
+        "id": "poi-les-2",
+        "name": "Sentra Pembuatan Garam Tradisional Palungan",
+        "nameEn": "Artisanal Palungan Salt Panning",
+        "category": "Agrowisata",
+        "distanceKm": 0.5,
+        "durationMinutes": 3,
+        "lat": -8.1375,
+        "lng": 115.3635,
+        "description": "Warisan turun-temurun pembuatan garam meja kristal menggunakan bilah pohon kelapa dan pengeringan tenaga surya pesisir.",
+        "descriptionEn": "Heritage salt extraction using hollowed coconut tree trunks and coastal solar evaporation.",
+        "highlights": "Edukasi Garam Organik Kristal Tejakula",
+        "highlightsEn": "Artisan Sea Salt Crystallization Workshop"
+      },
+      {
+        "id": "poi-les-3",
+        "name": "Konservasi Ikan Hias Ramah Lingkungan Les",
+        "nameEn": "Les Eco Barrier Reef Fish Sanctuary",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.8,
+        "durationMinutes": 5,
+        "lat": -8.136,
+        "lng": 115.365,
+        "description": "Teladan dunia komunitas nelayan yang beralih dari penangkapan kimia ke jaring tangan lestari dan penanaman karang.",
+        "descriptionEn": "Internationally acclaimed fishermen community that abolished cyanide fishing in favor of net rescue and coral replanting.",
+        "highlights": "Snorkeling Karang Mandiri & Edukasi Nelayan",
+        "highlightsEn": "Reef Snorkel & Sustainable Fishery Story"
+      }
+    ]
   },
   {
     "id": "desa-sembiran",
@@ -139,7 +873,10 @@
     "zone": "North",
     "lat": -8.1315,
     "lng": 115.2884,
-    "focus": ["Culture", "Nature"],
+    "focus": [
+      "Culture",
+      "Nature"
+    ],
     "highlights": "Situs Megalitikum Bali Kuno, Tari Sanghyang & Tradisi Tenun Kapas Lokal",
     "avgHomestayPrice": 195000,
     "localUmkm": "Kain Tenun Kapas Sembiran, Madu Hutan Kering Buleleng Timur",
@@ -149,7 +886,60 @@
     "dailyQuota": 65,
     "currentSimulatedLoad": 19,
     "bufferVillageId": "desa-les",
-    "elevationMeters": 380
+    "elevationMeters": 380,
+    "accommodations": [
+      {
+        "id": "stay-sembiran-1",
+        "name": "Pondok Bali Aga Sembiran",
+        "nameEn": "Sembiran Bali Aga Heritage Home",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 200000,
+        "lat": -8.151,
+        "lng": 115.319,
+        "features": [
+          "Pekarangan Megalitik Kuno",
+          "Kopi Robusta Bukit Sembiran",
+          "Kisah Tetua Desa Adat"
+        ],
+        "featuresEn": [
+          "Megalithic Stone Compound",
+          "Highland Robusta Brew",
+          "Oral History by Village Elders"
+        ],
+        "bookingNote": "Termasuk pemandu warga untuk melihat situs bebatuan purba.",
+        "bookingNoteEn": "Includes resident guide to ancient megalithic stone sites."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-sembiran-1",
+        "name": "Situs Megalitikum Batu Menhir Kuno",
+        "nameEn": "Ancient Megalithic Menhir Stones",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.4,
+        "durationMinutes": 3,
+        "lat": -8.153,
+        "lng": 115.318,
+        "description": "Batu-batu pemujaan zaman megalitikum peninggalan peradaban awal masyarakat Bali Aga ribuan tahun lampau.",
+        "descriptionEn": "Prehistoric stone menhirs dating back millennia to the dawn of Bali Aga indigenous civilization.",
+        "highlights": "Arkeologi Zaman Batu & Punden Berundak",
+        "highlightsEn": "Stone Age Archaeology & Step Terraces"
+      },
+      {
+        "id": "poi-sembiran-2",
+        "name": "Pura Pelapuan & Bukit Sembiran Viewpoint",
+        "nameEn": "Pura Pelapuan & Sembiran Ridge",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.6,
+        "durationMinutes": 7,
+        "lat": -8.148,
+        "lng": 115.325,
+        "description": "Puncak punggungan bukit dengan pemandangan 360 derajat membentang dari Laut Jawa sampai gugusan gunung api Bali.",
+        "descriptionEn": "Highland ridge offering 360-degree vistas stretching from the Java Sea across North Bali's volcanic spine.",
+        "highlights": "Pemandangan Laut Utara & Gunung Batur",
+        "highlightsEn": "North Sea & Mount Batur Ridges"
+      }
+    ]
   },
   {
     "id": "desa-pejarakan",
@@ -158,7 +948,10 @@
     "zone": "North",
     "lat": -8.1461,
     "lng": 114.5739,
-    "focus": ["Nature", "Wellness"],
+    "focus": [
+      "Nature",
+      "Wellness"
+    ],
     "highlights": "Ekowisata Mangrove Teluk Terima, Air Panas Alami Banyuwedang & Gerbang Pulau Menjangan",
     "avgHomestayPrice": 240000,
     "localUmkm": "Koperasi Nelayan Labuhan Lalang, Kuliner Sate Lilit Ikan Karang",
@@ -168,7 +961,81 @@
     "dailyQuota": 100,
     "currentSimulatedLoad": 39,
     "bufferVillageId": "desa-pemuteran",
-    "elevationMeters": 8
+    "elevationMeters": 8,
+    "accommodations": [
+      {
+        "id": "stay-pejarakan-1",
+        "name": "Pejarakan Mangrove Eco-Homestay",
+        "nameEn": "Pejarakan Mangrove Eco-Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 230000,
+        "lat": -8.136,
+        "lng": 114.582,
+        "features": [
+          "Hutan Bakau Sebelah Rumah",
+          "Perahu Kayu Warga",
+          "Sarapan Ikan Gurame Bakar"
+        ],
+        "featuresEn": [
+          "Mangrove Canal Frontage",
+          "Traditional Wooden Skiff",
+          "Grilled Fish Breakfast"
+        ],
+        "bookingNote": "Akses perahu langsung menuju spot snorkeling Pulau Menjangan.",
+        "bookingNoteEn": "Direct boat departure point for Menjangan Island snorkeling."
+      },
+      {
+        "id": "stay-pejarakan-2",
+        "name": "Banyuwedang Springs Eco-Lodge",
+        "nameEn": "Banyuwedang Springs Eco-Lodge",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 390000,
+        "lat": -8.134,
+        "lng": 114.59,
+        "features": [
+          "Pemandian Air Panas Belerang Alami",
+          "Bungalo Kayu Bambu",
+          "Dikelilingi Burung Air"
+        ],
+        "featuresEn": [
+          "Natural Hot Sulphur Plunge",
+          "Bamboo Timber Bungalows",
+          "Waterbird Haven"
+        ],
+        "bookingNote": "Menggunakan energi ramah lingkungan dengan pengolahan limbah mandiri.",
+        "bookingNoteEn": "Sustainable energy design with on-site biological treatment."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-pejarakan-1",
+        "name": "Taman Nasional Laut Pulau Menjangan",
+        "nameEn": "Menjangan Island Marine Reserve",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 3.5,
+        "durationMinutes": 15,
+        "lat": -8.105,
+        "lng": 114.52,
+        "description": "Dinding karang tegak (wall drop-off) berkedalaman puluhan meter dengan kejernihan air spektakuler dan kawanan penyu sisik.",
+        "descriptionEn": "Legendary vertical reef drop-offs with crystal visibility harboring hawksbill turtles and gorgonian fans.",
+        "highlights": "Wall Diving Spektakuler & Kawasan Rusa Berenang",
+        "highlightsEn": "Spectacular Wall Diving & Swimming Deer Island"
+      },
+      {
+        "id": "poi-pejarakan-2",
+        "name": "Jembatan Kayu Hutan Mangrove Pejarakan",
+        "nameEn": "Pejarakan Mangrove Boardwalk",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.1,
+        "durationMinutes": 5,
+        "lat": -8.132,
+        "lng": 114.585,
+        "description": "Jalur jembatan kayu berkelok membelah kanopi bakau rindang yang menjadi zona pembibitan kepiting bakau dan burung migran.",
+        "descriptionEn": "Timber boardwalk threading through ancient tidal mangroves sheltering mud crabs and migratory birds.",
+        "highlights": "Canoeing Hutan Bakau & Sunset Teluk",
+        "highlightsEn": "Mangrove Canoeing & Sunset Bay Stroll"
+      }
+    ]
   },
   {
     "id": "desa-ambengan",
@@ -177,7 +1044,10 @@
     "zone": "North",
     "lat": -8.1658,
     "lng": 115.1025,
-    "focus": ["Nature", "Agriculture"],
+    "focus": [
+      "Nature",
+      "Agriculture"
+    ],
     "highlights": "Terasering Sawah Jembong, Air Terjun Bertingkat & Kerajinan Anyaman Bambu",
     "avgHomestayPrice": 200000,
     "localUmkm": "Anyaman Sokasi Bambu Ambengan, Kopi Luwak Liar & Cokelat Desa",
@@ -187,7 +1057,60 @@
     "dailyQuota": 85,
     "currentSimulatedLoad": 25,
     "bufferVillageId": "desa-sudaji",
-    "elevationMeters": 490
+    "elevationMeters": 490,
+    "accommodations": [
+      {
+        "id": "stay-ambengan-1",
+        "name": "Pondok Teras Sawah Ambengan",
+        "nameEn": "Ambengan Rice Terrace Cottage",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.171,
+        "lng": 115.112,
+        "features": [
+          "View Sawah Terasering Bertingkat",
+          "Dekat Air Terjun Aling-Aling",
+          "Masakan Rumahan Buleleng"
+        ],
+        "featuresEn": [
+          "Cascading Terrace Views",
+          "Near Aling-Aling Falls",
+          "Homecooked Buleleng Meals"
+        ],
+        "bookingNote": "Termasuk pemandu warga untuk petualangan air terjun.",
+        "bookingNoteEn": "Includes resident guide for safe canyon waterfall walks."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-ambengan-1",
+        "name": "Air Terjun Aling-Aling & Kroya",
+        "nameEn": "Aling-Aling & Kroya Waterfalls",
+        "category": "Air Terjun",
+        "distanceKm": 1.4,
+        "durationMinutes": 6,
+        "lat": -8.175,
+        "lng": 115.105,
+        "description": "Kompleks air terjun kembar dengan perosotan batu alami 12 meter dan lompatan tebing yang diawasi pemandu warga.",
+        "descriptionEn": "Twin 35-meter falls featuring natural rock waterslides and monitored cliff jumps into deep emerald pools.",
+        "highlights": "Perosotan Batu Alami & Kolam Air Zamrud",
+        "highlightsEn": "Natural Rock Slide & Emerald Plunge Basin"
+      },
+      {
+        "id": "poi-ambengan-2",
+        "name": "Kolam Alami Air Terjun Pucuk & Kembar",
+        "nameEn": "Pucuk & Kembar Secret Pools",
+        "category": "Air Terjun",
+        "distanceKm": 1.8,
+        "durationMinutes": 8,
+        "lat": -8.178,
+        "lng": 115.108,
+        "description": "Aliran air jernih pegunungan di celah lembah dengan pepohonan tropis rimbun untuk berenang tenang.",
+        "descriptionEn": "Serene highland springwater pools surrounded by dense rainforest foliage for peaceful dips.",
+        "highlights": "Kolam Berenang Alami & Kicau Burung Hutan",
+        "highlightsEn": "Wild Spring Swimming & Birdsong Sanctuary"
+      }
+    ]
   },
   {
     "id": "desa-gobleg",
@@ -196,7 +1119,11 @@
     "zone": "North",
     "lat": -8.2541,
     "lng": 115.0958,
-    "focus": ["Nature", "Culture", "Agriculture"],
+    "focus": [
+      "Nature",
+      "Culture",
+      "Agriculture"
+    ],
     "highlights": "Panorama Danau Kembar Tamblingan & Buyan, Hutan Hujan Tropis & Kebun Hortikultura",
     "avgHomestayPrice": 230000,
     "localUmkm": "Stroberi & Sayur Organik Kaldera, Kopi Lesung Tradisional Catur Desa",
@@ -206,7 +1133,60 @@
     "dailyQuota": 90,
     "currentSimulatedLoad": 34,
     "bufferVillageId": "desa-munduk",
-    "elevationMeters": 1220
+    "elevationMeters": 1220,
+    "accommodations": [
+      {
+        "id": "stay-gobleg-1",
+        "name": "Gobleg Highland Farm Homestay",
+        "nameEn": "Gobleg Highland Farm Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.243,
+        "lng": 115.084,
+        "features": [
+          "Kebun Stroberi & Sayur Mayur",
+          "Pemandangan Lembah Danau Buyan",
+          "Penghangat Ruangan Tradisional"
+        ],
+        "featuresEn": [
+          "Strawberry & Vegetable Farm",
+          "Lake Buyan Ridge View",
+          "Traditional Fireplace Warmth"
+        ],
+        "bookingNote": "Tamu boleh memetik stroberi manis segar langsung dari kebun.",
+        "bookingNoteEn": "Guests are welcome to pick fresh sweet strawberries directly."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-gobleg-1",
+        "name": "Wanagiri & Danau Kembar Twin Lakes View",
+        "nameEn": "Twin Lakes Caldera Viewpoint",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.5,
+        "durationMinutes": 8,
+        "lat": -8.239,
+        "lng": 115.102,
+        "description": "Punggungan kaldera tinggi pemisah Danau Buyan dan Danau Tamblingan dengan kabut tebal dan panorama epik.",
+        "descriptionEn": "Dramatic caldera ridge dividing Lake Buyan and Lake Tamblingan with ethereal rolling highland mists.",
+        "highlights": "Pemandangan Dua Danau Purba & Kabut Sejuk",
+        "highlightsEn": "Twin Caldera Lakes & Cool Mountain Mist"
+      },
+      {
+        "id": "poi-gobleg-2",
+        "name": "Pura Puncak Manik Gobleg",
+        "nameEn": "Pura Puncak Manik Mountain Shrine",
+        "category": "Pura & Budaya",
+        "distanceKm": 1.2,
+        "durationMinutes": 5,
+        "lat": -8.245,
+        "lng": 115.08,
+        "description": "Kuil purba pemujaan dewa kesuburan dan air yang berdiri di puncak bukit berhawa dingin berkabut.",
+        "descriptionEn": "Ancient sanctuary dedicated to agriculture and springwater deities perched on a misty pine hill.",
+        "highlights": "Pura Kuno Puncak Bukit & Suasana Hening",
+        "highlightsEn": "Hilltop Ancient Shrine & Meditative Silence"
+      }
+    ]
   },
   {
     "id": "desa-tenganan",
@@ -215,7 +1195,10 @@
     "zone": "East",
     "lat": -8.4756,
     "lng": 115.5658,
-    "focus": ["Culture", "Nature"],
+    "focus": [
+      "Culture",
+      "Nature"
+    ],
     "highlights": "Desa Bali Aga Kuno, Tenun Ikat Ganda Gringsing (Pewarna Alami 3 Tahun), Trekking Bukit Kangin",
     "avgHomestayPrice": 260000,
     "localUmkm": "Perajin Tenun Gringsing Asli, Lukisan Daun Lontar (Prasi), Madu Klanceng",
@@ -225,7 +1208,74 @@
     "dailyQuota": 120,
     "currentSimulatedLoad": 115,
     "bufferVillageId": "desa-timbrah",
-    "elevationMeters": 110
+    "elevationMeters": 110,
+    "accommodations": [
+      {
+        "id": "stay-tenganan-1",
+        "name": "Tenganan Heritage Homestay",
+        "nameEn": "Tenganan Heritage Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 260000,
+        "lat": -8.475,
+        "lng": 115.565,
+        "features": [
+          "Rumah Adat Tanpa Paku Logam",
+          "Keluarga Penenun Pegringsingan",
+          "Minuman Nira Tuak Manis"
+        ],
+        "featuresEn": [
+          "Traditional Nail-Free Wooden House",
+          "Pegringsingan Weaving Family",
+          "Sweet Palm Nectar Welcome Drink"
+        ],
+        "bookingNote": "Mendapat akses belajar sejarah tenun gringsing langsung dari sesepuh adat.",
+        "bookingNoteEn": "Direct access to learn double ikat weaving history from customary elders."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-tenganan-1",
+        "name": "Desa Adat Benteng Kuno Tenganan",
+        "nameEn": "Tenganan Ancient Walled Village",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.1,
+        "durationMinutes": 2,
+        "lat": -8.476,
+        "lng": 115.5645,
+        "description": "Tata ruang pemukiman Bali Aga tertutup dengan dinding batu keliling dan tradisi perang pandan tahunan.",
+        "descriptionEn": "Fortified Bali Aga heritage settlement preserving ancient customary council laws and pandanus duel rituals.",
+        "highlights": "Tenun Gringsing Ganda & Rumah Adat Asli",
+        "highlightsEn": "Double Ikat Weaving & Ancient Architecture"
+      },
+      {
+        "id": "poi-tenganan-2",
+        "name": "Pantai Pasir Putih Virgin Beach (Perasi)",
+        "nameEn": "Virgin Beach (Pantai Pasir Putih)",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 6.2,
+        "durationMinutes": 16,
+        "lat": -8.498,
+        "lng": 115.61,
+        "description": "Teluk pasir putih tersembunyi diapit dua tanjung hijau tebing karang dengan air laut biru bening.",
+        "descriptionEn": "Crescent white-sand cove sheltered between emerald headlands featuring turquoise calm bathing waters.",
+        "highlights": "Pasir Putih Karangasem & Ikan Bakar Tradisional",
+        "highlightsEn": "White Sand Bay & Traditional Grilled Seafood"
+      },
+      {
+        "id": "poi-tenganan-3",
+        "name": "Bukit Guungan Viewpoint",
+        "nameEn": "Bukit Guungan Panoramic Ridge",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 3.1,
+        "durationMinutes": 9,
+        "lat": -8.489,
+        "lng": 115.545,
+        "description": "Puncak perbukitan yang menyuguhkan pemandangan garis pantai timur Candidasa dan perairan Selat Lombok.",
+        "descriptionEn": "Scenic hillcrest overlooking Candidasa coastline, coral lagoons, and Lombok Strait swells.",
+        "highlights": "Trekking Punggungan Bukit & Laut Timur",
+        "highlightsEn": "Ridge Trekking & East Ocean Horizons"
+      }
+    ]
   },
   {
     "id": "desa-amed-purwakerti",
@@ -234,7 +1284,11 @@
     "zone": "East",
     "lat": -8.3347,
     "lng": 115.6472,
-    "focus": ["Nature", "Culinary", "Culture"],
+    "focus": [
+      "Nature",
+      "Culinary",
+      "Culture"
+    ],
     "highlights": "Taman Laut Jemeluk, Koperasi Garam Amed ber-Indikasi Geografis (IG) Pertama di Indonesia",
     "avgHomestayPrice": 260000,
     "localUmkm": "MPIG Garam Amed Bali, Warung Ikan Bakar Jukung Nelayan, Kopi Lempuyang",
@@ -244,7 +1298,95 @@
     "dailyQuota": 110,
     "currentSimulatedLoad": 58,
     "bufferVillageId": "desa-tulamben",
-    "elevationMeters": 15
+    "elevationMeters": 15,
+    "accommodations": [
+      {
+        "id": "stay-amed-1",
+        "name": "Pondok Jukung Warga Amed",
+        "nameEn": "Amed Outrigger Fisherman Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 230000,
+        "lat": -8.351,
+        "lng": 115.66,
+        "features": [
+          "Langsung Menghadap Laut",
+          "Perahu Layar Jukung Tradisional",
+          "Snorkeling Depan Kamar"
+        ],
+        "featuresEn": [
+          "Direct Seafront",
+          "Traditional Jukung Sailboat",
+          "House Reef Snorkeling"
+        ],
+        "bookingNote": "Dapat berlayar melihat sunrise bersama nelayan lokal.",
+        "bookingNoteEn": "Sunrise sailing tours available aboard local outriggers."
+      },
+      {
+        "id": "stay-amed-2",
+        "name": "Purwakerti Coral Eco-Lodge",
+        "nameEn": "Purwakerti Coral Eco-Lodge",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 390000,
+        "lat": -8.353,
+        "lng": 115.658,
+        "features": [
+          "Batu Karang & Atap Alang-Alang",
+          "Pemanas Surya Ramah Lingkungan",
+          "Menu Tangkapan Hari Ini"
+        ],
+        "featuresEn": [
+          "Reef Stone & Thatch Roof",
+          "Solar Powered Water Heating",
+          "Catch of the Day Dining"
+        ],
+        "bookingNote": "100% garam dapur dipasok dari petani garam setempat.",
+        "bookingNoteEn": "All table salt sourced from local Amed salt pan families."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-amed-1",
+        "name": "Teluk Jemeluk & Coral Garden",
+        "nameEn": "Jemeluk Bay Coral Garden",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.6,
+        "durationMinutes": 4,
+        "lat": -8.347,
+        "lng": 115.664,
+        "description": "Teluk terlindung dengan taman koral dangkal, patung kuil bawah laut, dan beragam penyu karang.",
+        "descriptionEn": "Sheltered bay with vibrant shallow coral gardens, underwater postbox sculptures, and resident sea turtles.",
+        "highlights": "Snorkeling Patung Bawah Laut & Penyu Karang",
+        "highlightsEn": "Underwater Sculpture Snorkel & Sea Turtles"
+      },
+      {
+        "id": "poi-amed-2",
+        "name": "Sentra Garam Tradisional Tanah Liat Amed",
+        "nameEn": "Artisanal Clay-Vessel Salt Panning",
+        "category": "Agrowisata",
+        "distanceKm": 1.5,
+        "durationMinutes": 5,
+        "lat": -8.342,
+        "lng": 115.648,
+        "description": "Warisan geologis pembuatan garam menggunakan air laut yang disaring tanah liat hitam menghasilkan garam gurih manis.",
+        "descriptionEn": "Ancient geological salt evaporation using clay cones producing minerals prized for delicate sweet savor.",
+        "highlights": "Pembuatan Garam Tradisional & Cenderamata Warga",
+        "highlightsEn": "Clay Salt Crafting & Local Artisan Souvenirs"
+      },
+      {
+        "id": "poi-amed-3",
+        "name": "Bukit Sunset Amed (View Gunung Agung)",
+        "nameEn": "Amed Sunset Point (Mt. Agung Backdrop)",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.1,
+        "durationMinutes": 7,
+        "lat": -8.349,
+        "lng": 115.652,
+        "description": "Puncak tanjung untuk menyaksikan matahari terbenam tepat di balik kerucut megah Gunung Agung.",
+        "descriptionEn": "Iconic clifftop promontory witnessing the golden sun dipping directly behind Mount Agung's massive silhouette.",
+        "highlights": "Sunset Spektakuler Berlatar Gunung Agung",
+        "highlightsEn": "Spectacular Sunset Behind Mount Agung"
+      }
+    ]
   },
   {
     "id": "desa-tulamben",
@@ -253,7 +1395,10 @@
     "zone": "East",
     "lat": -8.2781,
     "lng": 115.5928,
-    "focus": ["Nature", "Wellness"],
+    "focus": [
+      "Nature",
+      "Wellness"
+    ],
     "highlights": "Ekosistem Karang Kapal USAT Liberty, Pemberdayaan Porter Selam Wanita Lokal",
     "avgHomestayPrice": 240000,
     "localUmkm": "Komunitas Porter Wanita Tulamben, Warung Kuliner Pesisir & Kerajinan Kerang Lepas",
@@ -263,7 +1408,60 @@
     "dailyQuota": 100,
     "currentSimulatedLoad": 49,
     "bufferVillageId": "desa-amed-purwakerti",
-    "elevationMeters": 18
+    "elevationMeters": 18,
+    "accommodations": [
+      {
+        "id": "stay-tulamben-1",
+        "name": "Pondok Karang Tulamben",
+        "nameEn": "Tulamben Coral Reef Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 220000,
+        "lat": -8.277,
+        "lng": 115.5925,
+        "features": [
+          "Dekat Spot Kapal Karam USAT Liberty",
+          "Kolam Bilas Peralatan Menyelam",
+          "Sarapan Buah Tropis"
+        ],
+        "featuresEn": [
+          "Steps to USAT Liberty Wreck",
+          "Gear Rinse Tanks",
+          "Tropical Fruit Breakfast"
+        ],
+        "bookingNote": "Didampingi pemandu selam berlisensi dari pemuda lokal.",
+        "bookingNoteEn": "Guided by certified local village dive leaders."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-tulamben-1",
+        "name": "Bangkai Kapal Bersejarah USAT Liberty Wreck",
+        "nameEn": "USAT Liberty Shipwreck Sanctuary",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.3,
+        "durationMinutes": 3,
+        "lat": -8.2745,
+        "lng": 115.593,
+        "description": "Kapal kargo Perang Dunia II karam di pantai berbatu yang kini menjadi habitat terumbu karang buatan terpopuler di dunia.",
+        "descriptionEn": "WWII cargo shipwreck resting 30 meters offshore, now transformed into an artificial reef bustling with marine biodiversity.",
+        "highlights": "Snorkeling & Selam Bangkai Kapal Bersejarah",
+        "highlightsEn": "Historic Shipwreck Snorkel & Bio-Diversity"
+      },
+      {
+        "id": "poi-tulamben-2",
+        "name": "Taman Karang Dangkal Tulamben Coral Garden",
+        "nameEn": "Tulamben Coral Garden & Sea Fans",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.6,
+        "durationMinutes": 5,
+        "lat": -8.278,
+        "lng": 115.591,
+        "description": "Taman karang lunak berkedalaman 3-8 meter dengan anemone clownfish dan patung candi bawah air.",
+        "descriptionEn": "Shallow soft coral gardens harboring clownfish anemones, moray eels, and sunken temple shrines.",
+        "highlights": "Snorkeling Ikan Badut & Patung Candi",
+        "highlightsEn": "Clownfish Sanctuary & Sunken Shrine"
+      }
+    ]
   },
   {
     "id": "desa-sibetan",
@@ -272,7 +1470,11 @@
     "zone": "East",
     "lat": -8.4425,
     "lng": 115.5228,
-    "focus": ["Agriculture", "Culinary", "Culture"],
+    "focus": [
+      "Agriculture",
+      "Culinary",
+      "Culture"
+    ],
     "highlights": "Agrowisata Salak Bali (14 Varietas Lokal), Pembuatan Wine Salak Tradisional & Anyaman Lontar",
     "avgHomestayPrice": 210000,
     "localUmkm": "Agro Wine & Kopi Biji Salak Sibetan, Dodol & Keripik Salak Kelompok Wanita Tani",
@@ -282,7 +1484,60 @@
     "dailyQuota": 80,
     "currentSimulatedLoad": 22,
     "bufferVillageId": "desa-budakeling",
-    "elevationMeters": 560
+    "elevationMeters": 560,
+    "accommodations": [
+      {
+        "id": "stay-sibetan-1",
+        "name": "Pondok Salak Sibetan Homestay",
+        "nameEn": "Sibetan Snakefruit Farm Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.451,
+        "lng": 115.523,
+        "features": [
+          "Pekarangan Rimbun Kebun Salak",
+          "Pohon Salak Gula Pasir Manis",
+          "Suasana Hening Kaki Gunung"
+        ],
+        "featuresEn": [
+          "Lush Salak Orchard Estate",
+          "Heirloom Sugar Salak Palms",
+          "Quiet Foothill Air"
+        ],
+        "bookingNote": "Mendapat gratis mencicipi wine salak fermentasi khas Sibetan.",
+        "bookingNoteEn": "Complimentary tasting of artisanal Sibetan salak wine."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-sibetan-1",
+        "name": "Agrowisata Salak Gula Pasir & Wine Salak",
+        "nameEn": "Sibetan Heritage Salak Agro Trail",
+        "category": "Agrowisata",
+        "distanceKm": 0.5,
+        "durationMinutes": 4,
+        "lat": -8.448,
+        "lng": 115.525,
+        "description": "Sentra 15 varietas salak khas Bali termasuk salak gula pasir yang sangat manis dan proses pembuatan wine salak.",
+        "descriptionEn": "Horticultural heartland of 15 indigenous snakefruit varieties and zero-waste artisanal fruit wine distilleries.",
+        "highlights": "Petik Salak Langsung dari Pohon & Wine Lokal",
+        "highlightsEn": "Pick-Your-Own Salak & Organic Fruit Wine"
+      },
+      {
+        "id": "poi-sibetan-2",
+        "name": "Bukit Cemara Viewpoint Karangasem",
+        "nameEn": "Bukit Cemara Pine Ridge Viewpoint",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 3.8,
+        "durationMinutes": 12,
+        "lat": -8.435,
+        "lng": 115.512,
+        "description": "Puncak bukit pinus dengan sudut pandang magis menyaksikan lereng Gunung Agung berpadu dengan Selat Lombok.",
+        "descriptionEn": "Highland pine knoll presenting breathtaking angles of Mount Agung rising directly behind coastal plains.",
+        "highlights": "Hutan Pinus Sejuk & View Gunung Agung",
+        "highlightsEn": "Highland Pine Breeze & Volcano Vistas"
+      }
+    ]
   },
   {
     "id": "desa-budakeling",
@@ -291,7 +1546,10 @@
     "zone": "East",
     "lat": -8.4267,
     "lng": 115.5489,
-    "focus": ["Culture", "Wellness"],
+    "focus": [
+      "Culture",
+      "Wellness"
+    ],
     "highlights": "Tradisi Siwa-Buddha Kuno, Kampung Pandai Besi & Perajin Perak Tradisional, Harmoni Lintas Iman",
     "avgHomestayPrice": 220000,
     "localUmkm": "Perajin Emas & Perak Budakeling, Kuliner Nasi Sela (Ubi) Khas Karangasem",
@@ -301,7 +1559,60 @@
     "dailyQuota": 75,
     "currentSimulatedLoad": 18,
     "bufferVillageId": "desa-sibetan",
-    "elevationMeters": 480
+    "elevationMeters": 480,
+    "accommodations": [
+      {
+        "id": "stay-budakeling-1",
+        "name": "Budakeling Artisan Compound",
+        "nameEn": "Budakeling Artisan Compound",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 230000,
+        "lat": -8.436,
+        "lng": 115.578,
+        "features": [
+          "Bengkel Ukir Perak & Emas",
+          "Harmoni Budha-Siwa Bersejarah",
+          "Kebun Sayur Pekarangan"
+        ],
+        "featuresEn": [
+          "Silver & Gold Metalcraft Atelier",
+          "Historic Buddha-Shiva Syncretism",
+          "Backyard Organic Veggies"
+        ],
+        "bookingNote": "Bisa mengikuti kelas dasar menempa perak bersama perajin pande mas.",
+        "bookingNoteEn": "Hands-on silver forging workshop sessions with master smiths."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-budakeling-1",
+        "name": "Sentra Kerajinan Logam & Emas Kuno Pande Mas",
+        "nameEn": "Pande Mas Traditional Silversmith Guild",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.4,
+        "durationMinutes": 3,
+        "lat": -8.4345,
+        "lng": 115.579,
+        "description": "Komunitas pandai logam turun-temurun pembuat perlengkapan upacara sakral dan perhiasan filigree Bali kuno.",
+        "descriptionEn": "Ancestral metallurgy hamlet forging sacred ceremonial chalices and intricate Balinese filigree ornaments.",
+        "highlights": "Tempa Logam Mulia Tradisional & Seni Filigree",
+        "highlightsEn": "Artisanal Metal Forging & Filigree Jewels"
+      },
+      {
+        "id": "poi-budakeling-2",
+        "name": "Tirta Gangga Water Palace Cagar Budaya",
+        "nameEn": "Tirta Gangga Royal Water Garden",
+        "category": "Pura & Budaya",
+        "distanceKm": 3.5,
+        "durationMinutes": 9,
+        "lat": -8.412,
+        "lng": 115.587,
+        "description": "Taman air peninggalan Kerajaan Karangasem dengan kolam mata air alami bertabur batu pijak dan ikan koi raksasa.",
+        "descriptionEn": "Royal water sanctuary built around natural springs featuring stepping stones across giant koi pools.",
+        "highlights": "Mata Air Suci Tirta Gangga & Arsitektur Candi Air",
+        "highlightsEn": "Sacred Water Stepping Stones & Royal Fountains"
+      }
+    ]
   },
   {
     "id": "desa-muncan",
@@ -310,7 +1621,11 @@
     "zone": "East",
     "lat": -8.4581,
     "lng": 115.4112,
-    "focus": ["Agriculture", "Nature", "Culture"],
+    "focus": [
+      "Agriculture",
+      "Nature",
+      "Culture"
+    ],
     "highlights": "Lembah Sawah Vulkanik kaki Gunung Agung, Wisata Edukasi Bajak Sawah Tradisional (Matekap)",
     "avgHomestayPrice": 240000,
     "localUmkm": "Beras Merah Vulkanik Muncan, Jaje Laklak Bakar Kayu Kopi",
@@ -320,7 +1635,60 @@
     "dailyQuota": 85,
     "currentSimulatedLoad": 26,
     "bufferVillageId": "desa-sidemen",
-    "elevationMeters": 540
+    "elevationMeters": 540,
+    "accommodations": [
+      {
+        "id": "stay-muncan-1",
+        "name": "Pondok Subak Muncan",
+        "nameEn": "Muncan Subak Ridge Lodge",
+        "type": "Pondok Desa",
+        "pricePerNightRp": 240000,
+        "lat": -8.452,
+        "lng": 115.421,
+        "features": [
+          "View Sawah Terasering Bertingkat",
+          "Balkon Menghadap Sungai Telaga Waja",
+          "Kopi Robusta Asli Muncan"
+        ],
+        "featuresEn": [
+          "Cascading Terraces",
+          "River Canyon Facing Balcony",
+          "Fresh Muncan Robusta"
+        ],
+        "bookingNote": "Berada tepat di jalur transit pengalihan beban desa Sidemen.",
+        "bookingNoteEn": "Ideally located along the Sidemen buffer corridor."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-muncan-1",
+        "name": "Arung Jeram Sungai Telaga Waja",
+        "nameEn": "Telaga Waja River Rafting Corridor",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.8,
+        "durationMinutes": 6,
+        "lat": -8.448,
+        "lng": 115.425,
+        "description": "Sungai berarus deras dengan air jernih pegunungan yang melintasi ngarai tebing hijau dan jeram air terjun.",
+        "descriptionEn": "Pristine mountain-fed white water river flowing through deep green gorges and bamboo bridges.",
+        "highlights": "Rafting Arus Deras & Ngarai Hijau Alami",
+        "highlightsEn": "White Water Rafting & Lush River Canyons"
+      },
+      {
+        "id": "poi-muncan-2",
+        "name": "Sawah Terasering Subak Muncan",
+        "nameEn": "Subak Muncan Amphitheater Terraces",
+        "category": "Agrowisata",
+        "distanceKm": 0.8,
+        "durationMinutes": 4,
+        "lat": -8.455,
+        "lng": 115.418,
+        "description": "Hamparan sawah alami bertingkat melingkar yang memanfaatkan sistem pembagian air subak mandiri.",
+        "descriptionEn": "Spectacular contoured rice terraces irrigated by traditional community water canals.",
+        "highlights": "Jalan Pematang Sawah & Udara Bebas Polusi",
+        "highlightsEn": "Paddy Ridge Walks & Crisp Mountain Air"
+      }
+    ]
   },
   {
     "id": "desa-timbrah",
@@ -329,7 +1697,10 @@
     "zone": "East",
     "lat": -8.4819,
     "lng": 115.5872,
-    "focus": ["Culture", "Culinary"],
+    "focus": [
+      "Culture",
+      "Culinary"
+    ],
     "highlights": "Desa Bali Aga Penyangga Tenganan, Tradisi Guling Samsam & Arsitektur Balai Desa Kuno",
     "avgHomestayPrice": 215000,
     "localUmkm": "Kuliner Tradisional Timbrah, Kerajinan Anyaman Ata & Bambu",
@@ -339,7 +1710,60 @@
     "dailyQuota": 70,
     "currentSimulatedLoad": 15,
     "bufferVillageId": "desa-tenganan",
-    "elevationMeters": 140
+    "elevationMeters": 140,
+    "accommodations": [
+      {
+        "id": "stay-timbrah-1",
+        "name": "Bale Adat Timbrah Guest Home",
+        "nameEn": "Bale Adat Timbrah Guest Home",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 220000,
+        "lat": -8.461,
+        "lng": 115.548,
+        "features": [
+          "Rumah Adat Kuno Berarsitektur Asli",
+          "Sarapan Nasi Belayag Khas",
+          "Dikelola Warga Adat"
+        ],
+        "featuresEn": [
+          "Authentic Ancient Compound",
+          "Traditional Nasi Belayag",
+          "Customary Village Run"
+        ],
+        "bookingNote": "Wajib mematuhi etika busana adat saat melintas jalan desa.",
+        "bookingNoteEn": "Modest customary dress requested along village paths."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-timbrah-1",
+        "name": "Desa Kuno Tradisi Usaba Sambah Timbrah",
+        "nameEn": "Historic Timbrah Customary Quarter",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.2,
+        "durationMinutes": 2,
+        "lat": -8.4625,
+        "lng": 115.546,
+        "description": "Desa adat kuno dengan aturan ketat pelestarian rumah tradisional dan ritual persembahan hasil bumi tahunan.",
+        "descriptionEn": "Ancient community governed by strict architectural preservation decrees and annual agricultural rites.",
+        "highlights": "Arsitektur Dinding Bebatuan Kuno & Awig-Awig",
+        "highlightsEn": "Ancient Stone Walls & Historic Village Code"
+      },
+      {
+        "id": "poi-timbrah-2",
+        "name": "Taman Ujung Sukasada Karangasem",
+        "nameEn": "Taman Ujung Sukasada Floating Palace",
+        "category": "Pura & Budaya",
+        "distanceKm": 6.8,
+        "durationMinutes": 16,
+        "lat": -8.467,
+        "lng": 115.631,
+        "description": "Istana peristirahatan air raja Karangasem dengan pilar bergaya Eropa-Bali dan kolam luas berlatar laut.",
+        "descriptionEn": "Royal water palace blending Balinese and European architecture flanked by vast reflecting pools and sea views.",
+        "highlights": "Kolam Terapung Megah & Panorama Selat Lombok",
+        "highlightsEn": "Floating Royal Pavilions & Lombok Strait Vistas"
+      }
+    ]
   },
   {
     "id": "desa-trunyan",
@@ -348,7 +1772,10 @@
     "zone": "Central-North",
     "lat": -8.2519,
     "lng": 115.4214,
-    "focus": ["Culture", "Nature"],
+    "focus": [
+      "Culture",
+      "Nature"
+    ],
     "highlights": "Budaya Bali Mula Danau Batur, Pohon Taru Menyan Kuno & Geopark Kaldera Batur",
     "avgHomestayPrice": 250000,
     "localUmkm": "Koperasi Perahu Danau Batur, Kopi Arabika Kintamani (Indikasi Geografis), Ikan Mujair Nyatnyat",
@@ -358,7 +1785,60 @@
     "dailyQuota": 90,
     "currentSimulatedLoad": 44,
     "bufferVillageId": "desa-batur-selatan",
-    "elevationMeters": 1050
+    "elevationMeters": 1050,
+    "accommodations": [
+      {
+        "id": "stay-trunyan-1",
+        "name": "Kedisan Lakeside Homestay",
+        "nameEn": "Kedisan Lakeside Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 220000,
+        "lat": -8.272,
+        "lng": 115.378,
+        "features": [
+          "Tepi Danau Batur",
+          "Dermaga Perahu Menyeberang Trunyan",
+          "Ikan Mujair Nyat-Nyat Segar"
+        ],
+        "featuresEn": [
+          "Lake Batur Shoreline",
+          "Trunyan Boat Crossing Pier",
+          "Fresh Spiced Lake Fish"
+        ],
+        "bookingNote": "Termasuk pendampingan menyeberang danau menggunakan perahu motor desa.",
+        "bookingNoteEn": "Includes boat transfer assistance across the caldera lake."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-trunyan-1",
+        "name": "Pemakaman Angin Purba Pohon Taru Menyan",
+        "nameEn": "Taru Menyan Ancient Open-Air Cemetery",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.8,
+        "durationMinutes": 8,
+        "lat": -8.257,
+        "lng": 115.412,
+        "description": "Tradisi pemakaman terbuka unik warga Bali Aga di mana jenazah diletakkan di bawah naungan pohon wangi Taru Menyan.",
+        "descriptionEn": "Sacred Bali Aga burial sanctuary where bodies rest open-air under the fragrant canopy of ancient Taru Menyan trees.",
+        "highlights": "Tradisi Pemakaman Angin & Sejarah Bali Aga Purba",
+        "highlightsEn": "Open-Air Burial Rites & Indigenous Heritage"
+      },
+      {
+        "id": "poi-trunyan-2",
+        "name": "Danau Kaldera Batur & Tebing Abang",
+        "nameEn": "Lake Batur & Mount Abang Cliffs",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.5,
+        "durationMinutes": 12,
+        "lat": -8.268,
+        "lng": 115.405,
+        "description": "Danau kaldera terbesar di Bali dengan latar dinding kaldera terjal Gunung Abang setinggi 2.152 mdpl.",
+        "descriptionEn": "Bali's largest volcanic lake framed by the steep forested cliffs of Mount Abang.",
+        "highlights": "Tur Kano Danau & Panorama Kaldera Kuno",
+        "highlightsEn": "Lakeside Canoeing & Ancient Caldera Scenery"
+      }
+    ]
   },
   {
     "id": "desa-undisan",
@@ -367,7 +1847,11 @@
     "zone": "Central-North",
     "lat": -8.4389,
     "lng": 115.3881,
-    "focus": ["Nature", "Wellness", "Culture"],
+    "focus": [
+      "Nature",
+      "Wellness",
+      "Culture"
+    ],
     "highlights": "Desa Penyangga Penglipuran, Trekking Lembah Sungai Jinah, Perajin Perhiasan Perak & Yoga Desa",
     "avgHomestayPrice": 240000,
     "localUmkm": "Perajin Perak Undisan Kelod, Jamu & Boreh Tradisional Bali, Beras Organik Subak Undisan",
@@ -377,7 +1861,81 @@
     "dailyQuota": 95,
     "currentSimulatedLoad": 29,
     "bufferVillageId": "desa-penglipuran",
-    "elevationMeters": 580
+    "elevationMeters": 580,
+    "accommodations": [
+      {
+        "id": "stay-undisan-1",
+        "name": "Undisan Eco-Heritage Homestay",
+        "nameEn": "Undisan Eco-Heritage Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 250000,
+        "lat": -8.455,
+        "lng": 115.385,
+        "features": [
+          "Pekarangan Asri Bunga Tropis",
+          "Masakan Mujair Bakar Bumbu Bali",
+          "Jalur Trekking Bebas Ramai"
+        ],
+        "featuresEn": [
+          "Lush Tropical Flower Garden",
+          "Spiced Grilled Fish Dining",
+          "Crowd-Free Ricefield Trails"
+        ],
+        "bookingNote": "Desa penyangga resmi penyeimbang kuota Desa Penglipuran.",
+        "bookingNoteEn": "Official eco-buffer village balancing Penglipuran tourism loads."
+      },
+      {
+        "id": "stay-undisan-2",
+        "name": "De Klumpu Eco-Lodge Undisan",
+        "nameEn": "De Klumpu Eco-Lodge Undisan",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 520000,
+        "lat": -8.458,
+        "lng": 115.388,
+        "features": [
+          "Bale Lumbung Padi Kayu Tradisional",
+          "View Lembah Hijau Tembuku",
+          "Kolam Alami Mata Air"
+        ],
+        "featuresEn": [
+          "Traditional Rice Barn Architecture",
+          "Green Tembuku Valley View",
+          "Natural Springfed Pool"
+        ],
+        "bookingNote": "Menyediakan tur bersepeda keliling pengrajin bambu desa.",
+        "bookingNoteEn": "Organizes cycling routes across local bamboo craftsman workshops."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-undisan-1",
+        "name": "Air Terjun Tangkup & Goa Giri Campuhan",
+        "nameEn": "Tangkup Waterfall & Sacred Cave",
+        "category": "Air Terjun",
+        "distanceKm": 1.8,
+        "durationMinutes": 7,
+        "lat": -8.462,
+        "lng": 115.392,
+        "description": "Air terjun alami tersembunyi di celah ngarai bebatuan dengan aliran sungai sejuk dan goa pertapaan.",
+        "descriptionEn": "Secluded waterfall nestled inside a lush rocky chasm featuring crystal river shallows and meditation caves.",
+        "highlights": "Kolam Alami & Suasana Pertapaan Hening",
+        "highlightsEn": "Pristine River Pools & Meditative Cavern"
+      },
+      {
+        "id": "poi-undisan-2",
+        "name": "Jalur Trekking Subak Abian Undisan",
+        "nameEn": "Undisan Subak Abian Walking Trail",
+        "category": "Agrowisata",
+        "distanceKm": 0.7,
+        "durationMinutes": 4,
+        "lat": -8.454,
+        "lng": 115.382,
+        "description": "Jalur jalan kaki santai menyusuri petak sawah bertingkat, kebun kelapa, dan sistem pembagian air subak.",
+        "descriptionEn": "Gentle path traversing multi-tiered rice paddies, coconut groves, and communal irrigation channels.",
+        "highlights": "Jalan Pematang Sawah & Interaksi Petani Lokal",
+        "highlightsEn": "Terrace Ridge Walk & Local Farmer Encounters"
+      }
+    ]
   },
   {
     "id": "desa-batur-selatan",
@@ -386,7 +1944,11 @@
     "zone": "Central-North",
     "lat": -8.2764,
     "lng": 115.3653,
-    "focus": ["Nature", "Agriculture", "Wellness"],
+    "focus": [
+      "Nature",
+      "Agriculture",
+      "Wellness"
+    ],
     "highlights": "UNESCO Global Geopark Batur, Pemandian Air Panas Alami Vulkanik & Kebun Jeruk Kintamani",
     "avgHomestayPrice": 270000,
     "localUmkm": "Petani Kopi Arabika Kintamani, Madu Kaldera, Pemandu Geopark Lokal Resmi",
@@ -396,7 +1958,95 @@
     "dailyQuota": 120,
     "currentSimulatedLoad": 66,
     "bufferVillageId": "desa-trunyan",
-    "elevationMeters": 1320
+    "elevationMeters": 1320,
+    "accommodations": [
+      {
+        "id": "stay-batur-1",
+        "name": "Songan Lakeside Eco-Camp",
+        "nameEn": "Songan Lakeside Eco-Camp",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 320000,
+        "lat": -8.248,
+        "lng": 115.395,
+        "features": [
+          "Tepi Danau Batur Langsung",
+          "Tenda Glamping & Pondok Kayu",
+          "Api Unggun Malam Hari"
+        ],
+        "featuresEn": [
+          "Lake Batur Shoreline",
+          "Glamping Domes & Timber Huts",
+          "Evening Campfire Gatherings"
+        ],
+        "bookingNote": "Titik kumpul favorit untuk pendakian sunrise Gunung Batur.",
+        "bookingNoteEn": "Prime staging base for Mount Batur sunrise ascents."
+      },
+      {
+        "id": "stay-batur-2",
+        "name": "Black Lava View Homestay",
+        "nameEn": "Black Lava View Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 240000,
+        "lat": -8.252,
+        "lng": 115.385,
+        "features": [
+          "Panorama Hamparan Lahar Hitam",
+          "Pemandian Air Panas Belerang",
+          "Sarapan Ubi Kukus Alami"
+        ],
+        "featuresEn": [
+          "Black Lava Basin Panorama",
+          "Thermal Sulphur Spring Nearby",
+          "Steamed Highland Veggies"
+        ],
+        "bookingNote": "Dikelola oleh keluarga pemandu lokal kaldera Batur.",
+        "bookingNoteEn": "Hosted by local volcano guide families."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-batur-1",
+        "name": "Trekking Sunrise Puncak Gunung Batur",
+        "nameEn": "Mount Batur Sunrise Caldera Trek",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 3.2,
+        "durationMinutes": 12,
+        "lat": -8.242,
+        "lng": 115.375,
+        "description": "Pendakian puncak gunung api aktif setinggi 1.717 mdpl untuk menyaksikan matahari terbit berlatar Danau Batur dan Gunung Rinjani.",
+        "descriptionEn": "Summit trek up active 1,717m volcanic peaks to witness dawn breaking across Lake Batur towards distant Mount Rinjani.",
+        "highlights": "Sunrise Kaldera Spektakuler & Uap Kawah Alami",
+        "highlightsEn": "Spectacular Caldera Sunrise & Volcanic Steam Vents"
+      },
+      {
+        "id": "poi-batur-2",
+        "name": "Kawasan Geopark UNESCO Black Lava Batur",
+        "nameEn": "UNESCO Geopark Black Lava Fields",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.1,
+        "durationMinutes": 8,
+        "lat": -8.256,
+        "lng": 115.368,
+        "description": "Hamparan batuan basal hitam sisa letusan purba yang membentang luas menyerupai lanskap planet lain.",
+        "descriptionEn": "Vast expanse of jagged black basaltic volcanic rocks from historical eruptions resembling lunar landscapes.",
+        "highlights": "Eksplorasi Lahar Hitam & Formasi Batuan Vulkanik",
+        "highlightsEn": "Black Lava Field Exploration & Volcanic Formations"
+      },
+      {
+        "id": "poi-batur-3",
+        "name": "Pemandian Air Panas Alami Toya Devasya / Bungkah",
+        "nameEn": "Toya Bungkah Natural Hot Springs",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.5,
+        "durationMinutes": 5,
+        "lat": -8.261,
+        "lng": 115.389,
+        "description": "Kolam air panas belerang alami di tepi Danau Batur dengan suhu 38-40°C yang merelaksasi otot setelah pendakian.",
+        "descriptionEn": "Thermal mineral springs bordering Lake Batur heated by subterranean magma to 38-40°C.",
+        "highlights": "Relaksasi Air Panas Belerang Tepi Danau",
+        "highlightsEn": "Thermal Sulphur Soaks Beside the Caldera Lake"
+      }
+    ]
   },
   {
     "id": "desa-ekasari",
@@ -405,7 +2055,11 @@
     "zone": "West",
     "lat": -8.2731,
     "lng": 114.5289,
-    "focus": ["Agriculture", "Culture", "Nature"],
+    "focus": [
+      "Agriculture",
+      "Culture",
+      "Nature"
+    ],
     "highlights": "Bendungan & Danau Palasari, Agrowisata Kakao Fermentasi Ekspor & Konservasi Burung Curik Bali",
     "avgHomestayPrice": 200000,
     "localUmkm": "Koperasi Kakao Kerta Semaya Samaniya, Olahan Cokelat Bean-to-Bar Jembrana",
@@ -415,7 +2069,60 @@
     "dailyQuota": 80,
     "currentSimulatedLoad": 21,
     "bufferVillageId": "desa-blimbingsari",
-    "elevationMeters": 115
+    "elevationMeters": 115,
+    "accommodations": [
+      {
+        "id": "stay-ekasari-1",
+        "name": "Ekasari Palasari Green Homestay",
+        "nameEn": "Ekasari Palasari Green Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.265,
+        "lng": 114.538,
+        "features": [
+          "Pekarangan Kebun Cokelat & Jeruk",
+          "Dekat Katedral Palasari",
+          "Sarapan Tradisional Jembrana"
+        ],
+        "featuresEn": [
+          "Chocolate & Citrus Orchard",
+          "Near Palasari Cathedral",
+          "Traditional Jembrana Dining"
+        ],
+        "bookingNote": "Tamu diajak mencicipi olahan cokelat murni buatan kelompok wanita tani.",
+        "bookingNoteEn": "Guests can sample pure chocolate crafted by local women's farm groups."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-ekasari-1",
+        "name": "Gereja Katedral Palasari & Arsitektur Gotik-Bali",
+        "nameEn": "Palasari Gothic-Balinese Cathedral",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.6,
+        "durationMinutes": 4,
+        "lat": -8.262,
+        "lng": 114.542,
+        "description": "Katedral megah bernuansa gotik yang diintegrasikan dengan ukiran batu padas dan gapura berornamen Bali.",
+        "descriptionEn": "Monumental stone cathedral fusing soaring European Gothic spires with Balinese temple relief carvings.",
+        "highlights": "Arsitektur Megah Gotik-Bali & Cagar Sejarah",
+        "highlightsEn": "Gothic-Balinese Architecture & Historic Heritage"
+      },
+      {
+        "id": "poi-ekasari-2",
+        "name": "Waduk Palasari & Jalur Sepeda Alam",
+        "nameEn": "Palasari Dam & Mountain Biking",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.8,
+        "durationMinutes": 6,
+        "lat": -8.27,
+        "lng": 114.532,
+        "description": "Danau penampungan air buatan yang indah untuk rekreasi memancing ramah lingkungan dan bersepeda keliling bukit.",
+        "descriptionEn": "Scenic reservoir flanked by green hills offering quiet eco-fishing spots and peaceful cycle paths.",
+        "highlights": "Danau Tenang & Panorama Perbukitan Jembrana",
+        "highlightsEn": "Peaceful Lake & Jembrana Mountain Ridges"
+      }
+    ]
   },
   {
     "id": "desa-medewi",
@@ -424,7 +2131,11 @@
     "zone": "West",
     "lat": -8.3992,
     "lng": 114.7986,
-    "focus": ["Nature", "Wellness", "Culinary"],
+    "focus": [
+      "Nature",
+      "Wellness",
+      "Culinary"
+    ],
     "highlights": "Pantai Ombak Panjang ramah Eco-Surfing, Sawah Pesisir & Kuliner Lawar Klungah (Kelapa Muda)",
     "avgHomestayPrice": 230000,
     "localUmkm": "Warung Lawar Klungah & Ikan Bakar Pesisir, Komunitas Instruktur Surfing Lokal Medewi",
@@ -434,7 +2145,81 @@
     "dailyQuota": 95,
     "currentSimulatedLoad": 37,
     "bufferVillageId": "desa-gumbrih",
-    "elevationMeters": 10
+    "elevationMeters": 10,
+    "accommodations": [
+      {
+        "id": "stay-medewi-1",
+        "name": "Medewi Point Break Homestay",
+        "nameEn": "Medewi Point Break Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 240000,
+        "lat": -8.418,
+        "lng": 114.805,
+        "features": [
+          "Jalan Kaki 2 Menit ke Ombak Medewi",
+          "Tempat Penyimpanan Papan Selancar",
+          "Sarapan Pancake Kelapa"
+        ],
+        "featuresEn": [
+          "2-Min Walk to Medewi Left-Hander",
+          "Surfboard Storage Racks",
+          "Coconut Pancake Breakfast"
+        ],
+        "bookingNote": "Dikelola oleh peselancar legendaris asal warga desa Medewi.",
+        "bookingNoteEn": "Hosted by local pioneer surfers from Medewi village."
+      },
+      {
+        "id": "stay-medewi-2",
+        "name": "Yeh Sumbul Coastal Eco-Lodge",
+        "nameEn": "Yeh Sumbul Coastal Eco-Lodge",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 380000,
+        "lat": -8.415,
+        "lng": 114.795,
+        "features": [
+          "Pesisir Pantai Pasir Hitam",
+          "Angin Laut Barat Alami",
+          "Kebun Sayur & Ikan Nelayan"
+        ],
+        "featuresEn": [
+          "Black Sand Coastline",
+          "Natural West Coast Breeze",
+          "Local Fisherman Produce"
+        ],
+        "bookingNote": "Pantai sunyi berombak lembut ramah untuk belajar selancar santai.",
+        "bookingNoteEn": "Mellow, uncrowded beach breaks perfect for beginner surfers."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-medewi-1",
+        "name": "Ombak Kidal Terpanjang Pantai Medewi",
+        "nameEn": "Medewi Longest Left-Hand Wave",
+        "category": "Pantai & Pesisir",
+        "distanceKm": 0.3,
+        "durationMinutes": 3,
+        "lat": -8.419,
+        "lng": 114.807,
+        "description": "Pantai berbatu dengan gulungan ombak kidal (left-hander) terpanjang di Bali yang disukai peselancar dunia.",
+        "descriptionEn": "Cobblestone point break producing Bali's longest and most consistent peeling left-hand waves.",
+        "highlights": "Surfing Kelas Dunia & Sunset Samudera Hindia",
+        "highlightsEn": "World-Class Longboard Wave & Ocean Sunset"
+      },
+      {
+        "id": "poi-medewi-2",
+        "name": "Pohon Purba Raksasa Berlubang Bunut Bolong",
+        "nameEn": "Bunut Bolong Sacred Hollow Tree",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 7.5,
+        "durationMinutes": 18,
+        "lat": -8.361,
+        "lng": 114.789,
+        "description": "Pohon beringin raksasa dengan lubang terowongan alami di bagian akarnya yang cukup dilintasi kendaraan bermotor.",
+        "descriptionEn": "Colossal sacred fig tree with a massive natural hollow root arch through which the main village road passes.",
+        "highlights": "Pohon Terowongan Alami & Suasana Magis Hutan",
+        "highlightsEn": "Natural Tree Tunnel & Sacred Forest Legend"
+      }
+    ]
   },
   {
     "id": "desa-gumbrih",
@@ -443,7 +2228,11 @@
     "zone": "West",
     "lat": -8.4089,
     "lng": 114.8356,
-    "focus": ["Nature", "Culture", "Wellness"],
+    "focus": [
+      "Nature",
+      "Culture",
+      "Wellness"
+    ],
     "highlights": "Susur Sungai (River Tubing) Tukad Gumbrih, Konservasi Penyu Pesisir & Seni Jegog Bambu Raksasa",
     "avgHomestayPrice": 210000,
     "localUmkm": "Sanggar Seni Gamelan Jegog Jembrana, Kerajinan Batok Kelapa & Kuliner Jaje Bendu",
@@ -453,7 +2242,60 @@
     "dailyQuota": 80,
     "currentSimulatedLoad": 19,
     "bufferVillageId": "desa-medewi",
-    "elevationMeters": 22
+    "elevationMeters": 22,
+    "accommodations": [
+      {
+        "id": "stay-gumbrih-1",
+        "name": "Gumbrih Riverbank Homestay",
+        "nameEn": "Gumbrih Riverbank Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 210000,
+        "lat": -8.435,
+        "lng": 114.898,
+        "features": [
+          "Pekarangan Tepi Sungai Jernih",
+          "Kebun Karet & Kelapa",
+          "Suasana Hening Pedesaan"
+        ],
+        "featuresEn": [
+          "Clear Riverfront Yard",
+          "Rubber & Coconut Plantation",
+          "Tranquil Rural Village Life"
+        ],
+        "bookingNote": "Jalur tenang untuk menikmati pesisir barat Bali.",
+        "bookingNoteEn": "Peaceful base to explore West Bali's green fringe."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-gumbrih-1",
+        "name": "Air Terjun Juwuk Manis Jembrana",
+        "nameEn": "Juwuk Manis Twin Waterfall",
+        "category": "Air Terjun",
+        "distanceKm": 6.5,
+        "durationMinutes": 16,
+        "lat": -8.388,
+        "lng": 114.912,
+        "description": "Air terjun kembar tersembunyi di lereng bukit kopi dengan kolam alami dangkal berair jernih pegunungan.",
+        "descriptionEn": "Twin waterfall hidden inside coffee foothills featuring crystalline springwater wading pools.",
+        "highlights": "Air Terjun Kembar Tersembunyi & Jalur Kopi",
+        "highlightsEn": "Secluded Twin Falls & Coffee Foothill Trail"
+      },
+      {
+        "id": "poi-gumbrih-2",
+        "name": "Kawasan Hutan Lindung Sungai Gumbrih",
+        "nameEn": "Gumbrih Forest River Conservation",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.2,
+        "durationMinutes": 5,
+        "lat": -8.431,
+        "lng": 114.902,
+        "description": "Lembah sungai berbatu alami yang dilindungi warga sebagai habitat kepiting air tawar dan pohon hutan adat.",
+        "descriptionEn": "Protected rocky stream chasm preserving freshwater biodiversity and native jungle timbers.",
+        "highlights": "Jalan Pematang Sungai & Alam Asri Bebas Bising",
+        "highlightsEn": "Stream Walks & Unspoiled Natural Quietude"
+      }
+    ]
   },
   {
     "id": "desa-jatiluwih",
@@ -462,7 +2304,11 @@
     "zone": "Central",
     "lat": -8.3694,
     "lng": 115.1319,
-    "focus": ["Agriculture", "Nature", "Culinary"],
+    "focus": [
+      "Agriculture",
+      "Nature",
+      "Culinary"
+    ],
     "highlights": "Warisan Budaya Dunia UNESCO Subak, Beras Merah Cendana Kuno & Jalur Sepeda Pematang Sawah",
     "avgHomestayPrice": 310000,
     "localUmkm": "Teh Beras Merah Organik Jatiluwih, Warung Petani Subak & Kopi Batukaru",
@@ -472,7 +2318,95 @@
     "dailyQuota": 140,
     "currentSimulatedLoad": 92,
     "bufferVillageId": "desa-wongaya-gede",
-    "elevationMeters": 685
+    "elevationMeters": 685,
+    "accommodations": [
+      {
+        "id": "stay-jatiluwih-1",
+        "name": "Jatiluwih Subak Eco-Lodge",
+        "nameEn": "Jatiluwih Subak Eco-Lodge",
+        "type": "Eco Lodge",
+        "pricePerNightRp": 450000,
+        "lat": -8.368,
+        "lng": 115.132,
+        "features": [
+          "Langsung Menghadap Hamparan Sawah UNESCO",
+          "Beras Merah Cendana Organik",
+          "Arsitektur Kayu Ramah Lingkungan"
+        ],
+        "featuresEn": [
+          "Direct UNESCO Rice Terrace Frontage",
+          "Organic Heirloom Red Rice Dining",
+          "Sustainable Timber Architecture"
+        ],
+        "bookingNote": "100% beras yang disajikan ditanam di petak sawah desa Jatiluwih.",
+        "bookingNoteEn": "100% of rice served is heritage red grain grown on-site."
+      },
+      {
+        "id": "stay-jatiluwih-2",
+        "name": "Pondok Asri Homestay Jatiluwih",
+        "nameEn": "Pondok Asri Homestay Jatiluwih",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 260000,
+        "lat": -8.371,
+        "lng": 115.129,
+        "features": [
+          "Pekarangan Keluarga Petani Subak",
+          "Balkon Sawah Kabut Pagi",
+          "Teh Beras Merah Herbal"
+        ],
+        "featuresEn": [
+          "Subak Farmer Family Compound",
+          "Morning Mist Terrace Balcony",
+          "Roasted Red Rice Herbal Tea"
+        ],
+        "bookingNote": "Tamu dapat ikut belajar membajak sawah bersama kerbau warga.",
+        "bookingNoteEn": "Guests can learn traditional buffalo plowing with local farmers."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-jatiluwih-1",
+        "name": "Lanskap Budaya Warisan Dunia UNESCO Jatiluwih",
+        "nameEn": "UNESCO World Heritage Subak Landscape",
+        "category": "Agrowisata",
+        "distanceKm": 0.2,
+        "durationMinutes": 2,
+        "lat": -8.3695,
+        "lng": 115.131,
+        "description": "Hamparan 600 hektar sawah berundak bertingkat terluas di Bali yang menerapkan filosofi Tri Hita Karana secara murni.",
+        "descriptionEn": "Over 600 hectares of contour-hugging rice terraces embodying Bali's ancient Tri Hita Karana water harmony.",
+        "highlights": "Jalur Trekking Subak UNESCO & Beras Merah Warisan",
+        "highlightsEn": "UNESCO Subak Walking Loops & Heirloom Red Grain"
+      },
+      {
+        "id": "poi-jatiluwih-2",
+        "name": "Air Terjun Yeh Hoo (Grojogan Jatiluwih)",
+        "nameEn": "Yeh Hoo Waterfall & Subak Stream",
+        "category": "Air Terjun",
+        "distanceKm": 2.1,
+        "durationMinutes": 7,
+        "lat": -8.378,
+        "lng": 115.135,
+        "description": "Air terjun alami di dasar lembah sawah dengan debit air jernih dan kolam dangkal untuk menyegarkan kaki.",
+        "descriptionEn": "Natural waterfall tucked beneath rice paddies offering clear cool waters for wading.",
+        "highlights": "Air Terjun Lembah Sawah & Aliran Sejuk",
+        "highlightsEn": "Valley Fall & Refreshing Mountain Waters"
+      },
+      {
+        "id": "poi-jatiluwih-3",
+        "name": "Pura Luhur Petali Hutan Adat",
+        "nameEn": "Pura Luhur Petali Rainforest Temple",
+        "category": "Pura & Budaya",
+        "distanceKm": 3.4,
+        "durationMinutes": 10,
+        "lat": -8.355,
+        "lng": 115.122,
+        "description": "Pura bersejarah sakral yang berdiri di tengah rimba purba lereng Gunung Batukaru dengan pepohonan raksasa.",
+        "descriptionEn": "Sacred mountain sanctuary veiled within ancient Batukaru rainforest giant ferns.",
+        "highlights": "Kuil Hutan Purba & Pepohonan Lumut",
+        "highlightsEn": "Ancient Jungle Shrine & Moss-Covered Trees"
+      }
+    ]
   },
   {
     "id": "desa-wongaya-gede",
@@ -481,7 +2415,11 @@
     "zone": "Central",
     "lat": -8.3811,
     "lng": 115.1047,
-    "focus": ["Culture", "Wellness", "Nature"],
+    "focus": [
+      "Culture",
+      "Wellness",
+      "Nature"
+    ],
     "highlights": "Kawasan Suci Pura Luhur Batukaru, Air Panas Belulang & Hutan Hujan Lindung",
     "avgHomestayPrice": 235000,
     "localUmkm": "Kelompok Tani Vanili & Kakao Batukaru, Warung Bubur Mengguh Tradisional",
@@ -491,7 +2429,60 @@
     "dailyQuota": 85,
     "currentSimulatedLoad": 31,
     "bufferVillageId": "desa-jatiluwih",
-    "elevationMeters": 740
+    "elevationMeters": 740,
+    "accommodations": [
+      {
+        "id": "stay-wongaya-1",
+        "name": "Batukaru Rainforest Eco-Homestay",
+        "nameEn": "Batukaru Rainforest Eco-Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 230000,
+        "lat": -8.375,
+        "lng": 115.092,
+        "features": [
+          "Kaki Gunung Batukaru Sejuk",
+          "Kopi Organik Arabika Batukaru",
+          "Suara Aliran Mata Air"
+        ],
+        "featuresEn": [
+          "Cool Mount Batukaru Slopes",
+          "Organic Arabica Mountain Coffee",
+          "Natural Spring Ambience"
+        ],
+        "bookingNote": "Sangat tenang, cocok untuk meditasi dan istirahat dari hiruk pikuk kota.",
+        "bookingNoteEn": "Serene mountain atmosphere suited for meditation and rest."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-wongaya-1",
+        "name": "Pura Luhur Batukaru",
+        "nameEn": "Pura Luhur Batukaru Sacred Temple",
+        "category": "Pura & Budaya",
+        "distanceKm": 1.2,
+        "durationMinutes": 5,
+        "lat": -8.371,
+        "lng": 115.088,
+        "description": "Salah satu pura Sad Kahyangan paling dihormati di Bali yang berdiri megah di tengah hutan hujan lereng barat Batukaru.",
+        "descriptionEn": "One of Bali's six holiest directional sanctuaries enveloped by misty primal rainforest on Mount Batukaru.",
+        "highlights": "Meru Tumpeng Kuno Berlumut & Danau Suci Hutan",
+        "highlightsEn": "Moss-Covered Multi-Tiered Meru & Sacred Lake"
+      },
+      {
+        "id": "poi-wongaya-2",
+        "name": "Jalur Pendakian Hutan Lindung Gunung Batukaru",
+        "nameEn": "Mount Batukaru Rainforest Nature Trail",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 2.5,
+        "durationMinutes": 9,
+        "lat": -8.365,
+        "lng": 115.084,
+        "description": "Jalur hutan hujan tropis basah dengan keanekaragaman lumut, pakis purba, dan satwa endemik pegunungan tengah.",
+        "descriptionEn": "Pristine rainforest trail rich in giant ferns, tree mosses, and endemic highland songbirds.",
+        "highlights": "Forest Bathing & Ekosistem Hutan Hujan Lindung",
+        "highlightsEn": "Forest Bathing & Protected Rainforest Ecology"
+      }
+    ]
   },
   {
     "id": "desa-taro",
@@ -500,7 +2491,11 @@
     "zone": "Central",
     "lat": -8.3742,
     "lng": 115.2808,
-    "focus": ["Culture", "Nature", "Agriculture"],
+    "focus": [
+      "Culture",
+      "Nature",
+      "Agriculture"
+    ],
     "highlights": "Konservasi Lembu Putih Suci (Nandini), Pura Gunung Raung Kuno Rsi Markandeya & Kunang-Kunang",
     "avgHomestayPrice": 290000,
     "localUmkm": "Pengolahan Kompos Organik Desa Taro, Perajin Ukiran Kayu & Kuliner Dapur Bali Mula",
@@ -510,7 +2505,95 @@
     "dailyQuota": 110,
     "currentSimulatedLoad": 64,
     "bufferVillageId": "desa-undisan",
-    "elevationMeters": 610
+    "elevationMeters": 610,
+    "accommodations": [
+      {
+        "id": "stay-taro-1",
+        "name": "Taro Firefly Eco-Homestay",
+        "nameEn": "Taro Firefly Eco-Homestay",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 260000,
+        "lat": -8.384,
+        "lng": 115.289,
+        "features": [
+          "Taman Kunang-Kunang Malam Hari",
+          "Konservasi Lembu Putih Suci",
+          "Sarapan Masakan Bambu Tradisional"
+        ],
+        "featuresEn": [
+          "Night Firefly Sanctuary",
+          "Sacred White Cattle Conservation",
+          "Bamboo Tube Steamed Breakfast"
+        ],
+        "bookingNote": "Termasuk tur malam melihat ribuan kunang-kunang di kebun desa.",
+        "bookingNoteEn": "Includes guided night walk to view thousands of bioluminescent fireflies."
+      },
+      {
+        "id": "stay-taro-2",
+        "name": "Bale Taro Bamboo Haven",
+        "nameEn": "Bale Taro Bamboo Haven",
+        "type": "Bamboo Villa",
+        "pricePerNightRp": 420000,
+        "lat": -8.387,
+        "lng": 115.286,
+        "features": [
+          "Arsitektur Bambu Lengkung Alami",
+          "Kolam Air Sumber Mata Air",
+          "Ketenangan Pedesaan Utara Ubud"
+        ],
+        "featuresEn": [
+          "Curved Eco-Bamboo Architecture",
+          "Springfed Pool",
+          "North Ubud Rural Peace"
+        ],
+        "bookingNote": "Bebas polusi cahaya dengan pemandangan bintang malam hari.",
+        "bookingNoteEn": "Zero light pollution with pristine night stargazing."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-taro-1",
+        "name": "Suaka Konservasi Lembu Putih Taro",
+        "nameEn": "Sacred White Cattle Sanctuary",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.4,
+        "durationMinutes": 3,
+        "lat": -8.3855,
+        "lng": 115.2875,
+        "description": "Kawasan perlindungan sapi putih suci langka (Lembu Putih) yang disucikan dan dirawat secara adat sejak abad ke-8.",
+        "descriptionEn": "Centuries-old sanctuary protecting rare albino sacred cattle revered since the 8th century by Rsi Markandeya.",
+        "highlights": "Edukasi Konservasi Lembu Putih Suci & Budaya Kuno",
+        "highlightsEn": "Sacred White Cow Conservation & Vedic Heritage"
+      },
+      {
+        "id": "poi-taro-2",
+        "name": "Pura Agung Gunung Raung Taro",
+        "nameEn": "Pura Agung Gunung Raung Ancient Temple",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.8,
+        "durationMinutes": 4,
+        "lat": -8.382,
+        "lng": 115.2895,
+        "description": "Pura tertua di Gianyar peninggalan Rsi Markandeya yang menjadi tonggak peradaban sistem irigasi subak di Bali.",
+        "descriptionEn": "One of Bali's foundational temples founded in the 8th century marking the origin point of Subak culture.",
+        "highlights": "Arsitektur Batu Padas Abad ke-8 & Sejarah Subak",
+        "highlightsEn": "8th-Century Stone Architecture & Subak Origins"
+      },
+      {
+        "id": "poi-taro-3",
+        "name": "Taman Konservasi Kunang-Kunang Semalam",
+        "nameEn": "Taro Bioluminescent Firefly Garden",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.1,
+        "durationMinutes": 5,
+        "lat": -8.389,
+        "lng": 115.284,
+        "description": "Kawasan pematang sawah organik bebas pestisida yang menjadi rumah bagi jutaan kunang-kunang di malam hari.",
+        "descriptionEn": "Organic chemical-free agricultural corridor where millions of wild fireflies illuminate the night skies.",
+        "highlights": "Wisata Malam Kunang-Kunang & Edukasi Lingkungan",
+        "highlightsEn": "Night Firefly Experience & Eco Stewardship"
+      }
+    ]
   },
   {
     "id": "desa-carangsari",
@@ -519,7 +2602,10 @@
     "zone": "South",
     "lat": -8.4689,
     "lng": 115.2175,
-    "focus": ["Culture", "Nature"],
+    "focus": [
+      "Culture",
+      "Nature"
+    ],
     "highlights": "Monumen Sejarah I Gusti Ngurah Rai, Hutan Pala Sangeh Utara & Arung Jeram Tukad Ayung",
     "avgHomestayPrice": 320000,
     "localUmkm": "Koperasi Arung Jeram Desa, Kerajinan Perak & Kuliner Betutu Carangsari",
@@ -529,7 +2615,59 @@
     "dailyQuota": 120,
     "currentSimulatedLoad": 78,
     "bufferVillageId": "desa-wongaya-gede",
-    "elevationMeters": 340
+    "elevationMeters": 340,
+    "accommodations": [
+      {
+        "id": "stay-carangsari-1",
+        "name": "Carangsari Heritage Guest House",
+        "nameEn": "Carangsari Heritage Guest House",
+        "type": "Homestay Warga",
+        "pricePerNightRp": 240000,
+        "lat": -8.468,
+        "lng": 115.221,
+        "features": [
+          "Pekarangan Pahlawan Nasional",
+          "Kebun Cokelat & Kopi Tradisional",
+          "Dekat Sungai Ayung"
+        ],
+        "featuresEn": [
+          "National Hero Heritage Compound",
+          "Artisan Cocoa & Coffee Grove",
+          "Near Ayung River Valleys"
+        ],
+        "bookingNote": "Desa kelahiran pahlawan I Gusti Ngurah Rai.",
+        "bookingNoteEn": "Birthplace village of national hero I Gusti Ngurah Rai."
+      }
+    ],
+    "nearbyAttractions": [
+      {
+        "id": "poi-carangsari-1",
+        "name": "Monumen Pahlawan Nasional I Gusti Ngurah Rai",
+        "nameEn": "I Gusti Ngurah Rai Memorial & Museum",
+        "category": "Pura & Budaya",
+        "distanceKm": 0.3,
+        "durationMinutes": 3,
+        "lat": -8.469,
+        "lng": 115.2225,
+        "description": "Monumen sejarah dan rumah pusaka pahlawan kemerdekaan Bali yang mempertahankan kedaulatan tanah air.",
+        "descriptionEn": "Historical sanctuary and ancestral museum honoring Bali's heroic independence commander.",
+        "highlights": "Sejarah Perjuangan Puputan & Rumah Pusaka",
+        "highlightsEn": "Independence Struggle History & Ancestral Artifacts"
+      },
+      {
+        "id": "poi-carangsari-2",
+        "name": "Jalur Petualangan Sungai Ayung Carangsari",
+        "nameEn": "Upper Ayung River Nature Trail",
+        "category": "Trekking & Viewpoint",
+        "distanceKm": 1.5,
+        "durationMinutes": 6,
+        "lat": -8.465,
+        "lng": 115.215,
+        "description": "Ngarai sungai Ayung bagian utara yang masih alami dengan pepohonan bambu lebat dan udara pedesaan sejuk.",
+        "descriptionEn": "Pristine upper gorges of the Ayung River framed by dense bamboo groves and cascading mountain springs.",
+        "highlights": "Jalan Ngarai Sungai Ayung & Alam Asri",
+        "highlightsEn": "Ayung River Gorge Trekking & Natural Scenery"
+      }
+    ]
   }
 ]
-

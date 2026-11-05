@@ -88,6 +88,29 @@ export const UI_TEXT = {
     nextStopLabel: "Destinasi berikutnya",
     minimizePanelLabel: "Kecilkan panel",
     expandPanelLabel: "Perluas detail desa",
+    // Transit & Durasi Perjalanan
+    transitTravelTime: "Waktu Tempuh",
+    transitFromGate: (gate: string) => `Dari ${gate}`,
+    transitToStay: "Menuju Homestay Warga",
+    transitFromPrev: (summary: string) => `${summary} dari titik sebelumnya`,
+    transitRoadEstimate: "Estimasi Jalur Darat",
+    // Penginapan & Wisata Terdekat
+    tabOverview: "Ringkasan",
+    tabStays: (count: number) => `Penginapan (${count})`,
+    tabAttractions: (count: number) => `Wisata Sekitar (${count})`,
+    localStaysTitle: "Penginapan di Daerah Ini",
+    nearbyAttractionsTitle: "Wisata & Daya Tarik Terdekat",
+    staysCountPill: (count: number) => `🏡 ${count} Penginapan Warga`,
+    attractionsCountPill: (count: number) => `🌿 ${count} Wisata Terdekat`,
+    perNightLabel: "/malam",
+    distanceFromVillage: (mins: number, km: string) =>
+      `~${mins} mnt (${km}) dari desa`,
+    stayBookingNoteLabel: "Catatan Reservasi:",
+    emptyStays: "Belum ada daftar penginapan tambahan di area ini.",
+    emptyAttractions: "Belum ada daftar wisata sekitar di area ini.",
+    layerStaysBtn: "Penginapan",
+    layerAttractionsBtn: "Wisata Sekitar",
+    featuresLabel: "Fasilitas & Suasana:",
     // Cultural Briefing
     etiquetteHeader: "Panduan Etika Adat Desa (Awig-Awig)",
     etiquetteSub:
@@ -200,6 +223,29 @@ export const UI_TEXT = {
     nextStopLabel: "Next village stop",
     minimizePanelLabel: "Minimize panel",
     expandPanelLabel: "Expand village details",
+    // Transit & Durasi Perjalanan
+    transitTravelTime: "Travel Time",
+    transitFromGate: (gate: string) => `From ${gate}`,
+    transitToStay: "To Community Homestay",
+    transitFromPrev: (summary: string) => `${summary} from previous stop`,
+    transitRoadEstimate: "Scenic Road Estimate",
+    // Accommodations & Nearby Attractions
+    tabOverview: "Overview",
+    tabStays: (count: number) => `Local Stays (${count})`,
+    tabAttractions: (count: number) => `Nearby Sights (${count})`,
+    localStaysTitle: "Community Stays in This Area",
+    nearbyAttractionsTitle: "Nearby Sights & Attractions",
+    staysCountPill: (count: number) => `🏡 ${count} Community Stays`,
+    attractionsCountPill: (count: number) => `🌿 ${count} Nearby Sights`,
+    perNightLabel: "/night",
+    distanceFromVillage: (mins: number, km: string) =>
+      `~${mins} mins (${km}) from village`,
+    stayBookingNoteLabel: "Booking Note:",
+    emptyStays: "No additional stays listed in this area.",
+    emptyAttractions: "No additional nearby sights listed in this area.",
+    layerStaysBtn: "Local Stays",
+    layerAttractionsBtn: "Nearby Sights",
+    featuresLabel: "Features & Vibe:",
     // Cultural Briefing
     etiquetteHeader: "Village Customary Etiquette (Awig-Awig)",
     etiquetteSub:

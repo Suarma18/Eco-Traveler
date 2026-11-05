@@ -149,3 +149,115 @@ export const DAY_COLORS: Record<
     textClass: "text-amber-800",
   },
 };
+
+/**
+ * Menghitung jarak garis lurus (Haversine) dalam kilometer
+ */
+export function calculateHaversineDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  if (lat1 === lat2 && lon1 === lon2) return 0;
+  const R = 6371; // Radius bumi dalam km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+export interface TransitEstimate {
+  straightKm: number;
+  roadDistanceKm: number;
+  durationMinutes: number;
+  formattedDuration: string;
+  formattedDistance: string;
+  formattedSummary: string;
+}
+
+/**
+ * Memperkirakan waktu tempuh dan jarak jalan realistis di Bali
+ * dengan faktor kelokan (1.38x) dan kecepatan berkendara rata-rata 35 km/jam
+ */
+export function estimateBaliTransit(
+  fromLat: number,
+  fromLng: number,
+  toLat: number,
+  toLng: number,
+  locale: Locale = "id"
+): TransitEstimate {
+  const straight = calculateHaversineDistanceKm(fromLat, fromLng, toLat, toLng);
+  // Faktor kelokan jalan pedesaan Bali (1.38x garis lurus)
+  const roadKm = Math.max(0.5, Math.round(straight * 1.38 * 10) / 10);
+  // Rata-rata 35 km/jam + buffer transisi/parkir 5 menit
+  const durationMinutes = Math.max(10, Math.round((roadKm / 35) * 60) + 5);
+
+  let formattedDuration: string;
+  if (durationMinutes < 60) {
+    formattedDuration =
+      locale === "en" ? `${durationMinutes} mins` : `${durationMinutes} mnt`;
+  } else {
+    const hours = Math.floor(durationMinutes / 60);
+    const mins = durationMinutes % 60;
+    if (mins === 0) {
+      formattedDuration = locale === "en" ? `${hours} hr` : `${hours} jam`;
+    } else {
+      formattedDuration =
+        locale === "en" ? `${hours}h ${mins}m` : `${hours}j ${mins}m`;
+    }
+  }
+
+  const formattedDistance =
+    locale === "en"
+      ? `${roadKm.toFixed(1)} km`
+      : `${roadKm.toFixed(1).replace(".", ",")} km`;
+
+  const formattedSummary = `~${formattedDuration} (${formattedDistance})`;
+
+  return {
+    straightKm: straight,
+    roadDistanceKm: roadKm,
+    durationMinutes,
+    formattedDuration,
+    formattedDistance,
+    formattedSummary,
+  };
+}
+
+/**
+ * Format total akumulasi durasi perjalanan harian
+ */
+export function formatDailyTransitSummary(
+  totalMinutes: number,
+  totalKm: number,
+  locale: Locale = "id"
+): string {
+  let timeStr: string;
+  if (totalMinutes < 60) {
+    timeStr = locale === "en" ? `${totalMinutes} mins` : `${totalMinutes} mnt`;
+  } else {
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    if (mins === 0) {
+      timeStr = locale === "en" ? `${hours} hr` : `${hours} jam`;
+    } else {
+      timeStr = locale === "en" ? `${hours}h ${mins}m` : `${hours}j ${mins}m`;
+    }
+  }
+
+  const distStr =
+    locale === "en"
+      ? `${totalKm.toFixed(1)} km`
+      : `${totalKm.toFixed(1).replace(".", ",")} km`;
+
+  return locale === "en"
+    ? `Transit: ~${timeStr} (${distStr})`
+    : `Perjalanan: ~${timeStr} (${distStr})`;
+}

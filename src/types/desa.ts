@@ -24,6 +24,48 @@ export type TourismFocus =
   | "Culinary"
   | "Agriculture";
 
+export type AccommodationType =
+  | "Homestay Warga"
+  | "Eco Lodge"
+  | "Bamboo Villa"
+  | "Pondok Desa";
+
+export interface LocalAccommodation {
+  id: string;
+  name: string;
+  nameEn?: string;
+  type: AccommodationType;
+  pricePerNightRp: number;
+  lat: number;
+  lng: number;
+  features: string[];
+  featuresEn?: string[];
+  bookingNote?: string;
+  bookingNoteEn?: string;
+}
+
+export type AttractionCategory =
+  | "Air Terjun"
+  | "Pura & Budaya"
+  | "Trekking & Viewpoint"
+  | "Pantai & Pesisir"
+  | "Agrowisata";
+
+export interface NearbyAttraction {
+  id: string;
+  name: string;
+  nameEn?: string;
+  category: AttractionCategory;
+  distanceKm: number;
+  durationMinutes: number;
+  lat: number;
+  lng: number;
+  description: string;
+  descriptionEn?: string;
+  highlights: string;
+  highlightsEn?: string;
+}
+
 export interface DesaWisata {
   id: string;
   name: string;
@@ -42,5 +84,7 @@ export interface DesaWisata {
   currentSimulatedLoad?: number;
   bufferVillageId?: string;
   elevationMeters?: number;
+  accommodations?: LocalAccommodation[];
+  nearbyAttractions?: NearbyAttraction[];
 }
 

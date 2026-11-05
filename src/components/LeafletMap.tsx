@@ -8,13 +8,19 @@ import {
   Popup,
   Polyline,
   CircleMarker,
+  Tooltip,
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { DayItinerary, TripDayActivity } from "@/types/trip";
 import { DesaWisata } from "@/types/desa";
-import { Locale, formatCurrency, DAY_COLORS } from "@/lib/utils";
+import {
+  Locale,
+  formatCurrency,
+  DAY_COLORS,
+  estimateBaliTransit,
+} from "@/lib/utils";
 import { getVillageVisualMeta } from "@/lib/village-media";
 import { DESA_BY_ID } from "@/lib/scoring";
 import {
@@ -32,6 +38,9 @@ import {
   ShieldAlert,
   Minimize2,
   Maximize2,
+  Car,
+  Compass,
+  BedDouble,
 } from "lucide-react";
 
 const CARTO_API_KEY =
@@ -186,6 +195,11 @@ export default function LeafletMap({
   const [showAllCuratedVillages, setShowAllCuratedVillages] = useState(true);
   const [showSouthHotspotZone, setShowSouthHotspotZone] = useState(true);
   const [inspectorMinimized, setInspectorMinimized] = useState(false);
+  const [inspectorTab, setInspectorTab] = useState<
+    "overview" | "stays" | "attractions"
+  >("overview");
+  const [showNearbyAttractions, setShowNearbyAttractions] = useState(false);
+  const [showAccommodations, setShowAccommodations] = useState(false);
   const [tileTheme, setTileTheme] = useState<BasemapProvider>("osm-clean");
 
   // Map basemap selalu konsisten mempertahankan OpenStreetMap (OSM) sebagai default
@@ -239,6 +253,38 @@ export default function LeafletMap({
     if (!activeVillageEntity) return null;
     return getLocalizedVillageText(activeVillageEntity, locale);
   }, [activeVillageEntity, locale]);
+
+  const activeAccommodations = useMemo(() => {
+    return activeVillageEntity?.accommodations || [];
+  }, [activeVillageEntity]);
+
+  const activeAttractions = useMemo(() => {
+    return activeVillageEntity?.nearbyAttractions || [];
+  }, [activeVillageEntity]);
+
+  const activeTransitEstimate = useMemo(() => {
+    if (!activeStep) return null;
+    if (activeStepIndex > 0) {
+      const prev = flatActivities[activeStepIndex - 1];
+      return estimateBaliTransit(
+        prev.activity.lat,
+        prev.activity.lng,
+        activeStep.activity.lat,
+        activeStep.activity.lng,
+        locale
+      );
+    }
+    if (activeStepIndex === 0 && activeStep.dayNumber === 1 && arrivalCoords) {
+      return estimateBaliTransit(
+        arrivalCoords[0],
+        arrivalCoords[1],
+        activeStep.activity.lat,
+        activeStep.activity.lng,
+        locale
+      );
+    }
+    return null;
+  }, [activeStep, activeStepIndex, flatActivities, arrivalCoords, locale]);
 
   const routeVillageIds = useMemo(() => {
     return new Set(days.flatMap((d) => d.activities.map((a) => a.villageId)));
@@ -391,6 +437,36 @@ export default function LeafletMap({
 
           <button
             type="button"
+            aria-pressed={showNearbyAttractions}
+            onClick={() => setShowNearbyAttractions((v) => !v)}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] dark:focus-visible:ring-orange-400 ${
+              showNearbyAttractions
+                ? "bg-orange-50 dark:bg-orange-950/80 text-[#EA580C] dark:text-[#FB923C] font-semibold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">{t.layerAttractionsBtn}</span>
+            <span className="sm:hidden">POI</span>
+          </button>
+
+          <button
+            type="button"
+            aria-pressed={showAccommodations}
+            onClick={() => setShowAccommodations((v) => !v)}
+            className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400 ${
+              showAccommodations
+                ? "bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300 font-semibold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            <BedDouble className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">{t.layerStaysBtn}</span>
+            <span className="sm:hidden">Stay</span>
+          </button>
+
+          <button
+            type="button"
             aria-label={t.switchBasemapLabel}
             onClick={() => {
               setTileTheme((prev) =>
@@ -506,6 +582,102 @@ export default function LeafletMap({
               );
             })}
 
+        {/* Titik Wisata Terdekat (Nearby Attractions POIs) */}
+        {showNearbyAttractions &&
+          allVillages.flatMap((v) =>
+            (v.nearbyAttractions || []).map((poi) => {
+              const poiName =
+                locale === "en" && poi.nameEn ? poi.nameEn : poi.name;
+              const desc =
+                locale === "en" && poi.descriptionEn
+                  ? poi.descriptionEn
+                  : poi.description;
+              const distKm =
+                locale === "en"
+                  ? `${poi.distanceKm} km`
+                  : `${poi.distanceKm.toString().replace(".", ",")} km`;
+              return (
+                <CircleMarker
+                  key={poi.id}
+                  center={[poi.lat, poi.lng]}
+                  radius={4.5}
+                  pathOptions={{
+                    color: useDarkMapColors ? "#FB923C" : "#EA580C",
+                    fillColor: useDarkMapColors ? "#FB923C" : "#EA580C",
+                    fillOpacity: 0.85,
+                    weight: 1.5,
+                  }}
+                >
+                  <Popup>
+                    <div className="text-stone-900 dark:text-stone-100 min-w-[200px] max-w-[240px] space-y-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-orange-50 dark:bg-orange-950 text-[#EA580C] dark:text-[#FB923C]">
+                          {poi.category}
+                        </span>
+                        <span className="text-[10px] font-mono text-stone-500 dark:text-stone-400">
+                          {t.distanceFromVillage(poi.durationMinutes, distKm)}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-stone-900 dark:text-white">
+                        {poiName}
+                      </h4>
+                      <p className="text-[11px] text-stone-600 dark:text-stone-300 leading-snug">
+                        {desc}
+                      </p>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              );
+            })
+          )}
+
+        {/* Titik Penginapan Warga & Eco-Lodge */}
+        {showAccommodations &&
+          allVillages.flatMap((v) =>
+            (v.accommodations || []).map((stay) => {
+              const stayName =
+                locale === "en" && stay.nameEn ? stay.nameEn : stay.name;
+              const features =
+                locale === "en" && stay.featuresEn
+                  ? stay.featuresEn
+                  : stay.features;
+              return (
+                <CircleMarker
+                  key={stay.id}
+                  center={[stay.lat, stay.lng]}
+                  radius={4.5}
+                  pathOptions={{
+                    color: useDarkMapColors ? "#34D399" : "#0D4732",
+                    fillColor: useDarkMapColors ? "#34D399" : "#10B981",
+                    fillOpacity: 0.85,
+                    weight: 1.5,
+                  }}
+                >
+                  <Popup>
+                    <div className="text-stone-900 dark:text-stone-100 min-w-[200px] max-w-[240px] space-y-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-[#0D4732] dark:text-emerald-300">
+                          {stay.type}
+                        </span>
+                        <span className="text-xs font-mono font-bold text-[#0D4732] dark:text-emerald-400 tabular-nums">
+                          {formatCurrency(stay.pricePerNightRp, locale)}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-stone-900 dark:text-white">
+                        {stayName}
+                      </h4>
+                      {features && features.length > 0 && (
+                        <p className="text-[10px] text-stone-600 dark:text-stone-300 leading-snug">
+                          {features.join(" • ")}
+                        </p>
+                      )}
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              );
+            })
+          )}
+
         {/* Pin Titik Kedatangan */}
         <Marker position={arrivalCoords} icon={createGateIcon()}>
           <Popup>
@@ -521,23 +693,41 @@ export default function LeafletMap({
         {/* Garis dari Pintu Kedatangan ke Destinasi Pertama Hari 1 */}
         {visibleDays.length > 0 &&
           visibleDays[0].dayNumber === 1 &&
-          visibleDays[0].activities.length > 0 && (
-            <Polyline
-              positions={[
-                arrivalCoords,
-                [
-                  visibleDays[0].activities[0].lat,
-                  visibleDays[0].activities[0].lng,
-                ],
-              ]}
-              pathOptions={{
-                color: useDarkMapColors ? "#34D399" : "#0D4732",
-                weight: 2.5,
-                dashArray: "6 8",
-                opacity: 0.8,
-              }}
-            />
-          )}
+          visibleDays[0].activities.length > 0 && (() => {
+            const firstAct = visibleDays[0].activities[0];
+            const gateTransit = estimateBaliTransit(
+              arrivalCoords[0],
+              arrivalCoords[1],
+              firstAct.lat,
+              firstAct.lng,
+              locale
+            );
+            return (
+              <Polyline
+                positions={[
+                  arrivalCoords,
+                  [firstAct.lat, firstAct.lng],
+                ]}
+                pathOptions={{
+                  color: useDarkMapColors ? "#34D399" : "#0D4732",
+                  weight: 2.5,
+                  dashArray: "6 8",
+                  opacity: 0.8,
+                }}
+              >
+                <Tooltip sticky>
+                  <div className="font-sans text-xs space-y-0.5">
+                    <div className="font-semibold text-slate-800 dark:text-slate-100">
+                      {arrivalLabel} ➔ {firstAct.villageName}
+                    </div>
+                    <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
+                      {gateTransit.formattedSummary}
+                    </div>
+                  </div>
+                </Tooltip>
+              </Polyline>
+            );
+          })()}
 
         {/* Polyline Jalur Harian & Pin Destinasi */}
         {visibleDays.map((day, dayIdx) => {
@@ -545,10 +735,6 @@ export default function LeafletMap({
           const dayColor = useDarkMapColors
             ? colorInfo.darkHex
             : colorInfo.hex;
-          const dayPositions: [number, number][] = day.activities.map((a) => [
-            a.lat,
-            a.lng,
-          ]);
 
           const prevDay = dayIdx > 0 ? visibleDays[dayIdx - 1] : null;
           const prevLastAct =
@@ -558,31 +744,80 @@ export default function LeafletMap({
 
           return (
             <React.Fragment key={day.dayNumber}>
-              {prevLastAct && day.activities.length > 0 && (
-                <Polyline
-                  positions={[
-                    [prevLastAct.lat, prevLastAct.lng],
-                    [day.activities[0].lat, day.activities[0].lng],
-                  ]}
-                  pathOptions={{
-                    color: useDarkMapColors ? "#A8A29E" : "#78716C",
-                    weight: 2.5,
-                    dashArray: "4 7",
-                    opacity: 0.8,
-                  }}
-                />
-              )}
+              {prevLastAct &&
+                day.activities.length > 0 && (() => {
+                  const nextAct = day.activities[0];
+                  const interTransit = estimateBaliTransit(
+                    prevLastAct.lat,
+                    prevLastAct.lng,
+                    nextAct.lat,
+                    nextAct.lng,
+                    locale
+                  );
+                  return (
+                    <Polyline
+                      positions={[
+                        [prevLastAct.lat, prevLastAct.lng],
+                        [nextAct.lat, nextAct.lng],
+                      ]}
+                      pathOptions={{
+                        color: useDarkMapColors ? "#A8A29E" : "#78716C",
+                        weight: 2.5,
+                        dashArray: "4 7",
+                        opacity: 0.8,
+                      }}
+                    >
+                      <Tooltip sticky>
+                        <div className="font-sans text-xs space-y-0.5">
+                          <div className="font-semibold text-slate-800 dark:text-slate-100">
+                            {prevLastAct.villageName} ➔ {nextAct.villageName}
+                          </div>
+                          <div className="font-mono text-[11px] text-slate-700 dark:text-slate-300 font-bold tabular-nums">
+                            {interTransit.formattedSummary}
+                          </div>
+                        </div>
+                      </Tooltip>
+                    </Polyline>
+                  );
+                })()}
 
-              {dayPositions.length > 1 && (
-                <Polyline
-                  positions={dayPositions}
-                  pathOptions={{
-                    color: dayColor,
-                    weight: 4,
-                    opacity: 0.95,
-                  }}
-                />
-              )}
+              {/* Garis Leg Antar-Destinasi Harian dengan Tooltip Durasi */}
+              {day.activities.map((act, actIdx) => {
+                if (actIdx === 0) return null;
+                const prevAct = day.activities[actIdx - 1];
+                const legTransit = estimateBaliTransit(
+                  prevAct.lat,
+                  prevAct.lng,
+                  act.lat,
+                  act.lng,
+                  locale
+                );
+                return (
+                  <Polyline
+                    key={`leg-${day.dayNumber}-${actIdx}`}
+                    positions={[
+                      [prevAct.lat, prevAct.lng],
+                      [act.lat, act.lng],
+                    ]}
+                    pathOptions={{
+                      color: dayColor,
+                      weight: 4,
+                      opacity: 0.95,
+                    }}
+                  >
+                    <Tooltip sticky>
+                      <div className="font-sans text-xs space-y-0.5">
+                        <div className="font-semibold text-slate-800 dark:text-slate-100">
+                          {prevAct.villageName} ➔ {act.villageName}
+                        </div>
+                        <div className="font-mono text-[11px] text-[#0D4732] dark:text-emerald-400 font-bold tabular-nums">
+                          {legTransit.formattedSummary}
+                        </div>
+                      </div>
+                    </Tooltip>
+                  </Polyline>
+                );
+              })}
 
               {day.activities.map((activity, actIdx) => {
                 const isSelected =
@@ -680,6 +915,15 @@ export default function LeafletMap({
                     {activeStep.activity.villageName} (
                     {activeStep.activity.regency})
                   </span>
+                  {activeTransitEstimate && (
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
+                      <Car
+                        className="w-2.5 h-2.5 text-emerald-400"
+                        aria-hidden="true"
+                      />
+                      {activeTransitEstimate.formattedSummary}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
@@ -742,6 +986,19 @@ export default function LeafletMap({
                         <span className="text-[10px] font-mono text-stone-300 bg-white/10 px-1.5 py-0.5 rounded tabular-nums">
                           {t.quotaFilled(activeVisualMeta.quotaPercentage)}
                         </span>
+                        {activeTransitEstimate && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-200 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded tabular-nums">
+                            <Car
+                              className="w-3 h-3 text-emerald-400 shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              {t.transitFromPrev(
+                                activeTransitEstimate.formattedSummary
+                              )}
+                            </span>
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center justify-between gap-2 mt-1">
                         <h4 className="text-sm font-display font-bold text-white truncate">
@@ -794,20 +1051,163 @@ export default function LeafletMap({
                     </div>
                   </div>
 
-                  {/* Awig-Awig & Etika Adat Kontekstual */}
-                  <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
-                    <ScrollText
-                      className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
-                      aria-hidden="true"
-                    />
-                    <div className="line-clamp-2 sm:line-clamp-none">
-                      <strong className="text-amber-300">
-                        {t.awigAwigPrefix}{" "}
-                      </strong>
-                      {activeVillageText?.customsNote ||
-                        "Respect sacred temple areas and preserve local subak irrigation channels."}
-                    </div>
+                  {/* Segmented Inspector Tab Bar */}
+                  <div className="flex items-center gap-1 pt-1 pb-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setInspectorTab("overview")}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+                        inspectorTab === "overview"
+                          ? "bg-white/20 text-white shadow-2xs"
+                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {t.tabOverview}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInspectorTab("stays")}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+                        inspectorTab === "stays"
+                          ? "bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 shadow-2xs"
+                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {t.tabStays(activeAccommodations.length)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInspectorTab("attractions")}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-semibold cursor-pointer transition-colors ${
+                        inspectorTab === "attractions"
+                          ? "bg-orange-500/30 text-orange-200 border border-orange-400/40 shadow-2xs"
+                          : "text-emerald-200/70 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {t.tabAttractions(activeAttractions.length)}
+                    </button>
                   </div>
+
+                  {/* Tab Content 1: Awig-Awig & Etika Adat Kontekstual */}
+                  {inspectorTab === "overview" && (
+                    <div className="p-2 rounded-lg bg-white/10 border border-white/10 text-[11px] text-emerald-50 leading-snug flex items-start gap-2">
+                      <ScrollText
+                        className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <div className="line-clamp-2 sm:line-clamp-none">
+                        <strong className="text-amber-300">
+                          {t.awigAwigPrefix}{" "}
+                        </strong>
+                        {activeVillageText?.customsNote ||
+                          "Respect sacred temple areas and preserve local subak irrigation channels."}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab Content 2: Penginapan di Daerah Tersebut */}
+                  {inspectorTab === "stays" && (
+                    <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                      {activeAccommodations.length === 0 ? (
+                        <p className="text-[11px] text-emerald-200/60 italic p-1">
+                          {t.emptyStays}
+                        </p>
+                      ) : (
+                        activeAccommodations.map((stay) => {
+                          const stayName =
+                            locale === "en" && stay.nameEn
+                              ? stay.nameEn
+                              : stay.name;
+                          const features =
+                            locale === "en" && stay.featuresEn
+                              ? stay.featuresEn
+                              : stay.features;
+                          return (
+                            <div
+                              key={stay.id}
+                              className="p-2 rounded-lg bg-white/10 border border-white/10 flex items-center justify-between gap-2 text-xs"
+                            >
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-semibold text-white truncate">
+                                    {stayName}
+                                  </span>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
+                                    {stay.type}
+                                  </span>
+                                </div>
+                                {features && features.length > 0 && (
+                                  <p className="text-[10px] text-emerald-200/80 truncate">
+                                    {features.join(" • ")}
+                                  </p>
+                                )}
+                              </div>
+                              <span className="font-mono text-xs font-bold text-emerald-300 tabular-nums shrink-0">
+                                {formatCurrency(stay.pricePerNightRp, locale)}
+                                <span className="text-[10px] text-emerald-200/60 font-sans font-normal ml-0.5">
+                                  {t.perNightLabel}
+                                </span>
+                              </span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab Content 3: Wisata Terdekat */}
+                  {inspectorTab === "attractions" && (
+                    <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                      {activeAttractions.length === 0 ? (
+                        <p className="text-[11px] text-emerald-200/60 italic p-1">
+                          {t.emptyAttractions}
+                        </p>
+                      ) : (
+                        activeAttractions.map((poi) => {
+                          const poiName =
+                            locale === "en" && poi.nameEn
+                              ? poi.nameEn
+                              : poi.name;
+                          const desc =
+                            locale === "en" && poi.descriptionEn
+                              ? poi.descriptionEn
+                              : poi.description;
+                          const distKm =
+                            locale === "en"
+                              ? `${poi.distanceKm} km`
+                              : `${poi.distanceKm
+                                  .toString()
+                                  .replace(".", ",")} km`;
+                          return (
+                            <div
+                              key={poi.id}
+                              className="p-2 rounded-lg bg-white/10 border border-white/10 space-y-0.5 text-xs"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className="font-semibold text-white truncate">
+                                    {poiName}
+                                  </span>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-orange-500/20 text-[#FB923C] shrink-0">
+                                    {poi.category}
+                                  </span>
+                                </div>
+                                <span className="font-mono text-[10px] text-emerald-300 tabular-nums shrink-0">
+                                  {t.distanceFromVillage(
+                                    poi.durationMinutes,
+                                    distKm
+                                  )}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-emerald-100/80 line-clamp-2">
+                                {desc}
+                              </p>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

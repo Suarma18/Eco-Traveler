@@ -566,6 +566,8 @@ export default function HomePage() {
                 onSelectDayFilter={setSelectedDayFilter}
                 locale={locale}
                 onJumpToMap={handleJumpToMapOnMobile}
+                arrivalCoords={itinerary.engineMeta?.arrivalCoords}
+                arrivalLabel={itinerary.engineMeta?.arrivalGateLabel}
               />
 
               {/* Panduan Etika Adat Desa (Awig-Awig) */}
