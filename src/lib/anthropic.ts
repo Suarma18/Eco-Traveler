@@ -67,20 +67,26 @@ async function callAnthropicMessagesApi(
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     try {
+      const requestPayload: Record<string, unknown> = {
+        model,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      };
+
+      // claude-sonnet-5-5 and reasoning models deprecate temperature parameter
+      if (!model.includes("sonnet-5-5") && !model.includes("claude-sonnet-5-5")) {
+        requestPayload.temperature = 0.3;
+      }
+
       const response = await fetch(ANTHROPIC_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
+          "x-api-key": apiKey.trim(),
           "anthropic-version": "2023-06-01",
         },
-        body: JSON.stringify({
-          model,
-          max_tokens: maxTokens,
-          temperature: 0.3,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userMessage }],
-        }),
+        body: JSON.stringify(requestPayload),
         signal: controller.signal,
       });
 
@@ -100,9 +106,12 @@ async function callAnthropicMessagesApi(
       }
 
       const json = await response.json();
-      const content = json?.content?.[0]?.text;
+      const textBlock = Array.isArray(json?.content)
+        ? json.content.find((c: { type: string; text?: string }) => c.type === "text")
+        : null;
+      const content = textBlock?.text;
       if (typeof content !== "string") {
-        throw new Error("Invalid response format from Anthropic API");
+        throw new Error("Invalid response format from Anthropic API: text block not found");
       }
       return content;
     } catch (err: unknown) {
@@ -131,8 +140,9 @@ export async function generateAiNarrative(
   lang: "id" | "en",
   userNote?: string
 ): Promise<{ success: boolean; data?: NarrateApiResponse; isFallback: boolean }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey.trim() === "") {
+  const rawKey = process.env.ANTHROPIC_API_KEY || "";
+  const apiKey = rawKey.replace(/^[#\s"']+|[#\s"']+$/g, "").trim();
+  if (!apiKey) {
     return { success: false, isFallback: true };
   }
 
@@ -163,7 +173,7 @@ export async function generateAiNarrative(
       model,
       systemPrompt,
       JSON.stringify(payloadData),
-      1200
+      2500
     );
 
     const cleaned = cleanJsonOutput(rawContent);
@@ -212,8 +222,9 @@ export async function parseAiPreferences(
   userText: string,
   lang: "id" | "en"
 ): Promise<{ success: boolean; data?: ParsedPreferencesResponse; isFallback: boolean }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey.trim() === "") {
+  const rawKey = process.env.ANTHROPIC_API_KEY || "";
+  const apiKey = rawKey.replace(/^[#\s"']+|[#\s"']+$/g, "").trim();
+  if (!apiKey) {
     return { success: false, isFallback: true };
   }
 
@@ -231,7 +242,7 @@ export async function parseAiPreferences(
       model,
       systemPrompt,
       cleanUserText,
-      400
+      1000
     );
 
     const cleaned = cleanJsonOutput(rawContent);

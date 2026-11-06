@@ -32,7 +32,15 @@ function validateNarrativeResponse(rawJson, expectedStopIds) {
 }
 
 const ALLOWED_ARRIVALS = ["NgurahRaiAirport", "GilimanukPort"];
-const ALLOWED_FOCUSES = ["Culture", "Nature", "Adventure", "Culinary", "Craft"];
+const ALLOWED_FOCUSES = [
+  "Culture",
+  "Nature",
+  "Culinary",
+  "Wellness",
+  "Agriculture",
+  "Adventure",
+  "Craft",
+];
 const ALLOWED_STAYS = ["Backpacker", "Moderate", "Comfort"];
 
 function validateParsedPreferences(rawJson) {

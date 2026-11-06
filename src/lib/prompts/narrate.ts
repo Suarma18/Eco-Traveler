@@ -19,8 +19,10 @@ export const ALLOWED_ARRIVALS = ["NgurahRaiAirport", "GilimanukPort"] as const;
 export const ALLOWED_FOCUSES = [
   "Culture",
   "Nature",
-  "Adventure",
   "Culinary",
+  "Wellness",
+  "Agriculture",
+  "Adventure",
   "Craft",
 ] as const;
 export const ALLOWED_STAYS = ["Backpacker", "Moderate", "Comfort"] as const;
