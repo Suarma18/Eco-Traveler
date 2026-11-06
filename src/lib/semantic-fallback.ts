@@ -1,6 +1,7 @@
 // Local Semantic Rule Engine for Eco Traveler
 // Deterministic, zero-dependency, offline-capable NLP extractor.
-// Guarantees user intent is never lost even during API downtime, quota exhaustion, or unconfigured keys.
+// Distinguishes travel pace, interests, exclusions, duration, and arrival gates.
+// Correctly handles clause boundaries, negation, conflicting instructions, typos, and unrecognized requests.
 
 export const ALLOWED_ARRIVALS = ["NgurahRaiAirport", "GilimanukPort"] as const;
 export const ALLOWED_FOCUSES = [
@@ -24,48 +25,157 @@ export interface ParsedPreferencesResponse {
   explanation: string;
 }
 
-// Normalizes text by removing punctuation, converting to lowercase, and collapsing whitespace
-function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s]/g, " ")
+export interface SemanticParseResult {
+  status: "matched" | "clarification_needed" | "unrecognized";
+  confidence: "high" | "medium" | "low" | "none";
+  processingSource: "gemini-ai" | "semantic-fallback";
+  parsed: ParsedPreferencesResponse | null;
+  detectedIntents: {
+    duration?: 1 | 2 | 3 | 4;
+    arrival?: AllowedArrival;
+    focuses?: AllowedFocus[];
+    excludedFocuses?: AllowedFocus[];
+    stay?: AllowedStay;
+    pace?: "relaxed" | "active";
+  };
+  conflictNotes?: string[];
+  clarificationPrompt?: string;
+  message?: string;
+}
+
+const NEGATION_PATTERNS = [
+  "jangan",
+  "tidak",
+  "tak",
+  "bukan",
+  "hindari",
+  "tanpa",
+  "bebas",
+  "kecuali",
+  "no",
+  "not",
+  "dont",
+  "don't",
+  "avoid",
+  "without",
+  "exclude",
+  "except",
+  "anti",
+];
+
+// Splits raw text into independent semantic clauses across commas, conjunctions, and delimiters
+function splitIntoClauses(rawText: string): string[] {
+  return rawText
+    .split(/[,;.!?\n]+|\b(tapi|tetapi|namun|melainkan|sedangkan|but|whereas|while|instead)\b/i)
+    .filter(Boolean)
+    .map((s) => s.trim().toLowerCase())
+    .filter((s) => s.length > 0);
+}
+
+function normalizeClause(clause: string): string {
+  return clause
+    .replace(/[^\w\s-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 /**
- * Typo-tolerant substring/token matcher.
- * Matches keywords even with common typos (e.g. 'relaxaced' -> 'relax', 'tedekat' -> 'dekat').
+ * Checks a specific clause for keywords and checks whether negation appears
+ * earlier inside the SAME clause. Negations never leak across clause boundaries.
  */
-function containsKeyword(normText: string, keywords: string[]): boolean {
+function inspectClauseForKeyword(
+  clause: string,
+  keywords: string[]
+): { matched: boolean; isNegated: boolean; matchedKeyword?: string } {
+  const norm = normalizeClause(clause);
+  const tokens = norm.split(/\s+/);
+
   for (const kw of keywords) {
-    if (normText.includes(kw)) return true;
-    if (kw.length >= 4) {
-      const tokens = normText.split(" ");
-      for (const tok of tokens) {
-        if (tok.startsWith(kw.slice(0, 4)) || tok.includes(kw)) {
-          return true;
+    for (let i = 0; i < tokens.length; i++) {
+      const tok = tokens[i];
+      const isMatch =
+        tok === kw ||
+        (kw.length >= 4 && (tok.startsWith(kw.slice(0, 4)) || tok.includes(kw))) ||
+        (kw.length >= 5 && kw.startsWith(tok) && tok.length >= 4);
+
+      if (isMatch) {
+        // Look back inside the same clause for a negation word
+        let negated = false;
+        for (let j = 0; j < i; j++) {
+          if (NEGATION_PATTERNS.includes(tokens[j])) {
+            negated = true;
+            break;
+          }
         }
+        return { matched: true, isNegated: negated, matchedKeyword: kw };
       }
     }
   }
-  return false;
+
+  return { matched: false, isNegated: false };
+}
+
+/**
+ * Scans all clauses for a category.
+ * If any clause explicitly negates the category, it is treated as negated (exclusion).
+ * Otherwise if matched without negation, it is treated as an active focus.
+ */
+function evaluateCategoryAcrossClauses(
+  clauses: string[],
+  keywords: string[]
+): { isIncluded: boolean; isExcluded: boolean } {
+  let isIncluded = false;
+  let isExcluded = false;
+
+  for (const clause of clauses) {
+    const res = inspectClauseForKeyword(clause, keywords);
+    if (res.matched) {
+      if (res.isNegated) {
+        isExcluded = true;
+      } else {
+        isIncluded = true;
+      }
+    }
+  }
+
+  return { isIncluded, isExcluded };
 }
 
 /**
  * Extracts travel parameters and intent from natural language input.
- * Handles both Indonesian and English, with resistance to typos.
+ * Handles both Indonesian and English, with clause-aware negation, conflict resolution,
+ * pace vs interest separation, and strict non-hallucinatory rejection of unrecognized text.
  */
 export function parsePreferencesSemantically(
   rawInput: string,
   lang: "id" | "en" = "id"
-): ParsedPreferencesResponse {
-  const norm = normalizeText(rawInput);
-  const detectedFocuses: AllowedFocus[] = [];
-  const explanations: string[] = [];
+): SemanticParseResult {
+  const cleanInput = (rawInput || "").trim();
+  if (!cleanInput) {
+    return {
+      status: "unrecognized",
+      confidence: "none",
+      processingSource: "semantic-fallback",
+      parsed: null,
+      detectedIntents: {},
+      message: lang === "en" ? "Empty input provided." : "Masukan teks kosong.",
+      clarificationPrompt:
+        lang === "en"
+          ? "Please enter travel preferences, e.g. '3 days relaxed with culinary focus'."
+          : "Silakan masukkan preferensi perjalanan, misal: '3 hari santai tambah kuliner'.",
+    };
+  }
 
-  // 1. Focus Detection
-  // Culinary / Kuliner (e.g. "tambah kuliner tedekat", "makanan lokal")
+  const clauses = splitIntoClauses(cleanInput);
+  const fullNorm = normalizeClause(cleanInput.toLowerCase());
+
+  const detectedFocuses = new Set<AllowedFocus>();
+  const excludedFocuses = new Set<AllowedFocus>();
+  const explanations: string[] = [];
+  const conflictNotes: string[] = [];
+
+  // --- 1. CLAUSE-AWARE FOCUS & EXCLUSION DETECTION ---
+  // A. Culinary / Kuliner
   const culinaryKeywords = [
     "kuliner",
     "makan",
@@ -83,16 +193,24 @@ export function parsePreferencesSemantically(
     "cook",
     "taste",
   ];
-  if (containsKeyword(norm, culinaryKeywords)) {
-    detectedFocuses.push("Culinary");
+  const culinaryEval = evaluateCategoryAcrossClauses(clauses, culinaryKeywords);
+  if (culinaryEval.isExcluded) {
+    excludedFocuses.add("Culinary");
+    explanations.push(
+      lang === "en"
+        ? "Excluded culinary stops based on your preference"
+        : "Menghindari sentra kuliner sesuai permintaan Anda"
+    );
+  } else if (culinaryEval.isIncluded) {
+    detectedFocuses.add("Culinary");
     explanations.push(
       lang === "en"
         ? "Focus shifted to local village culinary & food UMKM"
-        : "Fokus diarahkan ke kuliner lokal dan sentra UMKM pangan desa"
+        : "Fokus diarahkan ke sentra kuliner lokal dan UMKM pangan desa"
     );
   }
 
-  // Wellness / Santai (e.g. "more relaxaced", "lebih santai", "relax", "healing")
+  // B. Wellness / Santai
   const wellnessKeywords = [
     "santai",
     "relax",
@@ -112,8 +230,11 @@ export function parsePreferencesSemantically(
     "damai",
     "adem",
   ];
-  if (containsKeyword(norm, wellnessKeywords)) {
-    detectedFocuses.push("Wellness");
+  const wellnessEval = evaluateCategoryAcrossClauses(clauses, wellnessKeywords);
+  if (wellnessEval.isExcluded) {
+    excludedFocuses.add("Wellness");
+  } else if (wellnessEval.isIncluded) {
+    detectedFocuses.add("Wellness");
     explanations.push(
       lang === "en"
         ? "Trip pace adjusted for relaxed wellness & tranquility"
@@ -121,7 +242,7 @@ export function parsePreferencesSemantically(
     );
   }
 
-  // Nature / Alam
+  // C. Nature / Alam
   const natureKeywords = [
     "alam",
     "nature",
@@ -146,16 +267,24 @@ export function parsePreferencesSemantically(
     "sunset",
     "sunrise",
   ];
-  if (containsKeyword(norm, natureKeywords)) {
-    detectedFocuses.push("Nature");
+  const natureEval = evaluateCategoryAcrossClauses(clauses, natureKeywords);
+  if (natureEval.isExcluded) {
+    excludedFocuses.add("Nature");
     explanations.push(
       lang === "en"
-        ? "Highlights prioritized for natural landscapes & coastal areas"
-        : "Prioritas ditambahkan pada panorama alam dan lanskap pesisir"
+        ? "Excluded nature / coastal stops per your request"
+        : "Mengecualikan destinasi alam / pantai sesuai permintaan"
+    );
+  } else if (natureEval.isIncluded) {
+    detectedFocuses.add("Nature");
+    explanations.push(
+      lang === "en"
+        ? "Prioritizing natural landscapes & coastal ecotourism"
+        : "Memprioritaskan panorama alam dan ekowisata pesisir"
     );
   }
 
-  // Agriculture / Subak
+  // D. Agriculture / Subak
   const agroKeywords = [
     "tani",
     "agro",
@@ -171,8 +300,16 @@ export function parsePreferencesSemantically(
     "cengkeh",
     "kakao",
   ];
-  if (containsKeyword(norm, agroKeywords)) {
-    detectedFocuses.push("Agriculture");
+  const agroEval = evaluateCategoryAcrossClauses(clauses, agroKeywords);
+  if (agroEval.isExcluded) {
+    excludedFocuses.add("Agriculture");
+    explanations.push(
+      lang === "en"
+        ? "Excluded agricultural & farm stops"
+        : "Mengecualikan persawahan dan agrowisata"
+    );
+  } else if (agroEval.isIncluded) {
+    detectedFocuses.add("Agriculture");
     explanations.push(
       lang === "en"
         ? "Emphasizing agro-tourism & UNESCO Subak heritage"
@@ -180,7 +317,7 @@ export function parsePreferencesSemantically(
     );
   }
 
-  // Culture / Budaya
+  // E. Culture / Budaya
   const cultureKeywords = [
     "budaya",
     "culture",
@@ -200,80 +337,234 @@ export function parsePreferencesSemantically(
     "desa tua",
     "bali aga",
   ];
-  if (containsKeyword(norm, cultureKeywords)) {
-    detectedFocuses.push("Culture");
+  const cultureEval = evaluateCategoryAcrossClauses(clauses, cultureKeywords);
+  if (cultureEval.isExcluded) {
+    excludedFocuses.add("Culture");
     explanations.push(
       lang === "en"
-        ? "Curating authentic Balinese cultural & heritage spots"
+        ? "Excluded customary & temple heritage stops"
+        : "Mengecualikan kunjungan adat dan pura"
+    );
+  } else if (cultureEval.isIncluded) {
+    detectedFocuses.add("Culture");
+    explanations.push(
+      lang === "en"
+        ? "Curating authentic Balinese cultural & heritage villages"
         : "Mengutamakan desa adat tua dan warisan budaya otentik"
     );
   }
 
-  // 2. Duration / Days Detection
-  let detectedDays: 1 | 2 | 3 | 4 | null = null;
-  if (/(1\s*hari|1\s*day|satu\s*hari|one\s*day|day\s*trip|sehari)/.test(norm)) {
-    detectedDays = 1;
-    explanations.push(lang === "en" ? "Set duration to 1 day" : "Durasi diatur 1 hari");
-  } else if (/(2\s*hari|2\s*days|dua\s*hari|two\s*days|2d|weekend)/.test(norm)) {
-    detectedDays = 2;
-    explanations.push(lang === "en" ? "Set duration to 2 days" : "Durasi diatur 2 hari");
-  } else if (/(3\s*hari|3\s*days|tiga\s*hari|three\s*days|3d)/.test(norm)) {
-    detectedDays = 3;
-    explanations.push(lang === "en" ? "Set duration to 3 days" : "Durasi diatur 3 hari");
-  } else if (/(4\s*hari|4\s*days|empat\s*hari|four\s*days|4d)/.test(norm)) {
-    detectedDays = 4;
-    explanations.push(lang === "en" ? "Set duration to 4 days" : "Durasi diatur 4 hari");
+  // --- 2. PACE DETECTION ---
+  let detectedPace: "relaxed" | "active" | undefined;
+  if (/(padat|cepat|aktif|active|packed|intense|banyak\s*tempat)/.test(fullNorm)) {
+    detectedPace = "active";
+    explanations.push(
+      lang === "en"
+        ? "Active pace: maximizing village destination exploration"
+        : "Ritme aktif: mengoptimalkan jumlah kunjungan destinasi"
+    );
+  } else if (wellnessEval.isIncluded && !wellnessEval.isExcluded) {
+    detectedPace = "relaxed";
   }
 
-  // 3. Arrival Gate Detection
-  let detectedArrival: AllowedArrival | null = null;
-  if (/(gilimanuk|pelabuhan|port|ferry|jawa|ketapang)/.test(norm)) {
-    detectedArrival = "GilimanukPort";
+  // --- 3. DURATION DETECTION WITH CONFLICT & OUT-OF-BOUNDS RESOLUTION ---
+  const durationMatches: { days: number; index: number; raw: string }[] = [];
+
+  const dayRegexes: { days: number; regex: RegExp }[] = [
+    { days: 1, regex: /\b(1\s*hari|1\s*day|satu\s*hari|one\s*day|day\s*trip|sehari|1d)\b/g },
+    { days: 2, regex: /\b(2\s*hari|2\s*days|dua\s*hari|two\s*days|2d|weekend|akhir\s*pekan)\b/g },
+    { days: 3, regex: /\b(3\s*hari|3\s*days|tiga\s*hari|three\s*days|3d)\b/g },
+    { days: 4, regex: /\b(4\s*hari|4\s*days|empat\s*hari|four\s*days|4d)\b/g },
+  ];
+
+  for (const { days, regex } of dayRegexes) {
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(fullNorm)) !== null) {
+      durationMatches.push({ days, index: match.index, raw: match[0] });
+    }
+  }
+
+  // Detect out-of-bounds duration numbers like "10 hari", "0 hari", "7 hari"
+  const outOfBoundsMatch = /\b(\d+)\s*(hari|day|days)\b/.exec(fullNorm);
+  if (outOfBoundsMatch) {
+    const requestedVal = parseInt(outOfBoundsMatch[1], 10);
+    if (requestedVal < 1 || requestedVal > 4) {
+      return {
+        status: "clarification_needed",
+        confidence: "medium",
+        processingSource: "semantic-fallback",
+        parsed: null,
+        detectedIntents: {},
+        clarificationPrompt:
+          lang === "en"
+            ? `Eco Traveler supports curated routes between 1 and 4 days. You requested ${requestedVal} days. Please choose 1, 2, 3, or 4 days.`
+            : `Eco Traveler mendukung rute 1 sampai 4 hari. Anda meminta ${requestedVal} hari. Silakan pilih 1, 2, 3, atau 4 hari.`,
+        message:
+          lang === "en"
+            ? `Duration ${requestedVal} days is out of bounds (allowed: 1-4 days).`
+            : `Durasi ${requestedVal} hari di luar batas (didukung: 1-4 hari).`,
+      };
+    }
+  }
+
+  let detectedDays: 1 | 2 | 3 | 4 | null = null;
+  if (durationMatches.length > 0) {
+    durationMatches.sort((a, b) => a.index - b.index);
+    if (durationMatches.length > 1) {
+      const winner = durationMatches[durationMatches.length - 1];
+      const loser = durationMatches[0];
+      if (winner.days !== loser.days) {
+        conflictNotes.push(
+          lang === "en"
+            ? `Resolved duration conflict: ${winner.days} days chosen (superseding earlier mention of ${loser.days} days).`
+            : `Resolusi konflik durasi: memilih ${winner.days} hari (menggantikan penyebutan awal ${loser.days} hari).`
+        );
+      }
+      detectedDays = winner.days as 1 | 2 | 3 | 4;
+    } else {
+      detectedDays = durationMatches[0].days as 1 | 2 | 3 | 4;
+    }
     explanations.push(
-      lang === "en" ? "Set arrival to Gilimanuk Port" : "Pintu kedatangan diatur Pelabuhan Gilimanuk"
+      lang === "en" ? `Set duration to ${detectedDays} days` : `Durasi diatur ${detectedDays} hari`
     );
-  } else if (/(bandara|airport|dps|ngurah\s*rai|pesawat|flight)/.test(norm)) {
+  }
+
+  // --- 4. ARRIVAL GATE DETECTION WITH CLAUSE NEGATION ---
+  let detectedArrival: AllowedArrival | null = null;
+  const gilimanukEval = evaluateCategoryAcrossClauses(clauses, ["gilimanuk", "ferry", "ketapang"]);
+  const airportEval = evaluateCategoryAcrossClauses(clauses, [
+    "bandara",
+    "airport",
+    "dps",
+    "ngurah rai",
+    "pesawat",
+    "flight",
+    "tuban",
+  ]);
+
+  if (gilimanukEval.isExcluded || (gilimanukEval.isExcluded && airportEval.isIncluded)) {
     detectedArrival = "NgurahRaiAirport";
     explanations.push(
-      lang === "en"
-        ? "Set arrival to Ngurah Rai Airport"
-        : "Pintu kedatangan diatur Bandara Ngurah Rai"
+      lang === "en" ? "Arrival set to Airport (avoiding Gilimanuk)" : "Kedatangan diarahkan ke Bandara (bukan Gilimanuk)"
+    );
+  } else if (airportEval.isExcluded || (airportEval.isExcluded && gilimanukEval.isIncluded)) {
+    detectedArrival = "GilimanukPort";
+    explanations.push(
+      lang === "en" ? "Arrival set to Gilimanuk Port (avoiding Airport)" : "Kedatangan diarahkan ke Gilimanuk (bukan Bandara)"
+    );
+  } else if (gilimanukEval.isIncluded) {
+    detectedArrival = "GilimanukPort";
+    explanations.push(
+      lang === "en" ? "Set arrival to Gilimanuk Ferry Port" : "Pintu kedatangan: Pelabuhan Gilimanuk"
+    );
+  } else if (airportEval.isIncluded) {
+    detectedArrival = "NgurahRaiAirport";
+    explanations.push(
+      lang === "en" ? "Set arrival to Ngurah Rai Airport" : "Pintu kedatangan: Bandara Ngurah Rai"
     );
   }
 
-  // 4. Stay / Accommodation Detection
+  // --- 5. STAY / BUDGET DETECTION ---
   let detectedStay: AllowedStay | null = null;
-  if (/(backpacker|murah|hemat|budget|hostel|losmen)/.test(norm)) {
+  if (/(backpacker|murah|hemat|budget|hostel|losmen)/.test(fullNorm)) {
     detectedStay = "Backpacker";
     explanations.push(
-      lang === "en" ? "Set budget category to Backpacker" : "Tipe akomodasi: Backpacker (Homestay Warga)"
+      lang === "en" ? "Accommodation: Backpacker (Community Homestay)" : "Akomodasi: Backpacker (Homestay Warga)"
     );
-  } else if (/(menengah|mid|standar|standard|keluarga)/.test(norm)) {
+  } else if (/(menengah|mid|standar|standard|keluarga)/.test(fullNorm)) {
     detectedStay = "Moderate";
     explanations.push(
-      lang === "en" ? "Set budget category to Moderate" : "Tipe akomodasi: Standar / Moderate"
+      lang === "en" ? "Accommodation: Standard / Moderate" : "Akomodasi: Standar / Menengah"
     );
-  } else if (/(comfort|resort|boutique|eco\s*lodge|luxury|mewah|glamping|villa)/.test(norm)) {
+  } else if (/(comfort|resort|boutique|eco\s*lodge|luxury|mewah|glamping|villa)/.test(fullNorm)) {
     detectedStay = "Comfort";
     explanations.push(
-      lang === "en"
-        ? "Set accommodation category to Comfort Eco-Lodge"
-        : "Tipe akomodasi: Comfort (Eco-Lodge Warga)"
+      lang === "en" ? "Accommodation: Comfort Eco-Lodge" : "Akomodasi: Comfort (Eco-Lodge Warga)"
     );
   }
 
+  // Final Focuses: remove any that were explicitly excluded
+  const finalFocuses = Array.from(detectedFocuses).filter((f) => !excludedFocuses.has(f));
+
+  // --- 6. UNRECOGNIZED & AMBIGUOUS CHECK ---
+  const hasConcreteIntent =
+    detectedDays !== null ||
+    detectedArrival !== null ||
+    finalFocuses.length > 0 ||
+    excludedFocuses.size > 0 ||
+    detectedStay !== null ||
+    detectedPace !== undefined;
+
+  if (!hasConcreteIntent) {
+    const isVagueTravel = /(liburan|holiday|trip|vacation|wisata|jalan|travel|recommend|rekomen|bagus|seru|mau|tolong|help)/.test(
+      fullNorm
+    );
+
+    if (isVagueTravel) {
+      return {
+        status: "clarification_needed",
+        confidence: "low",
+        processingSource: "semantic-fallback",
+        parsed: null,
+        detectedIntents: {},
+        clarificationPrompt:
+          lang === "en"
+            ? "Could you specify what kind of trip you prefer? E.g., '3 days culture & culinary from Airport' or '2 days relaxed nature'."
+            : "Bisa perjelas perjalanan yang diinginkan? Contoh: '3 hari budaya & kuliner dari bandara' atau '2 hari santai alam'.",
+        message:
+          lang === "en"
+            ? "General travel intent detected, but specific parameters are missing."
+            : "Niat perjalanan terdeteksi, namun parameter rute belum spesifik.",
+      };
+    }
+
+    return {
+      status: "unrecognized",
+      confidence: "none",
+      processingSource: "semantic-fallback",
+      parsed: null,
+      detectedIntents: {},
+      clarificationPrompt:
+        lang === "en"
+          ? "No recognizable travel parameters found. Try specifying duration (1-4 days), gate (Airport/Gilimanuk), or interests (culture, nature, culinary, wellness, subak)."
+          : "Tidak ada parameter rute yang dikenali. Coba sebutkan durasi (1-4 hari), pintu masuk (Bandara/Gilimanuk), atau minat (budaya, alam, kuliner, santai, subak).",
+      message:
+        lang === "en"
+          ? "Input was not recognized as a travel preference request."
+          : "Masukan tidak dikenali sebagai permintaan preferensi perjalanan.",
+    };
+  }
+
+  const allNotes = [...explanations, ...conflictNotes];
   const finalExplanation =
-    explanations.length > 0
-      ? explanations.join(". ") + "."
+    allNotes.length > 0
+      ? allNotes.join(". ") + "."
       : lang === "en"
       ? "Trip preferences updated based on your prompt."
       : "Preferensi rute diperbarui berdasarkan catatan Anda.";
 
-  return {
+  const parsedData: ParsedPreferencesResponse = {
     days: detectedDays,
     arrival: detectedArrival,
-    focus: detectedFocuses.length > 0 ? detectedFocuses : null,
+    focus: finalFocuses.length > 0 ? finalFocuses : null,
     stay: detectedStay,
     explanation: finalExplanation,
+  };
+
+  return {
+    status: "matched",
+    confidence: "high",
+    processingSource: "semantic-fallback",
+    parsed: parsedData,
+    detectedIntents: {
+      duration: detectedDays || undefined,
+      arrival: detectedArrival || undefined,
+      focuses: finalFocuses.length > 0 ? finalFocuses : undefined,
+      excludedFocuses: excludedFocuses.size > 0 ? Array.from(excludedFocuses) : undefined,
+      stay: detectedStay || undefined,
+      pace: detectedPace,
+    },
+    conflictNotes: conflictNotes.length > 0 ? conflictNotes : undefined,
+    message: finalExplanation,
   };
 }

@@ -36,7 +36,7 @@ export const UI_TEXT = {
     printFooterDisclaimer:
       "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi.",
     printFooterSource:
-      "Sumber Data: Direktori Resmi Desa Wisata Dinas Pariwisata Provinsi Bali & Data Akun Regional PDRB BPS Provinsi Bali, dikurasi untuk Bali Utara, Timur, dan Barat.",
+      "Sumber Data: Profil Desa Wisata Dinas Pariwisata Provinsi Bali & Data PDRB Akomodasi BPS Bali 2022 (Kajian UIN Alauddin), dimodelkan sebagai simulasi rute berkeadilan.",
     themeLight: "Terang",
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
@@ -62,7 +62,7 @@ export const UI_TEXT = {
     arrivalGatePrefix: "Titik Masuk:",
     footerLeft: "Eco Traveler · Bali Smart Society",
     footerRight:
-      "28 desa wisata terkurasi · Sumber: Direktori Disparda Bali & BPS Bali",
+      "28 desa wisata terkurasi · Profil Desa Wisata Disparda & Baseline PDRB BPS Bali",
     loadingMapTitle: "Memuat Peta Desa Wisata Bali…",
     loadingMapSubtitle:
       "Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian.",
@@ -170,7 +170,7 @@ export const UI_TEXT = {
     adatVerifiedLabel: (by: string, at?: string) =>
       `Diverifikasi oleh: ${by}${at ? ` (${at})` : ""}`,
     adatPendingVerification:
-      "Konten adat dikurasi dari publikasi desa wisata dan literatur budaya setempat; verifikasi berkala bersama prajuru desa adat berlangsung aktif.",
+      "Aturan adat dan etika desa dikurasi dari publikasi desa wisata dan literatur budaya setempat; proses verifikasi partisipatif bersama prajuru adat berlangsung berkala.",
     adatQuotaMore: "Rincian Adat & Kuota",
     adatQuotaLess: "Tutup Rincian",
     quotaDetailLabel: (quota: number, load: number, pct: number) =>
@@ -226,7 +226,7 @@ export const UI_TEXT = {
     methodologyNote:
       "Catatan Metodologi: Porsi PDRB wilayah (status quo) dan porsi belanja rute ini bukan padanan langsung. Simulasi bersifat ilustratif untuk menunjukkan pengalihan belanja wisata.",
     gdpDataSource:
-      "Sumber: BPS Provinsi Bali (2022, dikutip dari Jurnal UIN Alauddin). Data tahun 2022, perlu pembaruan.",
+      "Sumber: BPS Provinsi Bali (PDRB Akomodasi & Makan Minum 2022, kajian UIN Alauddin 2024). Baseline pembanding status quo 9 kabupaten/kota.",
     derivedLabel: "turunan, perlu verifikasi",
   },
   en: {
@@ -255,7 +255,7 @@ export const UI_TEXT = {
     printFooterDisclaimer:
       "Compiled by Eco Traveler. This is not an official government document. Scores and cost estimates are assumption-based model calculations.",
     printFooterSource:
-      "Data Sources: Bali Tourism Board Village Directory & BPS Bali Regional GDP Accounts, curated for North, East, and West Bali corridors.",
+      "Data Sources: Bali Tourism Board Village Profiles & BPS Bali 2022 Hospitality GDP Accounts (UIN Alauddin Study), modeled as an equitable route simulation.",
     themeLight: "Light",
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",
@@ -281,7 +281,7 @@ export const UI_TEXT = {
     arrivalGatePrefix: "Arrival Gate:",
     footerLeft: "Eco Traveler · Bali Smart Society",
     footerRight:
-      "28 curated tourism villages · Source: Bali Tourism Board & BPS Bali",
+      "28 curated tourism villages · Bali Tourism Board Profiles & BPS Bali GDP Baseline",
     loadingMapTitle: "Loading Bali Spatial Village Atlas…",
     loadingMapSubtitle:
       "Preparing 28 village coordinates, density zones, and daily trails.",
@@ -388,7 +388,7 @@ export const UI_TEXT = {
     adatVerifiedLabel: (by: string, at?: string) =>
       `Customary verification by: ${by}${at ? ` (${at})` : ""}`,
     adatPendingVerification:
-      "Customary rules curated from village records and local cultural documentation; ongoing coordination with respective village customary councils.",
+      "Customary rules and village etiquette are curated from village tourism publications and local cultural records; participatory review with local customary councils is conducted periodically.",
     adatQuotaMore: "Adat & Quota Details",
     adatQuotaLess: "Hide Details",
     quotaDetailLabel: (quota: number, load: number, pct: number) =>
@@ -444,7 +444,7 @@ export const UI_TEXT = {
     methodologyNote:
       "Methodology Note: Regional GDP share (status quo) and route spending share are not direct equivalents. This comparison is illustrative to show tourism spend redirection.",
     gdpDataSource:
-      "Source: BPS Bali Province (2022, via UIN Alauddin Journal). Data from 2022, needs update.",
+      "Source: BPS Bali Province (Accommodation & Food GDP 2022, UIN Alauddin Study 2024). Status-quo baseline across Bali's 9 regencies/cities.",
     derivedLabel: "derived, needs verification",
   },
 } as const;

@@ -5,12 +5,15 @@ import {
   getParsePreferencesSystemPrompt,
   NarrateStopInput,
   NarrateApiResponse,
-  ParsedPreferencesResponse,
   ALLOWED_ARRIVALS,
   ALLOWED_FOCUSES,
   ALLOWED_STAYS,
 } from "./prompts/narrate";
-import { parsePreferencesSemantically } from "./semantic-fallback";
+import {
+  parsePreferencesSemantically,
+  ParsedPreferencesResponse,
+  SemanticParseResult,
+} from "./semantic-fallback";
 
 const CANDIDATE_GEMINI_MODELS = [
   process.env.GEMINI_MODEL || "gemini-flash-lite-latest",
@@ -19,7 +22,7 @@ const CANDIDATE_GEMINI_MODELS = [
   "gemini-flash-latest",
 ];
 
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 8_000;
 
 // Rate limiting: 20 requests per 10 minutes per IP
 const RATE_WINDOW_MS = 10 * 60 * 1000;
@@ -71,6 +74,13 @@ function getGeminiApiKey(): string | null {
   return apiKey || null;
 }
 
+// Global circuit-breaker to avoid futile retries on quota exhaustion (429)
+let quotaCooldownUntil = 0;
+
+export function isQuotaExhausted(): boolean {
+  return Date.now() < quotaCooldownUntil;
+}
+
 // 1A. Generate Route & Stop Narratives with Gemini (Multi-tier model fallback)
 export async function generateAiNarrative(
   stops: NarrateStopInput[],
@@ -78,7 +88,7 @@ export async function generateAiNarrative(
   userNote?: string
 ): Promise<{ success: boolean; data?: NarrateApiResponse; isFallback: boolean }> {
   const apiKey = getGeminiApiKey();
-  if (!apiKey) {
+  if (!apiKey || isQuotaExhausted()) {
     return { success: false, isFallback: true };
   }
 
@@ -159,9 +169,20 @@ export async function generateAiNarrative(
 
       narrativeCache.set(cacheKey, { data: validatedResult, cachedAt: Date.now() });
       return { success: true, data: validatedResult, isFallback: false };
-    } catch (err) {
-      console.warn(`[Gemini AI] Model ${modelName} failed narrative generation:`, err);
-      // Continue to next candidate model
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn(`[Gemini AI] Model ${modelName} narrative generation error:`, errMsg);
+
+      if (
+        errMsg.includes("429") ||
+        errMsg.includes("Quota exceeded") ||
+        errMsg.includes("RESOURCE_EXHAUSTED") ||
+        errMsg.includes("rate-limits")
+      ) {
+        quotaCooldownUntil = Date.now() + 60_000;
+        console.warn("[Gemini AI] Quota exhausted during narrative. Engaging 60s cooldown; skipping remaining retries.");
+        break;
+      }
     }
   }
 
@@ -172,16 +193,16 @@ export async function generateAiNarrative(
 export async function parseAiPreferences(
   userText: string,
   lang: "id" | "en"
-): Promise<{ success: boolean; data?: ParsedPreferencesResponse; isFallback: boolean }> {
+): Promise<SemanticParseResult> {
   const cleanUserText = (userText || "").slice(0, 300).trim();
   if (!cleanUserText) {
-    return { success: false, isFallback: true };
+    return parsePreferencesSemantically("", lang);
   }
 
   const apiKey = getGeminiApiKey();
 
-  // If Gemini API is available, try candidate models
-  if (apiKey) {
+  // If Gemini API is available and not in cooldown, try candidate models
+  if (apiKey && !isQuotaExhausted()) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const systemPrompt = getParsePreferencesSystemPrompt(lang);
 
@@ -198,7 +219,7 @@ export async function parseAiPreferences(
 
         const callPromise = model.generateContent(cleanUserText);
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error(`Gemini ${modelName} parse timed out`)), 7_000)
+          setTimeout(() => reject(new Error(`Gemini ${modelName} parse timed out`)), 6_000)
         );
 
         const result = await Promise.race([callPromise, timeoutPromise]);
@@ -230,46 +251,58 @@ export async function parseAiPreferences(
             stay = parsed.stay;
           }
 
-          const explanation =
-            typeof parsed.explanation === "string"
-              ? parsed.explanation.trim()
-              : lang === "en"
-              ? "Preferences adjusted based on your request."
-              : "Preferensi disesuaikan berdasarkan permintaan Anda.";
+          const hasRecognizedIntent =
+            days !== null || arrival !== null || (focus !== null && focus.length > 0) || stay !== null;
 
-          const validatedResult: ParsedPreferencesResponse = {
-            days,
-            arrival,
-            focus,
-            stay,
-            explanation,
-          };
+          if (hasRecognizedIntent) {
+            const explanation =
+              typeof parsed.explanation === "string"
+                ? parsed.explanation.trim()
+                : lang === "en"
+                ? "Preferences adjusted based on your request."
+                : "Preferensi disesuaikan berdasarkan permintaan Anda.";
 
-          return { success: true, data: validatedResult, isFallback: false };
+            const validatedResult: ParsedPreferencesResponse = {
+              days,
+              arrival,
+              focus,
+              stay,
+              explanation,
+            };
+
+            return {
+              status: "matched",
+              confidence: "high",
+              processingSource: "gemini-ai",
+              parsed: validatedResult,
+              detectedIntents: {
+                duration: days || undefined,
+                arrival: arrival || undefined,
+                focuses: focus || undefined,
+                stay: stay || undefined,
+              },
+              message: explanation,
+            };
+          }
         }
-      } catch (err) {
-        console.warn(`[Gemini AI] Model ${modelName} failed parsing preferences:`, err);
-        // Continue to next candidate model
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.warn(`[Gemini AI] Model ${modelName} parse error:`, errMsg);
+
+        if (
+          errMsg.includes("429") ||
+          errMsg.includes("Quota exceeded") ||
+          errMsg.includes("RESOURCE_EXHAUSTED") ||
+          errMsg.includes("rate-limits")
+        ) {
+          quotaCooldownUntil = Date.now() + 60_000;
+          console.warn("[Gemini AI] Quota exhausted (429). Engaging 60s cooldown; switching directly to semantic engine.");
+          break; // Stop retrying remaining models on project-wide quota limit!
+        }
       }
     }
   }
 
   // Fallback: Resilient Local Semantic Rule Engine
-  // Parses typos like "relaxaced", "tedekat", and natural language intents offline with 0 latency
-  const semanticData = parsePreferencesSemantically(cleanUserText, lang);
-  const hasExtractedIntent =
-    semanticData.days !== null ||
-    semanticData.arrival !== null ||
-    (semanticData.focus !== null && semanticData.focus.length > 0) ||
-    semanticData.stay !== null;
-
-  if (hasExtractedIntent) {
-    return {
-      success: true,
-      data: semanticData,
-      isFallback: true,
-    };
-  }
-
-  return { success: false, isFallback: true };
+  return parsePreferencesSemantically(cleanUserText, lang);
 }

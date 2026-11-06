@@ -16,6 +16,7 @@ import {
   HeartPulse,
   Sprout,
   Sparkles,
+  Info,
 } from "lucide-react";
 
 interface TripPlannerFormProps {
@@ -110,6 +111,8 @@ export default function TripPlannerForm({
   const [isAiParsing, setIsAiParsing] = useState(false);
   const [aiChanges, setAiChanges] = useState<string[]>([]);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [aiSource, setAiSource] = useState<"gemini-ai" | "semantic-fallback" | null>(null);
+  const [aiClarification, setAiClarification] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const toggleInterest = (interestId: string) => {
@@ -146,8 +149,10 @@ export default function TripPlannerForm({
     if (!aiPrompt.trim() || isAiParsing) return;
     setIsAiParsing(true);
     setAiError(null);
+    setAiClarification(null);
     setAiChanges([]);
     setAiExplanation(null);
+    setAiSource(null);
 
     try {
       const res = await fetch("/api/ai/parse-preferences", {
@@ -157,17 +162,32 @@ export default function TripPlannerForm({
       });
 
       const data = await res.json();
+
       if (!res.ok || !data.success || !data.parsed) {
+        if (data.status === "clarification_needed" || data.status === "unrecognized") {
+          setAiClarification(
+            data.clarificationPrompt ||
+              data.message ||
+              (locale === "en"
+                ? "Please specify duration (1-4 days), gate, or interest focus (e.g. '3 days relaxed with culinary focus')."
+                : "Silakan masukkan preferensi rute spesifik, misal: '3 hari santai tambah kuliner' atau 'dari gilimanuk budget backpacker'.")
+          );
+          return;
+        }
+
         setAiError(
           data.error ||
             (locale === "en"
-              ? "AI service is currently unavailable or API key is not configured. Please adjust parameters manually."
-              : "Layanan AI sedang tidak tersedia atau kunci API belum dikonfigurasi. Silakan sesuaikan parameter secara manual.")
+              ? "Unable to interpret travel preferences. Please adjust parameters manually below."
+              : "Gagal memproses preferensi. Silakan sesuaikan parameter secara manual di bawah.")
         );
         return;
       }
 
+      setAiSource(data.processingSource || (data.fallback ? "semantic-fallback" : "gemini-ai"));
+
       const { days, arrival, focus, stay, explanation } = data.parsed;
+      const excludedFocuses: string[] = data.detectedIntents?.excludedFocuses || [];
       const changes: string[] = [];
       const nextReq: TripRequest = { ...value, locale };
 
@@ -195,18 +215,41 @@ export default function TripPlannerForm({
         );
       }
 
+      // Handle exclusions and focus updates
+      let updatedInterests = [...value.interests];
+
+      if (excludedFocuses.length > 0) {
+        updatedInterests = updatedInterests.filter((f) => !excludedFocuses.includes(f));
+        changes.push(
+          locale === "en"
+            ? `Excluded: ${excludedFocuses.join(", ")}`
+            : `Mengecualikan: ${excludedFocuses.join(", ")}`
+        );
+      }
+
       if (focus !== null && Array.isArray(focus) && focus.length > 0) {
-        const isDiff =
-          focus.length !== value.interests.length ||
-          focus.some((f: string) => !value.interests.includes(f));
-        if (isDiff) {
-          nextReq.interests = focus;
-          changes.push(
-            locale === "en"
-              ? `Focus: ${focus.join(", ")}`
-              : `Fokus: ${focus.join(", ")}`
-          );
+        for (const f of focus) {
+          if (!updatedInterests.includes(f) && !excludedFocuses.includes(f)) {
+            updatedInterests.push(f);
+          }
         }
+        changes.push(
+          locale === "en"
+            ? `Focus: ${focus.join(", ")}`
+            : `Fokus: ${focus.join(", ")}`
+        );
+      }
+
+      // Ensure at least one interest exists
+      if (updatedInterests.length === 0) {
+        updatedInterests = ["Nature", "Culture"];
+      }
+
+      if (
+        updatedInterests.length !== value.interests.length ||
+        updatedInterests.some((i) => !value.interests.includes(i))
+      ) {
+        nextReq.interests = updatedInterests;
       }
 
       if (stay !== null && stay !== value.budgetCategory) {
@@ -216,7 +259,11 @@ export default function TripPlannerForm({
         );
       }
 
-      setAiExplanation(explanation || null);
+      if (data.conflictNotes && data.conflictNotes.length > 0) {
+        changes.push(...data.conflictNotes);
+      }
+
+      setAiExplanation(explanation || data.message || null);
       setAiChanges(changes.length > 0 ? changes : [t.aiNoChangeNotice]);
 
       // Apply updated parameters and trigger deterministic engine recalculation
@@ -565,11 +612,27 @@ export default function TripPlannerForm({
 
         {/* Changed Parameter Chips & Feedback */}
         {aiChanges.length > 0 && (
-          <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200/80 dark:border-emerald-800/60 text-xs space-y-1">
+          <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200/80 dark:border-emerald-800/60 text-xs space-y-1.5">
             <div className="font-semibold text-[#0D4732] dark:text-emerald-300 flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] uppercase tracking-wide">
                 {t.aiChangePrefix}
               </span>
+              {aiSource && (
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-2xs ${
+                    aiSource === "gemini-ai"
+                      ? "bg-[#0D261C] dark:bg-emerald-700 text-emerald-200 dark:text-white"
+                      : "bg-teal-700 dark:bg-teal-800 text-teal-100"
+                  }`}
+                >
+                  <Sparkles className="w-2.5 h-2.5" aria-hidden="true" />
+                  {aiSource === "gemini-ai"
+                    ? "Gemini Spatial AI (Cloud)"
+                    : locale === "en"
+                    ? "Subak Semantic NLP (Local)"
+                    : "Subak Semantic NLP (Lokal)"}
+                </span>
+              )}
               {aiChanges.map((ch, idx) => (
                 <span
                   key={idx}
@@ -584,6 +647,23 @@ export default function TripPlannerForm({
                 &ldquo;{aiExplanation}&rdquo;
               </p>
             )}
+          </div>
+        )}
+
+        {/* Clarification Needed Guidance Box */}
+        {aiClarification && (
+          <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+            <div className="font-semibold flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300">
+              <Info className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              <span>
+                {locale === "en"
+                  ? "Clarification Needed"
+                  : "Perlu Parameter Lebih Spesifik"}
+              </span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-amber-800/90 dark:text-amber-300/90">
+              {aiClarification}
+            </p>
           </div>
         )}
 

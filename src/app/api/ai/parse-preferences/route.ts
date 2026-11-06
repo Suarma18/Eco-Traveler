@@ -38,23 +38,31 @@ export async function POST(req: NextRequest) {
 
     const result = await parseAiPreferences(cleanPrompt, locale);
 
-    if (result.data) {
+    if (result.status === "matched" && result.parsed) {
       return NextResponse.json({
         success: true,
-        isAiGenerated: !result.isFallback,
-        fallback: result.isFallback,
-        parsed: result.data,
+        status: result.status,
+        confidence: result.confidence,
+        processingSource: result.processingSource,
+        isAiGenerated: result.processingSource === "gemini-ai",
+        fallback: result.processingSource === "semantic-fallback",
+        parsed: result.parsed,
+        detectedIntents: result.detectedIntents,
+        conflictNotes: result.conflictNotes,
+        message: result.message,
       });
     }
 
     return NextResponse.json({
       success: false,
+      status: result.status,
+      confidence: result.confidence,
+      processingSource: result.processingSource,
       isAiGenerated: false,
       fallback: true,
-      error:
-        locale === "en"
-          ? "We could not identify travel parameters from that prompt. Try e.g. '3 days relaxed with culinary focus'."
-          : "Preferensi tidak teridentifikasi. Coba ketik misalnya '3 hari santai tambah kuliner' atau 'dari gilimanuk budget murah'.",
+      clarificationPrompt: result.clarificationPrompt,
+      message: result.message,
+      error: result.clarificationPrompt || result.message,
     });
   } catch (err) {
     console.error("Error in /api/ai/parse-preferences:", err);
