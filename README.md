@@ -6,7 +6,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black.svg)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg)](https://tailwindcss.com/)
-[![Anthropic Claude](https://img.shields.io/badge/AI-Claude%203.5%20Sonnet-d97706.svg)](https://anthropic.com/)
+[![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini%203.5%20Flash-4285F4.svg)](https://ai.google.dev/)
 [![Tests](https://img.shields.io/badge/Unit%20Tests-30%2F30%20Pass-emerald.svg)](tests/)
 
 ---
@@ -33,12 +33,12 @@ Provinsi Bali menghadapi tantangan ketimpangan spasial dan ekonomi yang signifik
 
 ## ⚡ Fitur Utama & Keunggulan
 
-### 1. Dual-Core AI Architecture (Claude 3.5 Sonnet + Subak Spatial Engine)
-- **POST `/api/ai/narrate`:** Generator narasi rute dinamis yang menyusun:
+### 1. Dual-Core AI Architecture (Google Gemini 3.5 Flash + Subak Spatial Engine)
+- **POST `/api/ai/narrate`:** Generator narasi rute dinamis (Google Gemini) yang menyusun:
   - Ringkasan kontekstual *"Mengapa rute ini?"* (2–3 kalimat) yang menjelaskan logika redistribusi spasial rute tersebut.
   - Narasi pengalaman per stop (maksimal 60 kata) dalam bahasa aktif (ID / EN).
-- **POST `/api/ai/parse-preferences`:** Kotak dialog teks bebas alami (contoh: *"lebih santai, perbanyak kuliner tradisional, hindari jalan terlalu jauh"*) yang diterjemahkan oleh AI menjadi parameter mesin rute (durasi, preferensi menginap, fokus aktivitas, dsb.).
-- **Honest AI Badge:** Lencana *"AI Generated"* hanya muncul apabila respons AI benar-benar dihasilkan secara langsung melalui Anthropic Messages API.
+- **POST `/api/ai/parse-preferences`:** Kotak dialog teks bebas alami (contoh: *"lebih santai, perbanyak kuliner tradisional, hindari jalan terlalu jauh"*) yang diterjemahkan secara cerdas oleh Google Gemini menjadi parameter mesin rute (durasi, preferensi menginap, fokus aktivitas, dsb.).
+- **Honest AI Badge:** Lencana *"AI Generated"* hanya muncul apabila respons AI benar-benar dihasilkan secara langsung melalui Google Gemini API.
 - **Prinsip *Deterministic Source of Truth*:** Seluruh angka matematis (skor pemerataan, retensi lokal, waktu tempuh, jarak, simulasi PDRB) tetap dihitung secara deterministik oleh mesin kalkulasi internal untuk mencegah halusinasi data numerik.
 - **Zero-Crash Fallback Guarantee:** Jika kuota API habis atau server offline, aplikasi secara mulus beralih ke narasi deterministik tanpa membuat web crash atau terganggu.
 

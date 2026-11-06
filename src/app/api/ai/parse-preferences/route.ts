@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, parseAiPreferences } from "@/lib/anthropic";
+import { checkRateLimit, parseAiPreferences } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 

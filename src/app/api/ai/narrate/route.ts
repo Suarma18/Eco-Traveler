@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, generateAiNarrative } from "@/lib/anthropic";
+import { checkRateLimit, generateAiNarrative } from "@/lib/gemini";
 import { NarrateStopInput } from "@/lib/prompts/narrate";
 
 export const runtime = "nodejs";
