@@ -46,19 +46,95 @@ Guidelines:
 4. Estimate local spending (Homestay, Warung, Community Guide) in Indonesian Rupiah.
 5. Write descriptions in plain, concrete language without promotional clichés. Output valid JSON only.`;
 
-function scoreVillageMatch(village: DesaWisata, interests: string[]): number {
-  if (!interests || interests.length === 0) return 1;
+function haversineDistanceKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function scoreVillageMatch(
+  village: DesaWisata,
+  request: TripRequest,
+  referenceCoords?: [number, number]
+): number {
+  const interests = request.interests || ["Culture", "Nature"];
   const normalizedInterests = interests.map((i) => i.toLowerCase());
   let matchCount = 0;
 
+  // 1. Core Interest Alignment
   for (const focus of village.focus) {
     if (normalizedInterests.includes(focus.toLowerCase())) {
-      matchCount += 2;
+      matchCount += 3.0;
     }
   }
 
+  // 2. Negative Constraints: Excluded Focuses & Excluded Villages
+  if (request.excludedFocuses && request.excludedFocuses.length > 0) {
+    const exLower = request.excludedFocuses.map((f) => f.toLowerCase());
+    for (const focus of village.focus) {
+      if (exLower.includes(focus.toLowerCase())) {
+        matchCount -= 12.0;
+      }
+    }
+  }
+
+  if (request.excludedVillages && request.excludedVillages.includes(village.id)) {
+    return -999;
+  }
+
+  // 3. Spatial Redistribution Priority Bonus (Buleleng, Karangasem, Jembrana, Bangli, Klungkung)
   if (PRIORITY_REGENCIES.has(village.regency)) {
-    matchCount += 1.5;
+    matchCount += 2.0;
+  }
+
+  // 4. Crowd Avoidance: Penalize high simulated loads, reward serene low-density villages
+  if (request.avoidCrowds) {
+    const loadRatio =
+      village.dailyQuota && village.dailyQuota > 0
+        ? (village.currentSimulatedLoad || 0) / village.dailyQuota
+        : 0.5;
+
+    if (loadRatio >= 0.70) {
+      // High load (e.g. Penglipuran with 88% load): penalty to divert travelers
+      matchCount -= 8.0;
+    } else if (loadRatio <= 0.45) {
+      // Peaceful low-density village: bonus
+      matchCount += 3.5;
+    }
+  }
+
+  // 5. Local Business Priority: Reward community UMKM and homestay models
+  if (request.prioritizeLocalBusiness) {
+    if (village.localUmkm && village.localUmkm.length > 10) {
+      matchCount += 3.0;
+    }
+    if (village.avgHomestayPrice && village.avgHomestayPrice <= 300000) {
+      matchCount += 1.5;
+    }
+  }
+
+  // 6. Driving Time Preference: Distance penalty to cluster stops
+  if (request.drivingPreference === "short" && referenceCoords) {
+    const dist = haversineDistanceKm(
+      referenceCoords[0],
+      referenceCoords[1],
+      village.lat,
+      village.lng
+    );
+    matchCount -= dist * 0.12;
   }
 
   return matchCount;
@@ -145,23 +221,77 @@ export function buildDeterministicItinerary(
     ],
   };
 
-  const timeSlots: ("Pagi" | "Siang" | "Sore")[] = ["Pagi", "Siang", "Sore"];
+  const isRelaxed = request.pace === "relaxed";
+  const stopCountPerDay = isRelaxed ? 2 : 3;
+  const timeSlots: ("Pagi" | "Siang" | "Sore")[] = isRelaxed
+    ? ["Pagi", "Siang"]
+    : ["Pagi", "Siang", "Sore"];
+
   const rawDays: DayItinerary[] = [];
+  let referenceCoords: [number, number] = ARRIVAL_GATES[gate].coords;
 
   for (let d = 0; d < duration; d++) {
-    const candidateIds = corridorSequence[d] || corridorSequence[0];
+    const candidateIds = [...(corridorSequence[d] || corridorSequence[0])];
+
+    // If crowd avoidance is active, inject buffer villages (e.g. Undisan for Penglipuran)
+    if (request.avoidCrowds) {
+      for (const id of [...candidateIds]) {
+        const v = DESA_BY_ID.get(id);
+        if (v?.bufferVillageId && !candidateIds.includes(v.bufferVillageId)) {
+          candidateIds.push(v.bufferVillageId);
+        }
+      }
+    }
+
     const candidates = candidateIds
       .map((id) => DESA_BY_ID.get(id))
       .filter((v): v is DesaWisata => Boolean(v));
 
     const ranked = [...candidates].sort(
-      (a, b) => scoreVillageMatch(b, interests) - scoreVillageMatch(a, interests)
+      (a, b) =>
+        scoreVillageMatch(b, request, referenceCoords) -
+        scoreVillageMatch(a, request, referenceCoords)
     );
-    const selectedVillages = ranked.slice(0, 3);
 
-    selectedVillages.sort(
-      (a, b) => candidateIds.indexOf(a.id) - candidateIds.indexOf(b.id)
-    );
+    const selectedVillages = ranked.slice(0, stopCountPerDay);
+
+    // If short driving time requested, sequence stops by nearest-neighbor from referenceCoords
+    if (request.drivingPreference === "short" && selectedVillages.length > 1) {
+      const sorted: DesaWisata[] = [];
+      const pool = [...selectedVillages];
+      let currentRef = referenceCoords;
+
+      while (pool.length > 0) {
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < pool.length; i++) {
+          const dist = haversineDistanceKm(currentRef[0], currentRef[1], pool[i].lat, pool[i].lng);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestIdx = i;
+          }
+        }
+        const [nextV] = pool.splice(bestIdx, 1);
+        sorted.push(nextV);
+        currentRef = [nextV.lat, nextV.lng];
+      }
+      selectedVillages.length = 0;
+      selectedVillages.push(...sorted);
+    } else {
+      selectedVillages.sort(
+        (a, b) => candidateIds.indexOf(a.id) - candidateIds.indexOf(b.id)
+      );
+    }
+
+    // Update reference coords for next day
+    if (selectedVillages.length > 0) {
+      const lastSelected = selectedVillages[selectedVillages.length - 1];
+      referenceCoords = [lastSelected.lat, lastSelected.lng];
+    }
+
+    const localBonus = request.prioritizeLocalBusiness ? 1.18 : 1.0;
+    const paceSpendFactor = isRelaxed ? 1.35 : 1.0;
+    const finalActivitySpendMultiplier = spendMultiplier * localBonus * paceSpendFactor;
 
     const activities: TripDayActivity[] = selectedVillages.map(
       (village, idx) => {
@@ -169,7 +299,7 @@ export function buildDeterministicItinerary(
         const baseSpend =
           slot === "Siang" ? 185000 : slot === "Pagi" ? 140000 : 160000;
         const estimatedSpend =
-          Math.round((baseSpend * spendMultiplier) / 5000) * 5000;
+          Math.round((baseSpend * finalActivitySpendMultiplier) / 5000) * 5000;
 
         const slotActionPrefix =
           slot === "Pagi"
@@ -211,16 +341,21 @@ export function buildDeterministicItinerary(
       anchorVillage.avgHomestayPrice * spendMultiplier
     );
 
+    const stayType =
+      request.prioritizeLocalBusiness
+        ? "Community Homestay"
+        : budget === "Comfort"
+        ? "Eco Lodge"
+        : "Community Homestay";
+
     const recommendedStay = isFinalDay
       ? undefined
       : {
           name:
-            budget === "Comfort"
-              ? `${anchorVillage.name} Heritage Eco-Lodge`
-              : `Pondok Warga Pokdarwis ${anchorVillage.name}`,
-          type: (budget === "Comfort" ? "Eco Lodge" : "Community Homestay") as
-            | "Eco Lodge"
-            | "Community Homestay",
+            stayType === "Community Homestay"
+              ? `Pondok Warga Pokdarwis ${anchorVillage.name}`
+              : `${anchorVillage.name} Heritage Eco-Lodge`,
+          type: stayType as "Eco Lodge" | "Community Homestay",
           priceRangeRp: `${formatRupiah(stayPrice)} - ${formatRupiah(
             stayPrice + 60000
           )} / malam`,
@@ -369,6 +504,12 @@ export async function generateRedistributiveItinerary(
 - Minat Wisatawan: ${request.interests.join(", ")}
 - Kategori Anggaran: ${request.budgetCategory}
 - Titik Kedatangan: ${ARRIVAL_GATES[gate].label} (${gate})
+- Ritme Perjalanan (Pace): ${request.pace || "standar"}
+- Hindari Keramaian: ${request.avoidCrowds ? "YA (hindari desa padat seperti Penglipuran, prioritaskan desa penyangga/tenang)" : "standar"}
+- Prioritas Usaha Lokal: ${request.prioritizeLocalBusiness ? "YA (maksimalkan belanja ke UMKM Pokdarwis & homestay warga)" : "standar"}
+- Preferensi Berkendara: ${request.drivingPreference === "short" ? "Rute Pendek (jarak antar desa berdekatan, minimalkan waktu berkendara)" : "standar"}
+- Pengecualian Minat: ${request.excludedFocuses && request.excludedFocuses.length > 0 ? request.excludedFocuses.join(", ") : "tidak ada"}
+- Desa yang Dikecualikan: ${request.excludedVillages && request.excludedVillages.length > 0 ? request.excludedVillages.join(", ") : "tidak ada"}
 - Bahasa Output: ${langInstruction}
 
 Dataset Desa Wisata Terverifikasi (HANYA gunakan desa dari daftar ini, jangan mengulang desa yang sama):

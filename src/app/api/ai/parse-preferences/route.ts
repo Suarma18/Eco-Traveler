@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
         fallback: result.processingSource === "semantic-fallback",
         parsed: result.parsed,
         detectedIntents: result.detectedIntents,
+        satisfactionReport: result.satisfactionReport,
         conflictNotes: result.conflictNotes,
         message: result.message,
       });

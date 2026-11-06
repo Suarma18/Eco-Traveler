@@ -5,6 +5,7 @@ import { TripRequest, BudgetCategory, ArrivalGate } from "@/types/trip";
 import { Locale } from "@/lib/utils";
 import { UI_TEXT } from "@/lib/i18n";
 import { PRESET_1_SVG, PRESET_2_SVG } from "@/lib/village-media";
+import { ConstraintSatisfaction } from "@/lib/semantic-fallback";
 import {
   Loader2,
   Compass,
@@ -113,6 +114,7 @@ export default function TripPlannerForm({
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [aiSource, setAiSource] = useState<"gemini-ai" | "semantic-fallback" | null>(null);
   const [aiClarification, setAiClarification] = useState<string | null>(null);
+  const [aiSatisfactionReport, setAiSatisfactionReport] = useState<ConstraintSatisfaction[]>([]);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const toggleInterest = (interestId: string) => {
@@ -258,6 +260,49 @@ export default function TripPlannerForm({
           locale === "en" ? `Stay: ${stay}` : `Akomodasi: ${stay}`
         );
       }
+
+      if (data.parsed.pace) {
+        nextReq.pace = data.parsed.pace;
+        changes.push(
+          locale === "en"
+            ? `Pace: ${data.parsed.pace === "relaxed" ? "Relaxed (2 stops/day)" : "Active"}`
+            : `Ritme: ${data.parsed.pace === "relaxed" ? "Santai (2 titik/hari)" : "Aktif"}`
+        );
+      }
+
+      if (data.parsed.avoidCrowds) {
+        nextReq.avoidCrowds = true;
+        nextReq.simulateCapacityAlert = true;
+        changes.push(
+          locale === "en"
+            ? "Avoid Crowds: Enabled (Buffer redirects active)"
+            : "Hindari Keramaian: Aktif (Pengalihan penyangga)"
+        );
+      }
+
+      if (data.parsed.prioritizeLocalBusiness) {
+        nextReq.prioritizeLocalBusiness = true;
+        changes.push(
+          locale === "en"
+            ? "Local Business: Priority (Pokdarwis UMKM & Homestay)"
+            : "Usaha Warga: Prioritas (UMKM Pokdarwis & Homestay)"
+        );
+      }
+
+      if (data.parsed.drivingPreference) {
+        nextReq.drivingPreference = data.parsed.drivingPreference;
+        changes.push(
+          locale === "en"
+            ? `Driving: ${data.parsed.drivingPreference === "short" ? "Short Legs (<40km)" : "Scenic Routes"}`
+            : `Berkendara: ${data.parsed.drivingPreference === "short" ? "Rute Pendek (<40km)" : "Panorama Pedesaan"}`
+        );
+      }
+
+      if (data.parsed.excludedFocuses && data.parsed.excludedFocuses.length > 0) {
+        nextReq.excludedFocuses = data.parsed.excludedFocuses;
+      }
+
+      setAiSatisfactionReport(data.satisfactionReport || []);
 
       if (data.conflictNotes && data.conflictNotes.length > 0) {
         changes.push(...data.conflictNotes);
@@ -646,6 +691,55 @@ export default function TripPlannerForm({
               <p className="text-[11px] text-slate-600 dark:text-slate-300 italic">
                 &ldquo;{aiExplanation}&rdquo;
               </p>
+            )}
+
+            {/* Constraint Satisfaction & Disclosure Breakdown */}
+            {aiSatisfactionReport.length > 0 && (
+              <div className="pt-2 border-t border-emerald-200/70 dark:border-emerald-800/50 space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+                  {locale === "en"
+                    ? "Constraint Evaluation & Transparency:"
+                    : "Evaluasi Batasan & Transparansi:"}
+                </p>
+                <div className="grid gap-1">
+                  {aiSatisfactionReport.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-1.5 text-[11px] leading-snug"
+                    >
+                      <span
+                        className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
+                          item.status === "satisfied"
+                            ? "bg-emerald-600/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
+                            : item.status === "partially_supported"
+                            ? "bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30"
+                            : "bg-rose-500/15 text-rose-800 dark:text-rose-300 border border-rose-500/30"
+                        }`}
+                      >
+                        {item.status === "satisfied"
+                          ? locale === "en"
+                            ? "Satisfied"
+                            : "Terpenuhi"
+                          : item.status === "partially_supported"
+                          ? locale === "en"
+                            ? "Partially Supported"
+                            : "Didukung Parsial"
+                          : locale === "en"
+                          ? "Unsupported"
+                          : "Tak Didukung"}
+                      </span>
+                      <span className="text-slate-700 dark:text-slate-300">
+                        <strong className="text-slate-900 dark:text-slate-100">
+                          {item.preference}:
+                        </strong>{" "}
+                        <span className="text-slate-600 dark:text-slate-400">
+                          {item.note}
+                        </span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         )}

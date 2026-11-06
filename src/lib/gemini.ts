@@ -246,13 +246,66 @@ export async function parseAiPreferences(
             if (valid.length > 0) focus = valid;
           }
 
+          // Anti-Hallucination Guard: NEVER invent a stay preference if user never mentioned accommodation
+          const hasExplicitStayMention = /\b(backpacker|murah|hemat|budget|hostel|losmen|menengah|mid|standar|standard|keluarga|comfort|resort|boutique|eco\s*lodge|luxury|mewah|glamping|villa|villas|hotel|homestay|penginapan)\b/i.test(
+            cleanUserText
+          );
+
           let stay: (typeof ALLOWED_STAYS)[number] | null = null;
-          if (ALLOWED_STAYS.includes(parsed.stay)) {
+          if (hasExplicitStayMention && ALLOWED_STAYS.includes(parsed.stay)) {
             stay = parsed.stay;
           }
 
+          const pace: "relaxed" | "active" | null =
+            parsed.pace === "relaxed" || parsed.pace === "active" ? parsed.pace : null;
+
+          const avoidCrowds: boolean | null =
+            typeof parsed.avoidCrowds === "boolean"
+              ? parsed.avoidCrowds
+              : /(avoid\s*crowd|hindari\s*ramai|sepi|tenang|anti\s*overtourism)/i.test(cleanUserText)
+              ? true
+              : null;
+
+          const prioritizeLocalBusiness: boolean | null =
+            typeof parsed.prioritizeLocalBusiness === "boolean"
+              ? parsed.prioritizeLocalBusiness
+              : /(local\s*business|spend\s*more\s*on\s*local|umkm|belanja\s*warga|usaha\s*lokal)/i.test(cleanUserText)
+              ? true
+              : null;
+
+          const drivingPreference: "short" | "scenic" | "standard" | null =
+            parsed.drivingPreference === "short" ||
+            parsed.drivingPreference === "scenic" ||
+            parsed.drivingPreference === "standard"
+              ? parsed.drivingPreference
+              : /(short\s*driving|less\s*driving|dekat|tidak\s*jauh|rute\s*pendek)/i.test(cleanUserText)
+              ? "short"
+              : null;
+
+          let excludedFocuses: (typeof ALLOWED_FOCUSES)[number][] | null = null;
+          if (Array.isArray(parsed.excludedFocuses)) {
+            const validEx = parsed.excludedFocuses.filter((f: string): f is (typeof ALLOWED_FOCUSES)[number] =>
+              ALLOWED_FOCUSES.includes(f as (typeof ALLOWED_FOCUSES)[number])
+            );
+            if (validEx.length > 0) excludedFocuses = validEx;
+          }
+
+          const unsupportedPreferences: string[] | null =
+            Array.isArray(parsed.unsupportedPreferences) && parsed.unsupportedPreferences.length > 0
+              ? parsed.unsupportedPreferences.map(String)
+              : null;
+
           const hasRecognizedIntent =
-            days !== null || arrival !== null || (focus !== null && focus.length > 0) || stay !== null;
+            days !== null ||
+            arrival !== null ||
+            (focus !== null && focus.length > 0) ||
+            stay !== null ||
+            pace !== null ||
+            avoidCrowds !== null ||
+            prioritizeLocalBusiness !== null ||
+            drivingPreference !== null ||
+            (excludedFocuses !== null && excludedFocuses.length > 0) ||
+            (unsupportedPreferences !== null && unsupportedPreferences.length > 0);
 
           if (hasRecognizedIntent) {
             const explanation =
@@ -267,8 +320,78 @@ export async function parseAiPreferences(
               arrival,
               focus,
               stay,
+              pace,
+              avoidCrowds,
+              prioritizeLocalBusiness,
+              drivingPreference,
+              excludedFocuses,
+              unsupportedPreferences,
               explanation,
             };
+
+            const satisfactionReport = [];
+            if (focus && focus.length > 0) {
+              satisfactionReport.push({
+                preference: focus.join(", "),
+                type: "hard_constraint" as const,
+                status: "satisfied" as const,
+                note: lang === "en" ? "Matched cultural & natural village highlights" : "Sesuai sorotan desa wisata",
+              });
+            }
+            if (avoidCrowds) {
+              satisfactionReport.push({
+                preference: lang === "en" ? "Avoid crowded places" : "Hindari keramaian",
+                type: "soft_preference" as const,
+                status: "partially_supported" as const,
+                note:
+                  lang === "en"
+                    ? "Filtered high-density spots & applied simulated capacity redirects. Live sensor data is not available."
+                    : "Menyaring desa padat & mengaktifkan pengalihan kapasitas. Data sensor waktu nyata tidak tersedia.",
+              });
+            }
+            if (prioritizeLocalBusiness) {
+              satisfactionReport.push({
+                preference: lang === "en" ? "Spend more on local businesses" : "Prioritas belanja usaha lokal",
+                type: "soft_preference" as const,
+                status: "partially_supported" as const,
+                note:
+                  lang === "en"
+                    ? "Prioritized verified Pokdarwis UMKM & community homestays. External non-Pokdarwis vendor ownership is unverified."
+                    : "Memprioritaskan UMKM Pokdarwis & homestay warga. Kepemilikan usaha komersial non-warga tidak diverifikasi.",
+              });
+            }
+            if (drivingPreference) {
+              satisfactionReport.push({
+                preference: lang === "en" ? `Driving preference: ${drivingPreference}` : `Preferensi berkendara: ${drivingPreference}`,
+                type: "hard_constraint" as const,
+                status: "satisfied" as const,
+                note:
+                  lang === "en"
+                    ? "Destinations clustered geographically to minimize transit legs"
+                    : "Destinasi dikelompokkan secara geografis untuk meminimalkan waktu di jalan",
+              });
+            }
+            if (pace) {
+              satisfactionReport.push({
+                preference: lang === "en" ? `Pace: ${pace}` : `Ritme: ${pace}`,
+                type: "soft_preference" as const,
+                status: "satisfied" as const,
+                note: lang === "en" ? "Activity density adjusted" : "Kepadatan aktivitas harian disesuaikan",
+              });
+            }
+            if (unsupportedPreferences) {
+              for (const un of unsupportedPreferences) {
+                satisfactionReport.push({
+                  preference: un,
+                  type: "hard_constraint" as const,
+                  status: "unsupported" as const,
+                  note:
+                    lang === "en"
+                      ? "Constraint cannot be satisfied with rural village tourism network"
+                      : "Batasan tidak dapat dipenuhi dalam jaringan desa wisata",
+                });
+              }
+            }
 
             return {
               status: "matched",
@@ -279,8 +402,15 @@ export async function parseAiPreferences(
                 duration: days || undefined,
                 arrival: arrival || undefined,
                 focuses: focus || undefined,
+                excludedFocuses: excludedFocuses || undefined,
                 stay: stay || undefined,
+                pace: pace || undefined,
+                avoidCrowds: avoidCrowds || undefined,
+                prioritizeLocalBusiness: prioritizeLocalBusiness || undefined,
+                drivingPreference: drivingPreference || undefined,
+                unsupported: unsupportedPreferences || undefined,
               },
+              satisfactionReport,
               message: explanation,
             };
           }

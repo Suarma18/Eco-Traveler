@@ -56,13 +56,38 @@ export async function POST(req: NextRequest) {
 
     const locale: AppLocale = body.locale === "en" ? "en" : "id";
 
+    const pace =
+      body.pace === "relaxed" || body.pace === "active" ? body.pace : undefined;
+    const avoidCrowds =
+      body.avoidCrowds !== undefined ? Boolean(body.avoidCrowds) : undefined;
+    const prioritizeLocalBusiness =
+      body.prioritizeLocalBusiness !== undefined
+        ? Boolean(body.prioritizeLocalBusiness)
+        : undefined;
+    const drivingPreference =
+      body.drivingPreference === "short" || body.drivingPreference === "scenic"
+        ? body.drivingPreference
+        : undefined;
+    const excludedFocuses = Array.isArray(body.excludedFocuses)
+      ? body.excludedFocuses.map(String)
+      : undefined;
+    const excludedVillages = Array.isArray(body.excludedVillages)
+      ? body.excludedVillages.map(String)
+      : undefined;
+
     const tripRequest: TripRequest = {
       durationDays,
       interests,
       budgetCategory,
       arrivalGate,
-      simulateCapacityAlert: Boolean(body.simulateCapacityAlert),
+      simulateCapacityAlert: Boolean(body.simulateCapacityAlert) || Boolean(avoidCrowds),
       locale,
+      pace,
+      avoidCrowds,
+      prioritizeLocalBusiness,
+      drivingPreference,
+      excludedFocuses,
+      excludedVillages,
     };
 
     const itinerary = await generateRedistributiveItinerary(

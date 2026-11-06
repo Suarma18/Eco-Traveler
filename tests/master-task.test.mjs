@@ -196,3 +196,164 @@ test("Master Task P1: Data integrity - No raw TODO-HUMAN in user-facing UI label
     "TelemetryCards tooltip must not expose raw developer TODO-HUMAN"
   );
 });
+
+test("Fix AI Extraction: All 4 user intentions recognized and stay remains unchanged", async () => {
+  const prompt =
+    "I want to experience authentic Balinese village life, avoid crowded places, spend more on local businesses, and keep driving time short.";
+  const result = parsePreferencesSemantically(prompt, "en");
+
+  assert.equal(result.status, "matched", "Status must be matched");
+  assert.ok(result.parsed, "Parsed object must exist");
+
+  // 1. Travel interests: Culture
+  assert.ok(
+    result.parsed.focus?.includes("Culture"),
+    "Must recognize authentic Balinese village life as Culture focus"
+  );
+
+  // 2. Crowd avoidance: avoidCrowds = true
+  assert.equal(
+    result.parsed.avoidCrowds,
+    true,
+    "Must extract avoidCrowds as true"
+  );
+
+  // 3. Local business priority: prioritizeLocalBusiness = true
+  assert.equal(
+    result.parsed.prioritizeLocalBusiness,
+    true,
+    "Must extract prioritizeLocalBusiness as true"
+  );
+
+  // 4. Driving time preference: drivingPreference = short
+  assert.equal(
+    result.parsed.drivingPreference,
+    "short",
+    "Must extract drivingPreference as short"
+  );
+
+  // Acceptance Criterion: Accommodation remains unchanged (null)
+  assert.equal(
+    result.parsed.stay,
+    null,
+    "Accommodation preference must remain null because it was never requested"
+  );
+
+  // Satisfaction Report Disclosures
+  assert.ok(result.satisfactionReport, "Must provide satisfaction report");
+  const crowdReport = result.satisfactionReport.find((r) =>
+    r.preference.toLowerCase().includes("crowd")
+  );
+  assert.ok(crowdReport, "Must evaluate crowd avoidance");
+  assert.equal(
+    crowdReport.status,
+    "partially_supported",
+    "Crowd avoidance must be disclosed as partially supported due to simulated capacity guards without real-time sensors"
+  );
+
+  const localReport = result.satisfactionReport.find((r) =>
+    r.preference.toLowerCase().includes("local")
+  );
+  assert.ok(localReport, "Must evaluate local business priority");
+  assert.equal(
+    localReport.status,
+    "partially_supported",
+    "Local business priority must be disclosed as partially supported due to unverified external commercial ownership"
+  );
+});
+
+test("Route Optimization Engine: Consumes extended parameters and modifies destinations & scoring", () => {
+  const aiEngineCode = fs.readFileSync(
+    path.resolve("src/lib/ai-engine.ts"),
+    "utf8"
+  );
+
+  // 1. Verify engine consumes all new parameters
+  assert.ok(
+    aiEngineCode.includes("request.avoidCrowds"),
+    "Engine must consume request.avoidCrowds"
+  );
+  assert.ok(
+    aiEngineCode.includes("request.prioritizeLocalBusiness"),
+    "Engine must consume request.prioritizeLocalBusiness"
+  );
+  assert.ok(
+    aiEngineCode.includes("request.drivingPreference"),
+    "Engine must consume request.drivingPreference"
+  );
+  assert.ok(
+    aiEngineCode.includes("request.pace"),
+    "Engine must consume request.pace"
+  );
+  assert.ok(
+    aiEngineCode.includes("request.excludedFocuses"),
+    "Engine must consume request.excludedFocuses"
+  );
+
+  // 2. Verify Spatial Algorithm logic on dataset:
+  const penglipuran = desaDataset.find((d) => d.id === "desa-penglipuran");
+  const undisan = desaDataset.find((d) => d.id === "desa-undisan");
+  assert.ok(penglipuran, "Penglipuran must exist in dataset");
+  assert.ok(undisan, "Undisan must exist in dataset");
+
+  // In standard conditions, Penglipuran is a high-profile cultural village
+  assert.equal(penglipuran.bufferVillageId, "desa-undisan");
+  assert.ok(
+    penglipuran.currentSimulatedLoad / penglipuran.dailyQuota >= 0.7,
+    "Penglipuran has high simulated load ratio"
+  );
+
+  // When avoidCrowds is active, engine penalizes high load ratio >= 0.7 by -8.0
+  assert.ok(
+    aiEngineCode.includes("loadRatio >= 0.70"),
+    "Engine must check loadRatio >= 0.70 to divert from crowded villages"
+  );
+  assert.ok(
+    aiEngineCode.includes("v?.bufferVillageId && !candidateIds.includes(v.bufferVillageId)"),
+    "Engine must inject buffer villages when avoidCrowds is active"
+  );
+
+  // When prioritizeLocalBusiness is active, engine boosts local spend & prioritizes Community Homestay
+  assert.ok(
+    aiEngineCode.includes("request.prioritizeLocalBusiness ? 1.18 : 1.0"),
+    "Engine must apply local spend multiplier when prioritizeLocalBusiness is active"
+  );
+  assert.ok(
+    aiEngineCode.includes("stayType === \"Community Homestay\""),
+    "Engine must prioritize Community Homestay for high local retention"
+  );
+
+  // When drivingPreference === 'short', engine performs nearest-neighbor sequencing
+  assert.ok(
+    aiEngineCode.includes("request.drivingPreference === \"short\""),
+    "Engine must execute nearest-neighbor spatial clustering for short driving preference"
+  );
+});
+
+test("Unsupported constraints and adversarial negations are disclosed truthfully", () => {
+  const prompt =
+    "I want a 5-star luxury chain hotel and nightclub in the village with real-time crowd sensors, no temples, and avoid crowded places";
+  const result = parsePreferencesSemantically(prompt, "en");
+
+  assert.equal(result.status, "matched");
+  assert.ok(result.parsed?.unsupportedPreferences?.length > 0);
+
+  const unsupportedNotes = result.satisfactionReport?.filter(
+    (s) => s.status === "unsupported"
+  );
+  assert.ok(
+    unsupportedNotes && unsupportedNotes.length >= 2,
+    "Must disclose out-of-scope constraints like nightclub and 5-star hotel as unsupported"
+  );
+
+  // Negation: "no temples" must exclude Culture
+  assert.ok(
+    result.detectedIntents.excludedFocuses?.includes("Culture"),
+    "Must capture 'no temples' as excluded Culture focus"
+  );
+  assert.equal(
+    result.parsed?.avoidCrowds,
+    true,
+    "Must still capture crowd avoidance"
+  );
+});

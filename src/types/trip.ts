@@ -2,6 +2,8 @@ export type BudgetCategory = "Backpacker" | "Moderate" | "Comfort";
 export type ArrivalGate = "NgurahRaiAirport" | "GilimanukPort";
 export type TimeSlot = "Pagi" | "Siang" | "Sore" | "Malam";
 export type AppLocale = "id" | "en";
+export type TravelPace = "relaxed" | "active" | "standard";
+export type DrivingPreference = "short" | "scenic" | "standard";
 
 export interface TripRequest {
   durationDays: number; // 1, 2, 3, atau 4
@@ -10,6 +12,14 @@ export interface TripRequest {
   arrivalGate: ArrivalGate;
   simulateCapacityAlert?: boolean;
   locale?: AppLocale;
+
+  // Extended AI & Spatial optimization parameters
+  pace?: TravelPace;
+  avoidCrowds?: boolean;
+  prioritizeLocalBusiness?: boolean;
+  drivingPreference?: DrivingPreference;
+  excludedFocuses?: string[];
+  excludedVillages?: string[];
 }
 
 export interface TripDayActivity {
