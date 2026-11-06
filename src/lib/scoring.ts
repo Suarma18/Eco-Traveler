@@ -170,36 +170,38 @@ export function computeItineraryTelemetry(
       });
     }
 
-    const lastActivity = day.activities[day.activities.length - 1];
-    const stayVillage = lastActivity
-      ? lookup.get(lastActivity.villageId)
-      : undefined;
-    const stayRegency =
-      day.recommendedStay?.regency || lastActivity?.regency || "Buleleng";
+    if (day.recommendedStay) {
+      const lastActivity = day.activities[day.activities.length - 1];
+      const stayVillage = lastActivity
+        ? lookup.get(lastActivity.villageId)
+        : undefined;
+      const stayRegency =
+        day.recommendedStay.regency || lastActivity?.regency || "Buleleng";
 
-    const baseStayPrice =
-      stayVillage?.avgHomestayPrice ||
-      (budgetCategory === "Backpacker"
-        ? 210000
-        : budgetCategory === "Comfort"
-        ? 360000
-        : 270000);
+      const baseStayPrice =
+        stayVillage?.avgHomestayPrice ||
+        (budgetCategory === "Backpacker"
+          ? 210000
+          : budgetCategory === "Comfort"
+          ? 360000
+          : 270000);
 
-    const retentionFactor =
-      day.recommendedStay?.type === "Community Homestay" ? 0.94 : 0.86;
-    const retainedStayRp = Math.round(baseStayPrice * retentionFactor);
-    homestayLocalSpendRp += retainedStayRp;
+      const retentionFactor =
+        day.recommendedStay.type === "Community Homestay" ? 0.94 : 0.86;
+      const retainedStayRp = Math.round(baseStayPrice * retentionFactor);
+      homestayLocalSpendRp += retainedStayRp;
 
-    const prevReg = regencySpendMap.get(stayRegency) || {
-      visitCount: 0,
-      spendRp: 0,
-      zone: stayVillage?.zone || "North",
-      weight: getRegencyWeight(stayRegency),
-    };
-    regencySpendMap.set(stayRegency, {
-      ...prevReg,
-      spendRp: prevReg.spendRp + retainedStayRp,
-    });
+      const prevReg = regencySpendMap.get(stayRegency) || {
+        visitCount: 0,
+        spendRp: 0,
+        zone: stayVillage?.zone || "North",
+        weight: getRegencyWeight(stayRegency),
+      };
+      regencySpendMap.set(stayRegency, {
+        ...prevReg,
+        spendRp: prevReg.spendRp + retainedStayRp,
+      });
+    }
   }
 
   const totalLocalRetainedRp = activityLocalSpendRp + homestayLocalSpendRp;

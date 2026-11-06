@@ -1,4 +1,4 @@
-// System prompts for Anthropic Claude integration in Eco Traveler
+// System prompts for AI integration (Google Gemini) in Eco Traveler
 
 export function getNarrateSystemPrompt(lang: "id" | "en"): string {
   const langLabel = lang === "en" ? "English" : "Bahasa Indonesia";

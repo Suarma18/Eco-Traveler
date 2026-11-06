@@ -204,11 +204,29 @@ export function buildDeterministicItinerary(
       }
     );
 
+    const isFinalDay = d === duration - 1;
     const anchorVillage =
       selectedVillages[selectedVillages.length - 1] || DESA_DATASET[0];
     const stayPrice = Math.round(
       anchorVillage.avgHomestayPrice * spendMultiplier
     );
+
+    const recommendedStay = isFinalDay
+      ? undefined
+      : {
+          name:
+            budget === "Comfort"
+              ? `${anchorVillage.name} Heritage Eco-Lodge`
+              : `Pondok Warga Pokdarwis ${anchorVillage.name}`,
+          type: (budget === "Comfort" ? "Eco Lodge" : "Community Homestay") as
+            | "Eco Lodge"
+            | "Community Homestay",
+          priceRangeRp: `${formatRupiah(stayPrice)} - ${formatRupiah(
+            stayPrice + 60000
+          )} / malam`,
+          villageName: anchorVillage.name,
+          regency: anchorVillage.regency,
+        };
 
     rawDays.push({
       dayNumber: d + 1,
@@ -216,18 +234,7 @@ export function buildDeterministicItinerary(
         dayThemeTitles[gate]?.[d] || "Eksplorasi Desa Wisata Mandiri"
       }`,
       activities,
-      recommendedStay: {
-        name:
-          budget === "Comfort"
-            ? `${anchorVillage.name} Heritage Eco-Lodge`
-            : `Pondok Warga Pokdarwis ${anchorVillage.name}`,
-        type: budget === "Comfort" ? "Eco Lodge" : "Community Homestay",
-        priceRangeRp: `${formatRupiah(stayPrice)} - ${formatRupiah(
-          stayPrice + 60000
-        )} / malam`,
-        villageName: anchorVillage.name,
-        regency: anchorVillage.regency,
-      },
+      recommendedStay,
     });
   }
 
@@ -468,11 +475,14 @@ Kembalikan JSON dengan struktur persis:
               capacityStatus: "OPTIMAL",
             };
           }),
-          recommendedStay: day.recommendedStay || {
-            name: "Homestay Koperasi Desa Wisata",
-            type: "Community Homestay",
-            priceRangeRp: "Rp 250.000 - Rp 290.000 / malam",
-          },
+          recommendedStay:
+            idx === (parsed.days || []).length - 1
+              ? undefined
+              : day.recommendedStay || {
+                  name: "Homestay Koperasi Desa Wisata",
+                  type: "Community Homestay",
+                  priceRangeRp: "Rp 250.000 - Rp 290.000 / malam",
+                },
         }));
 
         const guardedDays = applyAntiOvertourismCapacityGuard(
@@ -536,6 +546,170 @@ Kembalikan JSON dengan struktur persis:
           ? ARRIVAL_GATES[gate].labelEn
           : ARRIVAL_GATES[gate].label,
       arrivalCoords: ARRIVAL_GATES[gate].coords,
+    },
+  };
+}
+
+export interface ItineraryValidationReport {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  details: {
+    durationDays: number;
+    nightsCount: number;
+    totalStops: number;
+    visitedVillages: string[];
+    uniqueVillages: number;
+    priorityRegencyRatio: number;
+  };
+}
+
+/**
+ * Validates the spatial, economic, and logical integrity of an itinerary response.
+ * Enforces competition guidelines:
+ * - Day / night consistency (1 day = 0 nights, 2 days = 1 night, etc.)
+ * - Valid geographic coordinates within Bali bounds
+ * - Verifiable village IDs from DESA_DATASET
+ * - Realistic spending & non-empty activity sequences
+ */
+export function validateItineraryRoute(
+  itinerary: ItineraryResponse
+): ItineraryValidationReport {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!itinerary) {
+    return {
+      isValid: false,
+      errors: ["Itinerary is null or undefined"],
+      warnings: [],
+      details: {
+        durationDays: 0,
+        nightsCount: 0,
+        totalStops: 0,
+        visitedVillages: [],
+        uniqueVillages: 0,
+        priorityRegencyRatio: 0,
+      },
+    };
+  }
+
+  const days = itinerary.days || [];
+  if (days.length === 0) {
+    errors.push("Itinerary has no days");
+  } else if (days.length > 4) {
+    errors.push(
+      `Itinerary days count (${days.length}) exceeds maximum allowable 4 days`
+    );
+  }
+
+  // Day / night consistency: expected nights is Math.max(0, days.length - 1)
+  const expectedNights = Math.max(0, days.length - 1);
+  const actualNights = days.filter((d) => Boolean(d.recommendedStay)).length;
+  if (actualNights > expectedNights) {
+    warnings.push(
+      `Itinerary has ${actualNights} overnight stays for a ${days.length}-day trip. Expected ${expectedNights} nights.`
+    );
+  }
+
+  // Final departure day should not have an overnight stay
+  if (days.length > 0) {
+    const lastDay = days[days.length - 1];
+    if (lastDay.recommendedStay) {
+      warnings.push(
+        "Final day of itinerary includes an overnight stay despite returning to arrival gate."
+      );
+    }
+  }
+
+  let totalStops = 0;
+  const visitedVillages: string[] = [];
+  let priorityStops = 0;
+
+  for (const day of days) {
+    if (!day.activities || day.activities.length === 0) {
+      errors.push(`Day ${day.dayNumber} has no activities`);
+      continue;
+    }
+    for (const act of day.activities) {
+      totalStops++;
+      visitedVillages.push(act.villageId);
+
+      const village = DESA_BY_ID.get(act.villageId);
+      if (!village) {
+        errors.push(`Activity references unknown villageId: ${act.villageId}`);
+      } else {
+        // Bali bounding box: latitude -8.9 to -8.0, longitude 114.4 to 115.8
+        if (
+          act.lat < -8.9 ||
+          act.lat > -8.0 ||
+          act.lng < 114.4 ||
+          act.lng > 115.8
+        ) {
+          errors.push(
+            `Invalid geographic coordinates for ${act.villageName}: [${act.lat}, ${act.lng}]`
+          );
+        }
+        if (PRIORITY_REGENCIES.has(act.regency)) {
+          priorityStops++;
+        }
+      }
+
+      if (
+        typeof act.estimatedLocalSpendRp !== "number" ||
+        act.estimatedLocalSpendRp <= 0
+      ) {
+        warnings.push(
+          `Activity in ${act.villageName} has non-positive spend: ${act.estimatedLocalSpendRp}`
+        );
+      }
+    }
+  }
+
+  const uniqueVillages = new Set(visitedVillages).size;
+  const priorityRatio = totalStops > 0 ? priorityStops / totalStops : 0;
+
+  if (priorityRatio < 0.6) {
+    warnings.push(
+      `Priority regency representation is ${(priorityRatio * 100).toFixed(
+        1
+      )}%, target is >= 70%.`
+    );
+  }
+
+  if (itinerary.metrics) {
+    if (
+      itinerary.metrics.spreadScore < 0 ||
+      itinerary.metrics.spreadScore > 100
+    ) {
+      errors.push(`Invalid Spread Score: ${itinerary.metrics.spreadScore}`);
+    }
+    if (
+      itinerary.metrics.localBenefitIndex < 0 ||
+      itinerary.metrics.localBenefitIndex > 100
+    ) {
+      errors.push(
+        `Invalid Local Benefit Index: ${itinerary.metrics.localBenefitIndex}`
+      );
+    }
+    if (itinerary.metrics.totalEstimatedSpendRp <= 0) {
+      errors.push(
+        `Invalid total spend: ${itinerary.metrics.totalEstimatedSpendRp}`
+      );
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    details: {
+      durationDays: days.length,
+      nightsCount: actualNights,
+      totalStops,
+      visitedVillages,
+      uniqueVillages,
+      priorityRegencyRatio: Math.round(priorityRatio * 1000) / 10,
     },
   };
 }

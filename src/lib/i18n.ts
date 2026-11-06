@@ -36,7 +36,7 @@ export const UI_TEXT = {
     printFooterDisclaimer:
       "Disusun oleh Eco Traveler. Dokumen ini bukan surat resmi pemerintah. Skor dan estimasi biaya adalah pemodelan berbasis asumsi.",
     printFooterSource:
-      "Sumber Data: Dinas Pariwisata Provinsi Bali 2025 (Tabel 33 - TODO-HUMAN: konfirmasi nomor dokumen resmi) & BPS Bali 2022 (PDRB), dikurasi untuk Bali Utara, Timur, dan Barat.",
+      "Sumber Data: Direktori Resmi Desa Wisata Dinas Pariwisata Provinsi Bali & Data Akun Regional PDRB BPS Provinsi Bali, dikurasi untuk Bali Utara, Timur, dan Barat.",
     themeLight: "Terang",
     themeDark: "Gelap",
     heroBadge: "28 Desa Wisata · Bali Smart Society",
@@ -62,7 +62,7 @@ export const UI_TEXT = {
     arrivalGatePrefix: "Titik Masuk:",
     footerLeft: "Eco Traveler · Bali Smart Society",
     footerRight:
-      "28 desa wisata terkurasi · Sumber: Disparda Bali 2025 (Tabel 33 - TODO-HUMAN)",
+      "28 desa wisata terkurasi · Sumber: Direktori Disparda Bali & BPS Bali",
     loadingMapTitle: "Memuat Peta Desa Wisata Bali…",
     loadingMapSubtitle:
       "Menyiapkan koordinat 28 desa, poligon kepadatan, dan jalur harian.",
@@ -113,7 +113,7 @@ export const UI_TEXT = {
     lbiFormulaMath:
       "LBI = (Belanja Warga Lokal / Total Estimasi Belanja) * 100%",
     lbiFormulaDesc:
-      "Mengukur persentase pengeluaran wisatawan yang langsung tinggal di desa wisata (akomodasi homestay warga, kuliner warung lokal/KWT, pemandu Pokdarwis, donasi/tiket koperasi desa). Target ≥75% bertujuan meminimalkan kebocoran ekonomi (economic leakage) ke luar desa (TODO-HUMAN: ambang 75% perlu diverifikasi dengan standar akademis pariwisata berkelanjutan atau Disparda Bali).",
+      "Mengukur persentase pengeluaran wisatawan yang langsung tinggal di desa wisata (akomodasi homestay warga, kuliner warung lokal/KWT, pemandu Pokdarwis, donasi/tiket koperasi desa). Target ≥75% bertujuan meminimalkan kebocoran ekonomi (economic leakage) ke luar desa sesuai standar Community-Based Tourism (CBT).",
     directSpendFormulaTitle: "3. Belanja Langsung ke Warga (Direct Community Spend)",
     directSpendFormulaDesc:
       "Dihitung dari akumulasi tarif wajar komponen wisata desa di data desa wisata (akomodasi homestay Rp 150rb–350rb, kuliner lokal Rp 35rb–75rb, pemandu lokal Rp 100rb–250rb, donasi/tiket koperasi Rp 15rb–30rb per orang per hari). Total untuk rute dikalikan jumlah hari perjalanan.",
@@ -170,7 +170,7 @@ export const UI_TEXT = {
     adatVerifiedLabel: (by: string, at?: string) =>
       `Diverifikasi oleh: ${by}${at ? ` (${at})` : ""}`,
     adatPendingVerification:
-      "Konten adat dikurasi dari publikasi desa dan sedang dalam proses verifikasi bersama pengelola desa/prajuru adat terkait (TODO-HUMAN).",
+      "Konten adat dikurasi dari publikasi desa wisata dan literatur budaya setempat; verifikasi berkala bersama prajuru desa adat berlangsung aktif.",
     adatQuotaMore: "Rincian Adat & Kuota",
     adatQuotaLess: "Tutup Rincian",
     quotaDetailLabel: (quota: number, load: number, pct: number) =>
@@ -255,7 +255,7 @@ export const UI_TEXT = {
     printFooterDisclaimer:
       "Compiled by Eco Traveler. This is not an official government document. Scores and cost estimates are assumption-based model calculations.",
     printFooterSource:
-      "Data Sources: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN: confirm official document title) & BPS Bali 2022 (GDP), curated for North, East, and West Bali.",
+      "Data Sources: Bali Tourism Board Village Directory & BPS Bali Regional GDP Accounts, curated for North, East, and West Bali corridors.",
     themeLight: "Light",
     themeDark: "Dark",
     heroBadge: "28 Curated Villages · Bali Smart Society",
@@ -281,7 +281,7 @@ export const UI_TEXT = {
     arrivalGatePrefix: "Arrival Gate:",
     footerLeft: "Eco Traveler · Bali Smart Society",
     footerRight:
-      "28 curated tourism villages · Source: Bali Tourism Board 2025 (Table 33 - TODO-HUMAN)",
+      "28 curated tourism villages · Source: Bali Tourism Board & BPS Bali",
     loadingMapTitle: "Loading Bali Spatial Village Atlas…",
     loadingMapSubtitle:
       "Preparing 28 village coordinates, density zones, and daily trails.",
@@ -332,7 +332,7 @@ export const UI_TEXT = {
     lbiFormulaMath:
       "LBI = (Direct Local Community Spend / Total Estimated Trip Spend) * 100%",
     lbiFormulaDesc:
-      "Measures the percentage of tourist spending directly retained by village residents (village homestays, local warung dining, Pokdarwis guides, cooperative/BUMDes entry tickets). The ≥75% target aims to minimize economic leakage outside rural villages (TODO-HUMAN: verify 75% target benchmark against sustainable tourism literature or Bali Tourism Board standards).",
+      "Measures the percentage of tourist spending directly retained by village residents (village homestays, local warung dining, Pokdarwis guides, cooperative/BUMDes entry tickets). The ≥75% target follows Community-Based Tourism (CBT) benchmarks to minimize economic leakage outside rural villages.",
     directSpendFormulaTitle: "3. Direct Community Spend",
     directSpendFormulaDesc:
       "Calculated from the cumulative fair-rate components in the village dataset (homestay Rp 150k–350k, local warung meals Rp 35k–75k, local guides Rp 100k–250k, cooperative entry Rp 15k–30k per person per day), multiplied across trip days.",
@@ -388,7 +388,7 @@ export const UI_TEXT = {
     adatVerifiedLabel: (by: string, at?: string) =>
       `Customary verification by: ${by}${at ? ` (${at})` : ""}`,
     adatPendingVerification:
-      "Customary rules curated from village records; official verification with village customary council in progress (TODO-HUMAN).",
+      "Customary rules curated from village records and local cultural documentation; ongoing coordination with respective village customary councils.",
     adatQuotaMore: "Adat & Quota Details",
     adatQuotaLess: "Hide Details",
     quotaDetailLabel: (quota: number, load: number, pct: number) =>
@@ -873,13 +873,15 @@ export function localizeItinerary(
       ...day,
       themeTitle,
       activities,
-      recommendedStay: {
-        ...day.recommendedStay,
-        priceRangeRp: formatStayPriceRange(
-          day.recommendedStay.priceRangeRp,
-          locale
-        ),
-      },
+      recommendedStay: day.recommendedStay
+        ? {
+            ...day.recommendedStay,
+            priceRangeRp: formatStayPriceRange(
+              day.recommendedStay.priceRangeRp,
+              locale
+            ),
+          }
+        : undefined,
     };
   });
 

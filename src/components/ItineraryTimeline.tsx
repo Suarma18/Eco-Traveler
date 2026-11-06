@@ -111,19 +111,20 @@ export default function ItineraryTimeline({
         const prevDay = days[d - 1];
         if (prevDay && prevDay.activities.length > 0) {
           const prevLastAct = prevDay.activities[prevDay.activities.length - 1];
-          const stayVillage = prevDay.recommendedStay
+          const prevStay = prevDay.recommendedStay;
+          const stayVillage = prevStay
             ? allVillages.find((v) =>
-                prevDay.recommendedStay.name
+                prevStay.name
                   .toLowerCase()
                   .includes(v.name.toLowerCase())
               ) ||
               allVillages.find(
                 (v) =>
-                  prevDay.recommendedStay.villageName &&
+                  prevStay.villageName &&
                   v.name
                     .toLowerCase()
                     .includes(
-                      prevDay.recommendedStay.villageName.toLowerCase()
+                      prevStay.villageName.toLowerCase()
                     )
               ) ||
               DESA_BY_ID.get(prevLastAct.villageId)
@@ -157,20 +158,21 @@ export default function ItineraryTimeline({
       }
 
       // Kaki menuju homestay
-      if (day.recommendedStay && day.activities.length > 0) {
+      const curStay = day.recommendedStay;
+      if (curStay && day.activities.length > 0) {
         const lastAct = day.activities[day.activities.length - 1];
         const stayVillage =
           allVillages.find((v) =>
-            day.recommendedStay.name
+            curStay.name
               .toLowerCase()
               .includes(v.name.toLowerCase())
           ) ||
           allVillages.find(
             (v) =>
-              day.recommendedStay.villageName &&
+              curStay.villageName &&
               v.name
                 .toLowerCase()
-                .includes(day.recommendedStay.villageName.toLowerCase())
+                .includes(curStay.villageName.toLowerCase())
           ) ||
           DESA_BY_ID.get(lastAct.villageId);
 
@@ -298,19 +300,20 @@ export default function ItineraryTimeline({
             if (prevDay && prevDay.activities.length > 0) {
               const prevLastAct =
                 prevDay.activities[prevDay.activities.length - 1];
-              const stayVillage = prevDay.recommendedStay
+              const prevStay = prevDay.recommendedStay;
+              const stayVillage = prevStay
                 ? allVillages.find((v) =>
-                    prevDay.recommendedStay.name
+                    prevStay.name
                       .toLowerCase()
                       .includes(v.name.toLowerCase())
                   ) ||
                   allVillages.find(
                     (v) =>
-                      prevDay.recommendedStay.villageName &&
+                      prevStay.villageName &&
                       v.name
                         .toLowerCase()
                         .includes(
-                          prevDay.recommendedStay.villageName.toLowerCase()
+                          prevStay.villageName.toLowerCase()
                         )
                   ) ||
                   DESA_BY_ID.get(prevLastAct.villageId)
@@ -342,20 +345,21 @@ export default function ItineraryTimeline({
             totalDayTransitKm += segEst.roadDistanceKm;
           }
 
-          if (day.recommendedStay && day.activities.length > 0) {
+          const curStay = day.recommendedStay;
+          if (curStay && day.activities.length > 0) {
             const lastAct = day.activities[day.activities.length - 1];
             const stayVillage =
               allVillages.find((v) =>
-                day.recommendedStay.name
+                curStay.name
                   .toLowerCase()
                   .includes(v.name.toLowerCase())
               ) ||
               allVillages.find(
                 (v) =>
-                  day.recommendedStay.villageName &&
+                  curStay.villageName &&
                   v.name
                     .toLowerCase()
-                    .includes(day.recommendedStay.villageName.toLowerCase())
+                    .includes(curStay.villageName.toLowerCase())
               ) ||
               DESA_BY_ID.get(lastAct.villageId);
 
@@ -495,19 +499,20 @@ export default function ItineraryTimeline({
                     if (!prevDay || prevDay.activities.length === 0) return null;
                     const prevLastAct =
                       prevDay.activities[prevDay.activities.length - 1];
-                    const stayVillage = prevDay.recommendedStay
+                    const prevStay = prevDay.recommendedStay;
+                    const stayVillage = prevStay
                       ? allVillages.find((v) =>
-                          prevDay.recommendedStay.name
+                          prevStay.name
                             .toLowerCase()
                             .includes(v.name.toLowerCase())
                         ) ||
                         allVillages.find(
                           (v) =>
-                            prevDay.recommendedStay.villageName &&
+                            prevStay.villageName &&
                             v.name
                               .toLowerCase()
                               .includes(
-                                prevDay.recommendedStay.villageName.toLowerCase()
+                                prevStay.villageName.toLowerCase()
                               )
                         ) ||
                         DESA_BY_ID.get(prevLastAct.villageId)
@@ -1125,20 +1130,22 @@ export default function ItineraryTimeline({
                 {/* Transit Menuju Homestay Warga */}
                 {day.recommendedStay &&
                   day.activities.length > 0 && (() => {
+                    const currentStay = day.recommendedStay;
+                    if (!currentStay) return null;
                     const lastAct = day.activities[day.activities.length - 1];
                     const stayVillage =
                       allVillages.find((v) =>
-                        day.recommendedStay.name
+                        currentStay.name
                           .toLowerCase()
                           .includes(v.name.toLowerCase())
                       ) ||
                       allVillages.find(
                         (v) =>
-                          day.recommendedStay.villageName &&
+                          currentStay.villageName &&
                           v.name
                             .toLowerCase()
                             .includes(
-                              day.recommendedStay.villageName.toLowerCase()
+                              currentStay.villageName.toLowerCase()
                             )
                       ) ||
                       DESA_BY_ID.get(lastAct.villageId);

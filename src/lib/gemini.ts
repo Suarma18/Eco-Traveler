@@ -10,13 +10,20 @@ import {
   ALLOWED_FOCUSES,
   ALLOWED_STAYS,
 } from "./prompts/narrate";
+import { parsePreferencesSemantically } from "./semantic-fallback";
 
-const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
-const TIMEOUT_MS = 15_000;
+const CANDIDATE_GEMINI_MODELS = [
+  process.env.GEMINI_MODEL || "gemini-flash-lite-latest",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-flash-latest",
+];
 
-// Rate limiting: 10 requests per 10 minutes per IP
+const TIMEOUT_MS = 10_000;
+
+// Rate limiting: 20 requests per 10 minutes per IP
 const RATE_WINDOW_MS = 10 * 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 10;
+const MAX_REQUESTS_PER_WINDOW = 20;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 export function checkRateLimit(ip: string): boolean {
@@ -58,26 +65,20 @@ export function cleanJsonOutput(raw: string): string {
   return cleaned;
 }
 
-function getGeminiClient(): { genAI: GoogleGenerativeAI; modelName: string } | null {
+function getGeminiApiKey(): string | null {
   const rawKey = process.env.GEMINI_API_KEY || "";
   const apiKey = rawKey.replace(/^[#\s"']+|[#\s"']+$/g, "").trim();
-  if (!apiKey) return null;
-
-  const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-  return {
-    genAI: new GoogleGenerativeAI(apiKey),
-    modelName,
-  };
+  return apiKey || null;
 }
 
-// 1A. Generate Route & Stop Narratives with Gemini
+// 1A. Generate Route & Stop Narratives with Gemini (Multi-tier model fallback)
 export async function generateAiNarrative(
   stops: NarrateStopInput[],
   lang: "id" | "en",
   userNote?: string
 ): Promise<{ success: boolean; data?: NarrateApiResponse; isFallback: boolean }> {
-  const client = getGeminiClient();
-  if (!client) {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
     return { success: false, isFallback: true };
   }
 
@@ -100,155 +101,175 @@ export async function generateAiNarrative(
     USER_NOTE: userNote || "",
   };
 
-  try {
-    const model = client.genAI.getGenerativeModel({
-      model: client.modelName,
-      systemInstruction: systemPrompt,
-      generationConfig: {
-        temperature: 0.2,
-        responseMimeType: "application/json",
-      },
-    });
+  const genAI = new GoogleGenerativeAI(apiKey);
 
-    const callPromise = model.generateContent(
-      `Please generate the route narrative following the instructions and provided data:\n${JSON.stringify(
-        payloadData
-      )}`
-    );
+  for (const modelName of CANDIDATE_GEMINI_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction: systemPrompt,
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json",
+        },
+      });
 
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Gemini narrative request timed out")), TIMEOUT_MS)
-    );
+      const callPromise = model.generateContent(
+        `Please generate the route narrative following the instructions and provided data:\n${JSON.stringify(
+          payloadData
+        )}`
+      );
 
-    const result = await Promise.race([callPromise, timeoutPromise]);
-    const rawContent = result.response.text();
-    const cleaned = cleanJsonOutput(rawContent);
-    const parsed = JSON.parse(cleaned);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Gemini ${modelName} narrative request timed out`)), TIMEOUT_MS)
+      );
 
-    // Strict schema validation
-    if (!parsed || typeof parsed.summary !== "string" || !Array.isArray(parsed.stops)) {
-      throw new Error("Narrative schema missing summary or stops");
+      const result = await Promise.race([callPromise, timeoutPromise]);
+      const rawContent = result.response.text();
+      const cleaned = cleanJsonOutput(rawContent);
+      const parsed = JSON.parse(cleaned);
+
+      if (!parsed || typeof parsed.summary !== "string" || !Array.isArray(parsed.stops)) {
+        throw new Error("Narrative schema missing summary or stops");
+      }
+
+      const validStopIds = new Set(stops.map((s) => s.id));
+      const validatedStops = parsed.stops
+        .filter(
+          (s: unknown): s is { id: string; narrative: string } =>
+            typeof s === "object" &&
+            s !== null &&
+            typeof (s as Record<string, unknown>).id === "string" &&
+            typeof (s as Record<string, unknown>).narrative === "string" &&
+            validStopIds.has((s as Record<string, unknown>).id as string)
+        )
+        .map((s: { id: string; narrative: string }) => ({
+          id: s.id,
+          narrative: s.narrative.slice(0, 350).trim(),
+        }));
+
+      if (validatedStops.length === 0) {
+        throw new Error("No valid stops returned from AI");
+      }
+
+      const validatedResult: NarrateApiResponse = {
+        summary: parsed.summary.trim(),
+        stops: validatedStops,
+      };
+
+      narrativeCache.set(cacheKey, { data: validatedResult, cachedAt: Date.now() });
+      return { success: true, data: validatedResult, isFallback: false };
+    } catch (err) {
+      console.warn(`[Gemini AI] Model ${modelName} failed narrative generation:`, err);
+      // Continue to next candidate model
     }
-
-    const validStopIds = new Set(stops.map((s) => s.id));
-    const validatedStops = parsed.stops
-      .filter(
-        (s: unknown): s is { id: string; narrative: string } =>
-          typeof s === "object" &&
-          s !== null &&
-          typeof (s as Record<string, unknown>).id === "string" &&
-          typeof (s as Record<string, unknown>).narrative === "string" &&
-          validStopIds.has((s as Record<string, unknown>).id as string)
-      )
-      .map((s: { id: string; narrative: string }) => ({
-        id: s.id,
-        narrative: s.narrative.slice(0, 350).trim(), // Cap at ~60 words
-      }));
-
-    if (validatedStops.length === 0) {
-      throw new Error("No valid stops returned from AI");
-    }
-
-    const validatedResult: NarrateApiResponse = {
-      summary: parsed.summary.trim(),
-      stops: validatedStops,
-    };
-
-    narrativeCache.set(cacheKey, { data: validatedResult, cachedAt: Date.now() });
-    return { success: true, data: validatedResult, isFallback: false };
-  } catch (err) {
-    console.warn("[Gemini AI] Narrative failed, falling back:", err);
-    return { success: false, isFallback: true };
   }
+
+  return { success: false, isFallback: true };
 }
 
-// 1B. Parse Natural Language Preferences with Gemini
+// 1B. Parse Natural Language Preferences with Gemini + Typo-Tolerant Semantic Engine
 export async function parseAiPreferences(
   userText: string,
   lang: "id" | "en"
 ): Promise<{ success: boolean; data?: ParsedPreferencesResponse; isFallback: boolean }> {
-  const client = getGeminiClient();
-  if (!client) {
-    return { success: false, isFallback: true };
-  }
-
   const cleanUserText = (userText || "").slice(0, 300).trim();
   if (!cleanUserText) {
     return { success: false, isFallback: true };
   }
 
-  const systemPrompt = getParsePreferencesSystemPrompt(lang);
+  const apiKey = getGeminiApiKey();
 
-  try {
-    const model = client.genAI.getGenerativeModel({
-      model: client.modelName,
-      systemInstruction: systemPrompt,
-      generationConfig: {
-        temperature: 0.1,
-        responseMimeType: "application/json",
-      },
-    });
+  // If Gemini API is available, try candidate models
+  if (apiKey) {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const systemPrompt = getParsePreferencesSystemPrompt(lang);
 
-    const callPromise = model.generateContent(cleanUserText);
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Gemini parse preferences timed out")), TIMEOUT_MS)
-    );
+    for (const modelName of CANDIDATE_GEMINI_MODELS) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: systemPrompt,
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json",
+          },
+        });
 
-    const result = await Promise.race([callPromise, timeoutPromise]);
-    const rawContent = result.response.text();
-    const cleaned = cleanJsonOutput(rawContent);
-    const parsed = JSON.parse(cleaned);
+        const callPromise = model.generateContent(cleanUserText);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error(`Gemini ${modelName} parse timed out`)), 7_000)
+        );
 
-    if (!parsed || typeof parsed !== "object") {
-      throw new Error("Parse preferences output is not an object");
+        const result = await Promise.race([callPromise, timeoutPromise]);
+        const rawContent = result.response.text();
+        const cleaned = cleanJsonOutput(rawContent);
+        const parsed = JSON.parse(cleaned);
+
+        if (parsed && typeof parsed === "object") {
+          let days: 1 | 2 | 3 | 4 | null = null;
+          if (parsed.days === 1 || parsed.days === 2 || parsed.days === 3 || parsed.days === 4) {
+            days = parsed.days;
+          }
+
+          let arrival: (typeof ALLOWED_ARRIVALS)[number] | null = null;
+          if (ALLOWED_ARRIVALS.includes(parsed.arrival)) {
+            arrival = parsed.arrival;
+          }
+
+          let focus: (typeof ALLOWED_FOCUSES)[number][] | null = null;
+          if (Array.isArray(parsed.focus)) {
+            const valid = parsed.focus.filter((f: string): f is (typeof ALLOWED_FOCUSES)[number] =>
+              ALLOWED_FOCUSES.includes(f as (typeof ALLOWED_FOCUSES)[number])
+            );
+            if (valid.length > 0) focus = valid;
+          }
+
+          let stay: (typeof ALLOWED_STAYS)[number] | null = null;
+          if (ALLOWED_STAYS.includes(parsed.stay)) {
+            stay = parsed.stay;
+          }
+
+          const explanation =
+            typeof parsed.explanation === "string"
+              ? parsed.explanation.trim()
+              : lang === "en"
+              ? "Preferences adjusted based on your request."
+              : "Preferensi disesuaikan berdasarkan permintaan Anda.";
+
+          const validatedResult: ParsedPreferencesResponse = {
+            days,
+            arrival,
+            focus,
+            stay,
+            explanation,
+          };
+
+          return { success: true, data: validatedResult, isFallback: false };
+        }
+      } catch (err) {
+        console.warn(`[Gemini AI] Model ${modelName} failed parsing preferences:`, err);
+        // Continue to next candidate model
+      }
     }
-
-    // Validate days
-    let days: 1 | 2 | 3 | 4 | null = null;
-    if (parsed.days === 1 || parsed.days === 2 || parsed.days === 3 || parsed.days === 4) {
-      days = parsed.days;
-    }
-
-    // Validate arrival
-    let arrival: (typeof ALLOWED_ARRIVALS)[number] | null = null;
-    if (ALLOWED_ARRIVALS.includes(parsed.arrival)) {
-      arrival = parsed.arrival;
-    }
-
-    // Validate focus
-    let focus: (typeof ALLOWED_FOCUSES)[number][] | null = null;
-    if (Array.isArray(parsed.focus)) {
-      const valid = parsed.focus.filter((f: string): f is (typeof ALLOWED_FOCUSES)[number] =>
-        ALLOWED_FOCUSES.includes(f as (typeof ALLOWED_FOCUSES)[number])
-      );
-      if (valid.length > 0) focus = valid;
-    }
-
-    // Validate stay
-    let stay: (typeof ALLOWED_STAYS)[number] | null = null;
-    if (ALLOWED_STAYS.includes(parsed.stay)) {
-      stay = parsed.stay;
-    }
-
-    const explanation =
-      typeof parsed.explanation === "string"
-        ? parsed.explanation.trim()
-        : lang === "en"
-        ? "Preferences adjusted based on your request."
-        : "Preferensi disesuaikan berdasarkan permintaan Anda.";
-
-    const validatedResult: ParsedPreferencesResponse = {
-      days,
-      arrival,
-      focus,
-      stay,
-      explanation,
-    };
-
-    return { success: true, data: validatedResult, isFallback: false };
-  } catch (err) {
-    console.warn("[Gemini AI] Parse preferences failed, falling back:", err);
-    return { success: false, isFallback: true };
   }
-}
 
+  // Fallback: Resilient Local Semantic Rule Engine
+  // Parses typos like "relaxaced", "tedekat", and natural language intents offline with 0 latency
+  const semanticData = parsePreferencesSemantically(cleanUserText, lang);
+  const hasExtractedIntent =
+    semanticData.days !== null ||
+    semanticData.arrival !== null ||
+    (semanticData.focus !== null && semanticData.focus.length > 0) ||
+    semanticData.stay !== null;
+
+  if (hasExtractedIntent) {
+    return {
+      success: true,
+      data: semanticData,
+      isFallback: true,
+    };
+  }
+
+  return { success: false, isFallback: true };
+}

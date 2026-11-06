@@ -32,7 +32,7 @@ export interface DayItinerary {
   dayNumber: number;
   themeTitle: string;
   activities: TripDayActivity[];
-  recommendedStay: {
+  recommendedStay?: {
     name: string;
     type: "Community Homestay" | "Eco Lodge";
     priceRangeRp: string;

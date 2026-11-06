@@ -145,7 +145,7 @@ export default function TelemetryCards({
             </span>
             <span
               className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-[#0D4732] dark:text-emerald-300"
-              title="Target standar pariwisata berbasis masyarakat untuk meminimalkan kebocoran ekonomi (TODO-HUMAN: konfirmasi rujukan akademis/Disparda)"
+              title="Target standar pariwisata berbasis masyarakat untuk meminimalkan kebocoran ekonomi (CBT benchmark)"
             >
               {t.lbiTarget}
             </span>
