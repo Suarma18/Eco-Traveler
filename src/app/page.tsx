@@ -21,7 +21,6 @@ import ItineraryTimeline from "@/components/ItineraryTimeline";
 import CulturalBriefing from "@/components/CulturalBriefing";
 import GovernmentBar from "@/components/GovernmentBar";
 import {
-  Compass,
   Map as MapIcon,
   FileDown,
   BarChart3,
@@ -350,10 +349,14 @@ export default function HomePage() {
         <div className="max-w-[1520px] mx-auto h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Identity */}
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0D261C] dark:bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0 ring-1 ring-emerald-500/20">
-              <Compass
-                className="w-4 h-4 text-emerald-300 dark:text-white"
-                aria-hidden="true"
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white dark:bg-[#0D261C] flex items-center justify-center shadow-xs shrink-0 ring-1 ring-slate-200/80 dark:ring-emerald-500/30 overflow-hidden p-0.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/img/eco-traveler.svg"
+                alt="Eco Traveler Logo"
+                className="w-full h-full object-contain"
+                width={36}
+                height={36}
               />
             </div>
             <div className="min-w-0">
@@ -554,9 +557,16 @@ export default function HomePage() {
               <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 text-slate-900">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded bg-[#0D261C] text-emerald-300 flex items-center justify-center font-bold text-xs">
-                        ET
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="/img/eco-traveler.svg"
+                          alt="Eco Traveler Logo"
+                          className="w-full h-full object-contain"
+                          width={32}
+                          height={32}
+                        />
                       </div>
                       <h1 className="font-display text-lg font-bold tracking-tight text-slate-900 uppercase">
                         {t.printHeaderTitle}

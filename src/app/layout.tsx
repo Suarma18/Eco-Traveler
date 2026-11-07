@@ -57,6 +57,11 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "Eco Traveler",
   },
+  icons: {
+    icon: "/img/eco-traveler.svg",
+    shortcut: "/img/eco-traveler.svg",
+    apple: "/img/eco-traveler.svg",
+  },
 };
 
 const THEME_INIT_SCRIPT = `
