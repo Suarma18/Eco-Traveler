@@ -1,13 +1,17 @@
-# Eco Traveler - AI Equitable Spatial Tourism Planner for Bali
+<div align="center">
+  <img src="public/img/eco-traveler.svg" alt="Eco Traveler Logo" width="110" />
+  <h1>Eco Traveler — Equitable Bali Travel Route Planner</h1>
+  <p><strong>Platform Perencana Wisata Berkeadilan & Generator Rute Berbasis AI untuk 28 Desa Wisata Bali Luar Sarbagita</strong></p>
 
-> **Platform Perencana Wisata Berkeadilan & Generator Rute Berbasis AI untuk 28 Desa Wisata Bali Luar Sarbagita**
-
-[![Production Build](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://route-traveler.vercel.app/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black.svg)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg)](https://tailwindcss.com/)
-[![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini%20API-4285F4.svg)](https://ai.google.dev/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-39%2F39%20Pass-emerald.svg)](tests/)
+  <p>
+    <a href="https://route-traveler.vercel.app/"><img src="https://img.shields.io/badge/Build-Passing-brightgreen.svg" alt="Production Build" /></a>
+    <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-14.2.16-black.svg" alt="Next.js" /></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.6-blue.svg" alt="TypeScript" /></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg" alt="Tailwind CSS" /></a>
+    <a href="https://ai.google.dev/"><img src="https://img.shields.io/badge/AI-Google%20Gemini%20API-4285F4.svg" alt="Google Gemini" /></a>
+    <a href="tests/"><img src="https://img.shields.io/badge/Unit%20Tests-39%2F39%20Pass-emerald.svg" alt="Tests" /></a>
+  </p>
+</div>
 
 ---
 
@@ -111,6 +115,7 @@ Eco Traveler/
 │   └── IMAGE-CREDITS.md              # Log atribusi 28 foto asli & lisensi Creative Commons
 ├── public/
 │   └── img/
+│       ├── eco-traveler.svg          # Vektor logo resmi Eco Traveler (master identity)
 │       └── villages/                 # Direktori 28 berkas foto asli desa wisata (.jpg)
 ├── src/
 │   ├── app/
